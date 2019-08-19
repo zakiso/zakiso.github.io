@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/40/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/26/android/api_guide/app_component/activity/2014-06-26-IntentFlag/" itemprop="url">Android 之Activity启动模式(二)之 Intent的Flag属性</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-26T02:12:00.000Z" itemprop="datePublished">6月 26 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            18 分钟 read (About 2728 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>前面介绍了通过launchMode设置Activity的启动模式。本章接着介绍Activity的启动模式相关内容，讲解的内容是Intent与启动模式相关的Flag，以及android:taskAffinity的属性。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">Intent与启动模式相关的Flag简介</a><br><strong>2</strong>. <a href="#anchor2">1. FLAG_ACTIVITY_NEW_TASK标签测试</a><br><strong>3</strong>. <a href="#anchor3">2. FLAG_ACTIVITY_CLEAR_TOP标签测试</a><br><strong>4</strong>. <a href="#anchor4">3. FLAG_ACTIVITY_CLEAR_TASK标签测试</a><br><strong>5</strong>. <a href="#anchor5">4. FLAG_ACTIVITY_SINGLE_TOP标签测试</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="Intent与启动模式相关的Flag简介"><a href="#Intent与启动模式相关的Flag简介" class="headerlink" title="Intent与启动模式相关的Flag简介"></a>Intent与启动模式相关的Flag简介</h1><p>这里仅仅对几个常用的与启动模式相关的Flag进行介绍。</p>
+<ol>
+<li><strong>FLAG_ACTIVITY_NEW_TASK</strong><br>在google的官方文档中介绍，它与launchMode=”singleTask”具有相同的行为。实际上，并不是完全相同！<br>很少单独使用FLAG_ACTIVITY_NEW_TASK，通常与FLAG_ACTIVITY_CLEAR_TASK或FLAG_ACTIVITY_CLEAR_TOP联合使用。因为单独使用该属性会导致奇怪的现象，通常达不到我们想要的效果！尽管如何，后面还是会通过”FLAG_ACTIVITY_NEW_TASK示例一”和”FLAG_ACTIVITY_NEW_TASK示例二”会向你展示单独使用它的效果。</li>
+</ol>
+<ol start="2">
+<li><p><strong>FLAG_ACTIVITY_SINGLE_TOP</strong><br>在google的官方文档中介绍，它与launchMode=”singleTop”具有相同的行为。实际上，的确如此！单独的使用FLAG_ACTIVITY_SINGLE_TOP，就能达到和launchMode=”singleTop”一样的效果。</p>
+</li>
+<li><p><strong>FLAG_ACTIVITY_CLEAR_TOP</strong><br>顾名思义，FLAG_ACTIVITY_CLEAR_TOP的作用清除”包含Activity的task”中位于该Activity实例之上的其他Activity实例。FLAG_ACTIVITY_CLEAR_TOP和FLAG_ACTIVITY_NEW_TASK两者同时使用，就能达到和launchMode=”singleTask”一样的效果！</p>
+</li>
+<li><p><strong>FLAG_ACTIVITY_CLEAR_TASK</strong><br>FLAG_ACTIVITY_CLEAR_TASK的作用包含Activity的task。使用FLAG_ACTIVITY_CLEAR_TASK时，通常会包含FLAG_ACTIVITY_NEW_TASK。这样做的目的是启动Activity时，清除之前已经存在的Activity实例所在的task；这自然也就清除了之前存在的Activity实例！</p>
+</li>
+</ol>
+<p>注意：<strong>当同时使用launchMode和上面的FLAG_ACTIVITY_NEW_TASK等标签时，以FLAG_ACTIVITY_NEW_TASK为标准。也就是说，代码的优先级比manifest中配置文件的优先级更高</strong>！ </p>
+<p>下面，通过几个实例加深对这几个标记的理解。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="1-FLAG-ACTIVITY-NEW-TASK标签测试"><a href="#1-FLAG-ACTIVITY-NEW-TASK标签测试" class="headerlink" title="1. FLAG_ACTIVITY_NEW_TASK标签测试"></a>1. FLAG_ACTIVITY_NEW_TASK标签测试</h1><h2 id="1-1-FLAG-ACTIVITY-NEW-TASK示例一"><a href="#1-1-FLAG-ACTIVITY-NEW-TASK示例一" class="headerlink" title="1.1 FLAG_ACTIVITY_NEW_TASK示例一"></a>1.1 FLAG_ACTIVITY_NEW_TASK示例一</h2><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/activity/intent_lauchmode/02_new_task/01_same_taskAffinity" target="_blank" rel="noopener">FLAG_ACTIVITY_NEW_TASK示例一的源码</a></p>
+<p>在该实例中，有两个Activity：ActivityTest和SecondActivity。manifest定义如下：</p>
+<pre><code>&lt;application android:label=&quot;@string/app_name&quot; android:icon=&quot;@drawable/ic_launcher&quot;&gt;
+    &lt;activity android:name=&quot;ActivityTest&quot;
+              android:label=&quot;@string/app_name&quot;&gt;
+        &lt;intent-filter&gt;
+            &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;
+            &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;
+        &lt;/intent-filter&gt;
+    &lt;/activity&gt;
+
+    &lt;activity android:name=&quot;SecondActivity&quot; /&gt;
+&lt;/application&gt;</code></pre><p>说明：通过manifest可以看出，ActivityTest和SecondActivity在同一个APK中。这也就意味着它们的android:taskAffinity是一样的！</p>
+<p><strong>ActivityTest的源码</strong></p>
+<pre><code>public class ActivityTest extends Activity {
+    private static final String TAG=&quot;##ActivityTest##&quot;;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        Log.d(TAG, &quot;onCreate: &quot;+this.toString()+&quot;, taskId=&quot;+this.getTaskId());
+        TextView tv = (TextView) findViewById(R.id.tv);
+        tv.setText(this.toString()+&quot;, taskId=&quot;+this.getTaskId());
+    }   
+
+    public void onJump(View view) {
+        Intent intent = new Intent(this, SecondActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }   
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.d(TAG, &quot;onNewIntent: intent=&quot;+intent+&quot;, activity=&quot;+this+&quot;, taskId=&quot;+this.getTaskId());
+    }   
+}</code></pre><p>说明：onJump()是ActivityTest中一个按钮的回调函数，点击该按钮会跳转到SecondActivity。<strong>注意，跳转的Intent添加了FLAG_ACTIVITY_NEW_TASK标志</strong>。</p>
+<p><strong>SecondActivity的源码</strong></p>
+<pre><code>public class SecondActivity extends Activity {
+
+    private static final String TAG=&quot;##SecondActivity##&quot;;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.second);
+
+        Log.d(TAG, &quot;onCreate: &quot;+this.toString()+&quot;, taskId=&quot;+this.getTaskId());
+        TextView tv = (TextView) findViewById(R.id.tv2);
+        tv.setText(this.toString()+&quot;, taskId=&quot;+this.getTaskId());
+    }   
+
+    public void onBack(View view) {
+        Intent intent = new Intent(this, ActivityTest.class);
+        startActivity(intent);
+    }   
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.d(TAG, &quot;onNewIntent: intent=&quot;+intent+&quot;, activity=&quot;+this+&quot;, taskId=&quot;+this.getTaskId());
+    }   
+}</code></pre><p>说明：onBack()是SecondActivity中一个按钮的回调函数，点击该按钮会跳转回ActivityTest。</p>
+<p><strong>测试内容</strong>：ActivityTest –&gt; SecondActivity –&gt; ActivityTest –&gt; SecondActivity<br><strong>测试结果</strong>：(01) ActivityTest和SecondActivity在同一个task中。 (02) 两个SecondActivity不同的实例！<br><strong>结果分析</strong>：如果说FLAG_ACTIVITY_NEW_TASK的作用和singleTask具有相同的效果。那么这个示例很明显的否则了这个结论！事实上，在相互跳转的两个Activity的android:taskAffinity相同的情况下，单独使用FLAG_ACTIVITY_NEW_TASK不会产生任何效果！</p>
+<p>那如果两个Activity的android:taskAffinity不相同呢？此时会导致什么效果呢？下面，我们通过示例来看看效果。</p>
+<h2 id="1-2-FLAG-ACTIVITY-NEW-TASK示例二"><a href="#1-2-FLAG-ACTIVITY-NEW-TASK示例二" class="headerlink" title="1.2 FLAG_ACTIVITY_NEW_TASK示例二"></a>1.2 FLAG_ACTIVITY_NEW_TASK示例二</h2><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/activity/intent_lauchmode/02_new_task/02_diff_taskAffinity" target="_blank" rel="noopener">FLAG_ACTIVITY_NEW_TASK示例二的源码</a></p>
+<p>我们修改”FLAG_ACTIVITY_NEW_TASK示例一”中manifest，将ActivityTest和SecondActivity的android:taskAffinity改为不同；其余的保持不变！修改后的manifest如下：</p>
+<pre><code>&lt;application android:label=&quot;@string/app_name&quot; android:icon=&quot;@drawable/ic_launcher&quot;&gt;
+    &lt;activity android:name=&quot;ActivityTest&quot;
+              android:taskAffinity=&quot;com.skw.activitytest01&quot;
+              android:label=&quot;@string/app_name&quot;&gt;
+        &lt;intent-filter&gt;
+            &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;
+            &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;
+        &lt;/intent-filter&gt;
+    &lt;/activity&gt;
+
+    &lt;activity android:name=&quot;SecondActivity&quot;
+              android:taskAffinity=&quot;com.skw.activitytest02&quot;
+        /&gt;
+&lt;/application&gt;</code></pre><p><strong>测试内容</strong>：ActivityTest –&gt; SecondActivity –&gt; ActivityTest –&gt; SecondActivity<br><strong>测试结果</strong>：(01) ActivityTest和SecondActivity在不同task中！ (02) 当第二次进入到ActivityTest中，再企图从ActivityTest中进入到SecondActivity时，没有产生任何效果，仍然停留在ActivityTest中！即第二次ActivityTest –&gt; SecondActivity压根就没发生！<br><strong>结果分析</strong>：当相互跳转的两个Activity的android:taskAffinity不同时，添加FLAG_ACTIVITY_NEW_TASK确实产生了一些效果：第一次启动Activity时，会新建一个task，并将Activity添加到该task中。这与singleTask产生的效果是一样的！但是，当企图再次从ActivityTest进入到SecondActivity时，却什么也没有发生！<br>为什么呢？是因为此时SecondActivity实例已经存在，但是它所在的task的栈顶是ActivityTest；而单独的添加FLAG_ACTIVITY_NEW_TASK又不会”删除task中位于SecondActivity之上的Activity实例”，所以就没有发生跳转！  </p>
+<p>好的，那下面，我们添加FLAG_ACTIVITY_CLEAR_TOP之后，再来看看效果。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="2-FLAG-ACTIVITY-CLEAR-TOP标签测试"><a href="#2-FLAG-ACTIVITY-CLEAR-TOP标签测试" class="headerlink" title="2. FLAG_ACTIVITY_CLEAR_TOP标签测试"></a>2. FLAG_ACTIVITY_CLEAR_TOP标签测试</h1><h2 id="2-1-FLAG-ACTIVITY-CLEAR-TOP示例一"><a href="#2-1-FLAG-ACTIVITY-CLEAR-TOP示例一" class="headerlink" title="2.1 FLAG_ACTIVITY_CLEAR_TOP示例一"></a>2.1 FLAG_ACTIVITY_CLEAR_TOP示例一</h2><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/activity/intent_lauchmode/03_clear_top/01_same_taskAffinity" target="_blank" rel="noopener">FLAG_ACTIVITY_CLEAR_TOP示例一的源码</a>。</p>
+<p>我们修改”FLAG_ACTIVITY_NEW_TASK示例一”中onJump()函数，修改后的代码如下：</p>
+<pre><code>public void onJump(View view) {
+    Intent intent = new Intent(this, SecondActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+            | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    startActivity(intent);
+}   </code></pre><p><strong>测试内容</strong>：ActivityTest –&gt; SecondActivity –&gt; ActivityTest –&gt; SecondActivity<br><strong>测试结果</strong>：(01) ActivityTest和SecondActivity在同一个task中！ (02) 两个SecondActivity是不同的实例。<br><strong>结果分析</strong>：这与没有添加FLAG_ACTIVITY_CLEAR_TOP时效果一样！这说明，当相互跳转的两个Activity的android:taskAffinity一样时，不会产生任何效果！  </p>
+<p>接下来，看看不同android:taskAffinity的情况。</p>
+<h2 id="2-2-FLAG-ACTIVITY-CLEAR-TOP示例二"><a href="#2-2-FLAG-ACTIVITY-CLEAR-TOP示例二" class="headerlink" title="2.2 FLAG_ACTIVITY_CLEAR_TOP示例二"></a>2.2 FLAG_ACTIVITY_CLEAR_TOP示例二</h2><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/activity/intent_lauchmode/03_clear_top/02_diff_taskAffinity" target="_blank" rel="noopener">FLAG_ACTIVITY_CLEAR_TOP示例二的源码</a>。</p>
+<p>我们修改”FLAG_ACTIVITY_NEW_TASK示例一”中onJump()函数，修改后的代码如下：</p>
+<pre><code>public void onJump(View view) {
+    Intent intent = new Intent(this, SecondActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+            | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    startActivity(intent);
+}   </code></pre><p><strong>测试内容</strong>：ActivityTest –&gt; SecondActivity –&gt; ActivityTest –&gt; SecondActivity<br><strong>测试结果</strong>：(01) ActivityTest和SecondActivity在不同task中！ (02) 两个SecondActivity是同一个实例。<br><strong>结果分析</strong>：此时的表现和SecondActivity是singleTask一样！ 这说明，在相互跳转的Activity的android:taskAffinity不同时，同时使用FLAG_ACTIVITY_NEW_TASK和FLAG_ACTIVITY_CLEAR_TOP，才具有和singleTask一样的效果！</p>
+<p>总的来说：FLAG_ACTIVITY_NEW_TASK和FLAG_ACTIVITY_CLEAR_TOP的使用和android:taskAffinity相关。在同时使用FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_CLEAR_TOP的情况下，以A启动B来说<br>(01) 当A和B的taskAffinity相同时：添加FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_CLEAR_TOP没有任何作用。和没有添加时的效果一样！<br>(02) 当A和B的taskAffinity不同时：添加FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_CLEAR_TOP后，表现的和B是singleTask一样！</p>
+<p><a name="anchor4"></a></p>
+<h1 id="3-FLAG-ACTIVITY-CLEAR-TASK标签测试"><a href="#3-FLAG-ACTIVITY-CLEAR-TASK标签测试" class="headerlink" title="3. FLAG_ACTIVITY_CLEAR_TASK标签测试"></a>3. FLAG_ACTIVITY_CLEAR_TASK标签测试</h1><h2 id="3-1-FLAG-ACTIVITY-CLEAR-TASK示例一"><a href="#3-1-FLAG-ACTIVITY-CLEAR-TASK示例一" class="headerlink" title="3.1 FLAG_ACTIVITY_CLEAR_TASK示例一"></a>3.1 FLAG_ACTIVITY_CLEAR_TASK示例一</h2><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/activity/intent_lauchmode/04_clear_task/01_same_taskAffinity" target="_blank" rel="noopener">FLAG_ACTIVITY_CLEAR_TASK示例一的源码</a></p>
+<p>我们修改”FLAG_ACTIVITY_NEW_TASK示例一”中onJump()函数，修改后的代码如下：</p>
+<pre><code>public void onJump(View view) {
+    Intent intent = new Intent(this, SecondActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+            | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+    startActivity(intent);
+}   </code></pre><p><strong>测试内容</strong>：ActivityTest –&gt; SecondActivity –&gt; ActivityTest –&gt; SecondActivity<br><strong>测试结果</strong>：(01) ActivityTest和SecondActivity在同一个task中！ (02) 两个SecondActivity是不同的实例。<br><strong>结果分析</strong>：这与没有添加FLAG_ACTIVITY_CLEAR_TASK时效果一样！这说明，当相互跳转的两个Activity的android:taskAffinity一样时，不会产生任何效果！  </p>
+<p>接下来，看看不同android:taskAffinity的情况。</p>
+<h2 id="3-2-FLAG-ACTIVITY-CLEAR-TASK示例二"><a href="#3-2-FLAG-ACTIVITY-CLEAR-TASK示例二" class="headerlink" title="3.2 FLAG_ACTIVITY_CLEAR_TASK示例二"></a>3.2 FLAG_ACTIVITY_CLEAR_TASK示例二</h2><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/activity/intent_lauchmode/04_clear_task/02_diff_taskAffinity" target="_blank" rel="noopener">FLAG_ACTIVITY_CLEAR_TASK示例二的源码</a></p>
+<p>我们修改”FLAG_ACTIVITY_NEW_TASK示例一”中onJump()函数，修改后的代码如下：</p>
+<pre><code>public void onJump(View view) {
+    Intent intent = new Intent(this, SecondActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+            | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+    startActivity(intent);
+}   </code></pre><p><strong>测试内容</strong>：ActivityTest –&gt; SecondActivity –&gt; ActivityTest –&gt; SecondActivity –&gt; 返回键 –&gt; 返回键<br><strong>测试结果</strong>：(01) ActivityTest和SecondActivity在不同的task中！ (02) 两个SecondActivity是不同的实例。 (03) 第一次返回键，返回到第一个ActivityTest中。 (04) 第二次返回键，返回到进入第一个ActivityTest之前的画面。<br><strong>结果分析</strong>：当同时使用FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_CLEAR_TASK时，每次启动Activity时，若该Activity的实例已经存在于某个task中，则清除该task中的全部内容；然后重新创建task并将Activity添加到新建的task中；否则，直接启动新的task并将该Activity添加到新建的task中。</p>
+<p>总的来说：FLAG_ACTIVITY_NEW_TASK和FLAG_ACTIVITY_CLEAR_TASK的使用和android:taskAffinity相关。在同时使用FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_CLEAR_TASK的情况下，以A启动B来说<br>(01) 当A和B的taskAffinity相同时：添加FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_CLEAR_TASK没有任何作用。和没有添加时的效果一样！<br>(02) 当A和B的taskAffinity不同时：添加FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_CLEAR_TASK后，启动B时，若该B已经存在于某个task中，则清除该task中的全部内容；然后重新创建task并将B添加到新建的task中；否则，直接启动新的task并将B添加到新建的task中。</p>
+<p><a name="anchor5"></a></p>
+<h1 id="4-FLAG-ACTIVITY-SINGLE-TOP标签测试"><a href="#4-FLAG-ACTIVITY-SINGLE-TOP标签测试" class="headerlink" title="4. FLAG_ACTIVITY_SINGLE_TOP标签测试"></a>4. FLAG_ACTIVITY_SINGLE_TOP标签测试</h1><p>FLAG_ACTIVITY_SINGLE_TOP的特性和launchMode=”singleTop”一样！这里就不做过多的说明了。</p>
+<p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/activity/intent_lauchmode/01_single_top/01_single" target="_blank" rel="noopener">FLAG_ACTIVITY_SINGLE_TOP示例一的源码</a>。该示例中，只有一个Activity示例，点击该Activity会跳转到它自身。</p>
+<p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/activity/intent_lauchmode/01_single_top/02_same_taskAffinity" target="_blank" rel="noopener">FLAG_ACTIVITY_SINGLE_TOP示例二的源码</a>。该示例中，有两个Activity示例，两个Activity之间可以相互跳转。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/39/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/41/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/39/">39</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/40/">40</a></li>
+        
+        <li><a class="pagination-link" href="/page/41/">41</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

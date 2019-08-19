@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/89/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2012/02/06/java/collection/2012-02-06-collection-06-vector/" itemprop="url">Java 集合系列06之 Vector详细介绍(源码解析)和使用示例</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-02-06T01:01:00.000Z" itemprop="datePublished">2月 6 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            27 分钟 read (About 3984 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>学完ArrayList和LinkedList之后，我们接着学习Vector。学习方式还是和之前一样，先对Vector有个整体认识，然后再学习它的源码；最后再通过实例来学会使用它。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1部分 Vector介绍</a><br><a href="#anchor2">第2部分 Vector数据结构</a><br><a href="#anchor3">第3部分 Vector源码解析(基于JDK1.6.0_45)</a><br><a href="#anchor4">第4部分 Vector遍历方式</a><br><a href="#anchor5">第5部分 Vector示例</a> </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第1部分-Vector介绍"><a href="#第1部分-Vector介绍" class="headerlink" title="第1部分 Vector介绍"></a>第1部分 Vector介绍</h1><h2 id="Vector简介"><a href="#Vector简介" class="headerlink" title="Vector简介"></a>Vector简介</h2><p>Vector 是矢量队列，它是JDK1.0版本添加的类。继承于AbstractList，实现了List, RandomAccess, Cloneable这些接口。<br>Vector 继承了AbstractList，实现了List；所以，它是一个队列，支持相关的添加、删除、修改、遍历等功能。<br>Vector 实现了RandmoAccess接口，即提供了随机访问功能。RandmoAccess是java中用来被List实现，为List提供快速访问功能的。在Vector中，我们即可以通过元素的序号快速获取元素对象；这就是快速随机访问。<br>Vector 实现了Cloneable接口，即实现clone()函数。它能被克隆。</p>
+<p>和ArrayList不同，Vector中的操作是线程安全的。</p>
+<h2 id="Vector的构造函数"><a href="#Vector的构造函数" class="headerlink" title="Vector的构造函数"></a>Vector的构造函数</h2><pre><code>Vector共有4个构造函数
+// 默认构造函数
+Vector()
+
+// capacity是Vector的默认容量大小。当由于增加数据导致容量增加时，每次容量会增加一倍。
+Vector(int capacity)
+
+// capacity是Vector的默认容量大小，capacityIncrement是每次Vector容量增加时的增量值。
+Vector(int capacity, int capacityIncrement)
+
+// 创建一个包含collection的Vector
+Vector(Collection&lt;? extends E&gt; collection)</code></pre><h2 id="Vector的API"><a href="#Vector的API" class="headerlink" title="Vector的API"></a>Vector的API</h2><pre><code>synchronized boolean        add(E object)
+             void           add(int location, E object)
+synchronized boolean        addAll(Collection&lt;? extends E&gt; collection)
+synchronized boolean        addAll(int location, Collection&lt;? extends E&gt; collection)
+synchronized void           addElement(E object)
+synchronized int            capacity()
+             void           clear()
+synchronized Object         clone()
+             boolean        contains(Object object)
+synchronized boolean        containsAll(Collection&lt;?&gt; collection)
+synchronized void           copyInto(Object[] elements)
+synchronized E              elementAt(int location)
+             Enumeration&lt;E&gt; elements()
+synchronized void           ensureCapacity(int minimumCapacity)
+synchronized boolean        equals(Object object)
+synchronized E              firstElement()
+             E              get(int location)
+synchronized int            hashCode()
+synchronized int            indexOf(Object object, int location)
+             int            indexOf(Object object)
+synchronized void           insertElementAt(E object, int location)
+synchronized boolean        isEmpty()
+synchronized E              lastElement()
+synchronized int            lastIndexOf(Object object, int location)
+synchronized int            lastIndexOf(Object object)
+synchronized E              remove(int location)
+             boolean        remove(Object object)
+synchronized boolean        removeAll(Collection&lt;?&gt; collection)
+synchronized void           removeAllElements()
+synchronized boolean        removeElement(Object object)
+synchronized void           removeElementAt(int location)
+synchronized boolean        retainAll(Collection&lt;?&gt; collection)
+synchronized E              set(int location, E object)
+synchronized void           setElementAt(E object, int location)
+synchronized void           setSize(int length)
+synchronized int            size()
+synchronized List&lt;E&gt;        subList(int start, int end)
+synchronized &lt;T&gt; T[]        toArray(T[] contents)
+synchronized Object[]       toArray()
+synchronized String         toString()
+synchronized void           trimToSize()</code></pre><p><a name="anchor2"></a></p>
+<h1 id="第2部分-Vector数据结构"><a href="#第2部分-Vector数据结构" class="headerlink" title="第2部分 Vector数据结构"></a>第2部分 Vector数据结构</h1><p>Vector的继承关系</p>
+<pre><code>java.lang.Object
+   ↳     java.util.AbstractCollection&lt;E&gt;
+         ↳     java.util.AbstractList&lt;E&gt;
+               ↳     java.util.Vector&lt;E&gt;</code></pre><p>Vector的声明</p>
+<pre><code>public class Vector&lt;E&gt;
+    extends AbstractList&lt;E&gt;
+    implements List&lt;E&gt;, RandomAccess, Cloneable, java.io.Serializable {}</code></pre><p>Vector与Collection关系如下图：</p>
+<p><img src="/media/pic/java/collection/collection06.jpg" alt="img"></p>
+<p>Vector的数据结构和ArrayList差不多，它包含了3个成员变量：<strong>elementData</strong> , <strong>elementCount</strong>， <strong>capacityIncrement</strong>。</p>
+<p>(01) elementData 是”Object[]类型的数组”，它保存了添加到Vector中的元素。elementData是个动态数组，如果初始化Vector时，没指定动态数组的&gt;大小，则使用默认大小10。随着Vector中元素的增加，Vector的容量也会动态增长，capacityIncrement是与容量增长相关的增长系数，具体的增长方式，请参考源码分析中的ensureCapacity()函数。</p>
+<p>(02) elementCount 是动态数组的实际大小。</p>
+<p>(03) capacityIncrement 是动态数组的增长系数。如果在创建Vector时，指定了capacityIncrement的大小；则，每次当Vector中动态数组容量增加时&gt;，增加的大小都是capacityIncrement。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="第3部分-Vector源码解析-基于JDK1-6-0-45"><a href="#第3部分-Vector源码解析-基于JDK1-6-0-45" class="headerlink" title="第3部分 Vector源码解析(基于JDK1.6.0_45)"></a>第3部分 Vector源码解析(基于JDK1.6.0_45)</h1><p>为了更了解Vector的原理，下面对Vector源码代码作出分析。 </p>
+<pre><code>package java.util;
+
+public class Vector&lt;E&gt;
+    extends AbstractList&lt;E&gt;
+    implements List&lt;E&gt;, RandomAccess, Cloneable, java.io.Serializable
+{
+
+    // 保存Vector中数据的数组
+    protected Object[] elementData;
+
+    // 实际数据的数量
+    protected int elementCount;
+
+    // 容量增长系数
+    protected int capacityIncrement;
+
+    // Vector的序列版本号
+    private static final long serialVersionUID = -2767605614048989439L;
+
+    // Vector构造函数。默认容量是10。
+    public Vector() {
+        this(10);
+    }
+
+    // 指定Vector容量大小的构造函数
+    public Vector(int initialCapacity) {
+        this(initialCapacity, 0);
+    }
+
+    // 指定Vector&quot;容量大小&quot;和&quot;增长系数&quot;的构造函数
+    public Vector(int initialCapacity, int capacityIncrement) {
+        super();
+        if (initialCapacity &lt; 0)
+            throw new IllegalArgumentException(&quot;Illegal Capacity: &quot;+
+                                               initialCapacity);
+        // 新建一个数组，数组容量是initialCapacity
+        this.elementData = new Object[initialCapacity];
+        // 设置容量增长系数
+        this.capacityIncrement = capacityIncrement;
+    }
+
+    // 指定集合的Vector构造函数。
+    public Vector(Collection&lt;? extends E&gt; c) {
+        // 获取“集合(c)”的数组，并将其赋值给elementData
+        elementData = c.toArray();
+        // 设置数组长度
+        elementCount = elementData.length;
+        // c.toArray might (incorrectly) not return Object[] (see 6260652)
+        if (elementData.getClass() != Object[].class)
+            elementData = Arrays.copyOf(elementData, elementCount, Object[].class);
+    }
+
+    // 将数组Vector的全部元素都拷贝到数组anArray中
+    public synchronized void copyInto(Object[] anArray) {
+        System.arraycopy(elementData, 0, anArray, 0, elementCount);
+    }
+
+    // 将当前容量值设为 =实际元素个数
+    public synchronized void trimToSize() {
+        modCount++;
+        int oldCapacity = elementData.length;
+        if (elementCount &lt; oldCapacity) {
+            elementData = Arrays.copyOf(elementData, elementCount);
+        }
+    }
+
+    // 确认“Vector容量”的帮助函数
+    private void ensureCapacityHelper(int minCapacity) {
+        int oldCapacity = elementData.length;
+        // 当Vector的容量不足以容纳当前的全部元素，增加容量大小。
+        // 若 容量增量系数&gt;0(即capacityIncrement&gt;0)，则将容量增大当capacityIncrement
+        // 否则，将容量增大一倍。
+        if (minCapacity &gt; oldCapacity) {
+            Object[] oldData = elementData;
+            int newCapacity = (capacityIncrement &gt; 0) ?
+                (oldCapacity + capacityIncrement) : (oldCapacity * 2);
+            if (newCapacity &lt; minCapacity) {
+                newCapacity = minCapacity;
+            }
+            elementData = Arrays.copyOf(elementData, newCapacity);
+        }
+    }
+
+    // 确定Vector的容量。
+    public synchronized void ensureCapacity(int minCapacity) {
+        // 将Vector的改变统计数+1
+        modCount++;
+        ensureCapacityHelper(minCapacity);
+    }
+
+    // 设置容量值为 newSize
+    public synchronized void setSize(int newSize) {
+        modCount++;
+        if (newSize &gt; elementCount) {
+            // 若 &quot;newSize 大于 Vector容量&quot;，则调整Vector的大小。
+            ensureCapacityHelper(newSize);
+        } else {
+            // 若 &quot;newSize 小于/等于 Vector容量&quot;，则将newSize位置开始的元素都设置为null
+            for (int i = newSize ; i &lt; elementCount ; i++) {
+                elementData[i] = null;
+            }
+        }
+        elementCount = newSize;
+    }
+
+    // 返回“Vector的总的容量”
+    public synchronized int capacity() {
+        return elementData.length;
+    }
+
+    // 返回“Vector的实际大小”，即Vector中元素个数
+    public synchronized int size() {
+        return elementCount;
+    }
+
+    // 判断Vector是否为空
+    public synchronized boolean isEmpty() {
+        return elementCount == 0;
+    }
+
+    // 返回“Vector中全部元素对应的Enumeration”
+    public Enumeration&lt;E&gt; elements() {
+        // 通过匿名类实现Enumeration
+        return new Enumeration&lt;E&gt;() {
+            int count = 0;
+
+            // 是否存在下一个元素
+            public boolean hasMoreElements() {
+                return count &lt; elementCount;
+            }
+
+            // 获取下一个元素
+            public E nextElement() {
+                synchronized (Vector.this) {
+                    if (count &lt; elementCount) {
+                        return (E)elementData[count++];
+                    }
+                }
+                throw new NoSuchElementException(&quot;Vector Enumeration&quot;);
+            }
+        };
+    }
+
+    // 返回Vector中是否包含对象(o)
+    public boolean contains(Object o) {
+        return indexOf(o, 0) &gt;= 0;
+    }
+
+
+    // 从index位置开始向后查找元素(o)。
+    // 若找到，则返回元素的索引值；否则，返回-1
+    public synchronized int indexOf(Object o, int index) {
+        if (o == null) {
+            // 若查找元素为null，则正向找出null元素，并返回它对应的序号
+            for (int i = index ; i &lt; elementCount ; i++)
+            if (elementData[i]==null)
+                return i;
+        } else {
+            // 若查找元素不为null，则正向找出该元素，并返回它对应的序号
+            for (int i = index ; i &lt; elementCount ; i++)
+            if (o.equals(elementData[i]))
+                return i;
+        }
+        return -1;
+    }
+
+    // 查找并返回元素(o)在Vector中的索引值
+    public int indexOf(Object o) {
+        return indexOf(o, 0);
+    }
+
+    // 从后向前查找元素(o)。并返回元素的索引
+    public synchronized int lastIndexOf(Object o) {
+        return lastIndexOf(o, elementCount-1);
+    }
+
+    // 从后向前查找元素(o)。开始位置是从前向后的第index个数；
+    // 若找到，则返回元素的“索引值”；否则，返回-1。
+    public synchronized int lastIndexOf(Object o, int index) {
+        if (index &gt;= elementCount)
+            throw new IndexOutOfBoundsException(index + &quot; &gt;= &quot;+ elementCount);
+
+        if (o == null) {
+            // 若查找元素为null，则反向找出null元素，并返回它对应的序号
+            for (int i = index; i &gt;= 0; i--)
+            if (elementData[i]==null)
+                return i;
+        } else {
+            // 若查找元素不为null，则反向找出该元素，并返回它对应的序号
+            for (int i = index; i &gt;= 0; i--)
+            if (o.equals(elementData[i]))
+                return i;
+        }
+        return -1;
+    }
+
+    // 返回Vector中index位置的元素。
+    // 若index月结，则抛出异常
+    public synchronized E elementAt(int index) {
+        if (index &gt;= elementCount) {
+            throw new ArrayIndexOutOfBoundsException(index + &quot; &gt;= &quot; + elementCount);
+        }
+
+        return (E)elementData[index];
+    }
+
+    // 获取Vector中的第一个元素。
+    // 若失败，则抛出异常！
+    public synchronized E firstElement() {
+        if (elementCount == 0) {
+            throw new NoSuchElementException();
+        }
+        return (E)elementData[0];
+    }
+
+    // 获取Vector中的最后一个元素。
+    // 若失败，则抛出异常！
+    public synchronized E lastElement() {
+        if (elementCount == 0) {
+            throw new NoSuchElementException();
+        }
+        return (E)elementData[elementCount - 1];
+    }
+
+    // 设置index位置的元素值为obj
+    public synchronized void setElementAt(E obj, int index) {
+        if (index &gt;= elementCount) {
+            throw new ArrayIndexOutOfBoundsException(index + &quot; &gt;= &quot; +
+                                 elementCount);
+        }
+        elementData[index] = obj;
+    }
+
+    // 删除index位置的元素
+    public synchronized void removeElementAt(int index) {
+        modCount++;
+        if (index &gt;= elementCount) {
+            throw new ArrayIndexOutOfBoundsException(index + &quot; &gt;= &quot; +
+                                 elementCount);
+        } else if (index &lt; 0) {
+            throw new ArrayIndexOutOfBoundsException(index);
+        }
+
+        int j = elementCount - index - 1;
+        if (j &gt; 0) {
+            System.arraycopy(elementData, index + 1, elementData, index, j);
+        }
+        elementCount--;
+        elementData[elementCount] = null; /* to let gc do its work */
+    }
+
+    // 在index位置处插入元素(obj)
+    public synchronized void insertElementAt(E obj, int index) {
+        modCount++;
+        if (index &gt; elementCount) {
+            throw new ArrayIndexOutOfBoundsException(index
+                                 + &quot; &gt; &quot; + elementCount);
+        }
+        ensureCapacityHelper(elementCount + 1);
+        System.arraycopy(elementData, index, elementData, index + 1, elementCount - index);
+        elementData[index] = obj;
+        elementCount++;
+    }
+
+    // 将“元素obj”添加到Vector末尾
+    public synchronized void addElement(E obj) {
+        modCount++;
+        ensureCapacityHelper(elementCount + 1);
+        elementData[elementCount++] = obj;
+    }
+
+    // 在Vector中查找并删除元素obj。
+    // 成功的话，返回true；否则，返回false。
+    public synchronized boolean removeElement(Object obj) {
+        modCount++;
+        int i = indexOf(obj);
+        if (i &gt;= 0) {
+            removeElementAt(i);
+            return true;
+        }
+        return false;
+    }
+
+    // 删除Vector中的全部元素
+    public synchronized void removeAllElements() {
+        modCount++;
+        // 将Vector中的全部元素设为null
+        for (int i = 0; i &lt; elementCount; i++)
+            elementData[i] = null;
+
+        elementCount = 0;
+    }
+
+    // 克隆函数
+    public synchronized Object clone() {
+        try {
+            Vector&lt;E&gt; v = (Vector&lt;E&gt;) super.clone();
+            // 将当前Vector的全部元素拷贝到v中
+            v.elementData = Arrays.copyOf(elementData, elementCount);
+            v.modCount = 0;
+            return v;
+        } catch (CloneNotSupportedException e) {
+            // this shouldn&apos;t happen, since we are Cloneable
+            throw new InternalError();
+        }
+    }
+
+    // 返回Object数组
+    public synchronized Object[] toArray() {
+        return Arrays.copyOf(elementData, elementCount);
+    }
+
+    // 返回Vector的模板数组。所谓模板数组，即可以将T设为任意的数据类型
+    public synchronized &lt;T&gt; T[] toArray(T[] a) {
+        // 若数组a的大小 &lt; Vector的元素个数；
+        // 则新建一个T[]数组，数组大小是“Vector的元素个数”，并将“Vector”全部拷贝到新数组中
+        if (a.length &lt; elementCount)
+            return (T[]) Arrays.copyOf(elementData, elementCount, a.getClass());
+
+        // 若数组a的大小 &gt;= Vector的元素个数；
+        // 则将Vector的全部元素都拷贝到数组a中。
+    System.arraycopy(elementData, 0, a, 0, elementCount);
+
+        if (a.length &gt; elementCount)
+            a[elementCount] = null;
+
+        return a;
+    }
+
+    // 获取index位置的元素
+    public synchronized E get(int index) {
+        if (index &gt;= elementCount)
+            throw new ArrayIndexOutOfBoundsException(index);
+
+        return (E)elementData[index];
+    }
+
+    // 设置index位置的值为element。并返回index位置的原始值
+    public synchronized E set(int index, E element) {
+        if (index &gt;= elementCount)
+            throw new ArrayIndexOutOfBoundsException(index);
+
+        Object oldValue = elementData[index];
+        elementData[index] = element;
+        return (E)oldValue;
+    }
+
+    // 将“元素e”添加到Vector最后。
+    public synchronized boolean add(E e) {
+        modCount++;
+        ensureCapacityHelper(elementCount + 1);
+        elementData[elementCount++] = e;
+        return true;
+    }
+
+    // 删除Vector中的元素o
+    public boolean remove(Object o) {
+        return removeElement(o);
+    }
+
+    // 在index位置添加元素element
+    public void add(int index, E element) {
+        insertElementAt(element, index);
+    }
+
+    // 删除index位置的元素，并返回index位置的原始值
+    public synchronized E remove(int index) {
+        modCount++;
+        if (index &gt;= elementCount)
+            throw new ArrayIndexOutOfBoundsException(index);
+        Object oldValue = elementData[index];
+
+        int numMoved = elementCount - index - 1;
+        if (numMoved &gt; 0)
+            System.arraycopy(elementData, index+1, elementData, index,
+                     numMoved);
+        elementData[--elementCount] = null; // Let gc do its work
+
+        return (E)oldValue;
+    }
+
+    // 清空Vector
+    public void clear() {
+        removeAllElements();
+    }
+
+    // 返回Vector是否包含集合c
+    public synchronized boolean containsAll(Collection&lt;?&gt; c) {
+        return super.containsAll(c);
+    }
+
+    // 将集合c添加到Vector中
+    public synchronized boolean addAll(Collection&lt;? extends E&gt; c) {
+        modCount++;
+        Object[] a = c.toArray();
+        int numNew = a.length;
+        ensureCapacityHelper(elementCount + numNew);
+        // 将集合c的全部元素拷贝到数组elementData中
+        System.arraycopy(a, 0, elementData, elementCount, numNew);
+        elementCount += numNew;
+        return numNew != 0;
+    }
+
+    // 删除集合c的全部元素
+    public synchronized boolean removeAll(Collection&lt;?&gt; c) {
+        return super.removeAll(c);
+    }
+
+    // 删除“非集合c中的元素”
+    public synchronized boolean retainAll(Collection&lt;?&gt; c)  {
+        return super.retainAll(c);
+    }
+
+    // 从index位置开始，将集合c添加到Vector中
+    public synchronized boolean addAll(int index, Collection&lt;? extends E&gt; c) {
+        modCount++;
+        if (index &lt; 0 || index &gt; elementCount)
+            throw new ArrayIndexOutOfBoundsException(index);
+
+        Object[] a = c.toArray();
+        int numNew = a.length;
+        ensureCapacityHelper(elementCount + numNew);
+
+        int numMoved = elementCount - index;
+        if (numMoved &gt; 0)
+        System.arraycopy(elementData, index, elementData, index + numNew, numMoved);
+
+        System.arraycopy(a, 0, elementData, index, numNew);
+        elementCount += numNew;
+        return numNew != 0;
+    }
+
+    // 返回两个对象是否相等
+    public synchronized boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    // 计算哈希值
+    public synchronized int hashCode() {
+        return super.hashCode();
+    }
+
+    // 调用父类的toString()
+    public synchronized String toString() {
+        return super.toString();
+    }
+
+    // 获取Vector中fromIndex(包括)到toIndex(不包括)的子集
+    public synchronized List&lt;E&gt; subList(int fromIndex, int toIndex) {
+        return Collections.synchronizedList(super.subList(fromIndex, toIndex), this);
+    }
+
+    // 删除Vector中fromIndex到toIndex的元素
+    protected synchronized void removeRange(int fromIndex, int toIndex) {
+        modCount++;
+        int numMoved = elementCount - toIndex;
+        System.arraycopy(elementData, toIndex, elementData, fromIndex,
+                         numMoved);
+
+        // Let gc do its work
+        int newElementCount = elementCount - (toIndex-fromIndex);
+        while (elementCount != newElementCount)
+            elementData[--elementCount] = null;
+    }
+
+    // java.io.Serializable的写入函数
+    private synchronized void writeObject(java.io.ObjectOutputStream s)
+        throws java.io.IOException {
+        s.defaultWriteObject();
+    }
+}</code></pre><p>总结：<br>(01) Vector实际上是通过一个数组去保存数据的。当我们构造Vecotr时；若使用默认构造函数，则Vector的默认容量大小是10。<br>(02) 当Vector容量不足以容纳全部元素时，Vector的容量会增加。若容量增加系数 &gt;0，则将容量的值增加“容量增加系数”；否则，将容量大小增加一倍。<br>(03) Vector的克隆函数，即是将全部元素克隆到一个数组中。</p>
+<p><a name="anchor4"></a></p>
+<h1 id="第4部分-Vector遍历方式"><a href="#第4部分-Vector遍历方式" class="headerlink" title="第4部分 Vector遍历方式"></a>第4部分 Vector遍历方式</h1><p>Vector支持4种遍历方式。建议使用下面的第二种去遍历Vector，因为效率问题。</p>
+<p><strong>(01) 第一种，通过迭代器遍历。即通过Iterator去遍历。</strong></p>
+<pre><code>Integer value = null;
+int size = vec.size();
+for (int i=0; i&lt;size; i++) {
+    value = (Integer)vec.get(i);        
+}</code></pre><p><strong>(02) 第二种，随机访问，通过索引值去遍历。</strong></p>
+<p>由于Vector实现了RandomAccess接口，它支持通过索引值去随机访问元素。</p>
+<pre><code>Integer value = null;
+int size = vec.size();
+for (int i=0; i&lt;size; i++) {
+    value = (Integer)vec.get(i);        
+}</code></pre><p><strong>(03) 第三种，另一种for循环。</strong></p>
+<pre><code>Integer value = null;
+for (Integer integ:vec) {
+    value = integ;
+}</code></pre><p><strong>(04) 第四种，Enumeration遍历。</strong></p>
+<pre><code>Integer value = null;
+Enumeration enu = vec.elements();
+while (enu.hasMoreElements()) {
+    value = (Integer)enu.nextElement();
+}</code></pre><p>测试这些遍历方式效率的代码如下：</p>
+<pre><code>import java.util.*;
+
+/*
+ * @desc Vector遍历方式和效率的测试程序。
+ *
+ * @author skywang
+ */
+public class VectorRandomAccessTest {
+
+    public static void main(String[] args) {
+        Vector vec= new Vector();
+        for (int i=0; i&lt;100000; i++)
+            vec.add(i);
+        iteratorThroughRandomAccess(vec) ;
+        iteratorThroughIterator(vec) ;
+        iteratorThroughFor2(vec) ;
+        iteratorThroughEnumeration(vec) ;
+
+    }
+
+    private static void isRandomAccessSupported(List list) {
+        if (list instanceof RandomAccess) {
+            System.out.println(&quot;RandomAccess implemented!&quot;);
+        } else {
+            System.out.println(&quot;RandomAccess not implemented!&quot;);
+        }
+
+    }
+
+    public static void iteratorThroughRandomAccess(List list) {
+
+        long startTime;
+        long endTime;
+        startTime = System.currentTimeMillis();
+        for (int i=0; i&lt;list.size(); i++) {
+            list.get(i);
+        }
+        endTime = System.currentTimeMillis();
+        long interval = endTime - startTime;
+        System.out.println(&quot;iteratorThroughRandomAccess：&quot; + interval+&quot; ms&quot;);
+    }
+
+    public static void iteratorThroughIterator(List list) {
+
+        long startTime;
+        long endTime;
+        startTime = System.currentTimeMillis();
+        for(Iterator iter = list.iterator(); iter.hasNext(); ) {
+            iter.next();
+        }
+        endTime = System.currentTimeMillis();
+        long interval = endTime - startTime;
+        System.out.println(&quot;iteratorThroughIterator：&quot; + interval+&quot; ms&quot;);
+    }
+
+
+    public static void iteratorThroughFor2(List list) {
+
+        long startTime;
+        long endTime;
+        startTime = System.currentTimeMillis();
+        for(Object obj:list)
+            ;
+        endTime = System.currentTimeMillis();
+        long interval = endTime - startTime;
+        System.out.println(&quot;iteratorThroughFor2：&quot; + interval+&quot; ms&quot;);
+    }
+
+    public static void iteratorThroughEnumeration(Vector vec) {
+
+        long startTime;
+        long endTime;
+        startTime = System.currentTimeMillis();
+        for(Enumeration enu = vec.elements(); enu.hasMoreElements(); ) {
+            enu.nextElement();
+        }
+        endTime = System.currentTimeMillis();
+        long interval = endTime - startTime;
+        System.out.println(&quot;iteratorThroughEnumeration：&quot; + interval+&quot; ms&quot;);
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code>iteratorThroughRandomAccess：6 ms
+iteratorThroughIterator：9 ms
+iteratorThroughFor2：8 ms
+iteratorThroughEnumeration：7 ms</code></pre><p>总结：遍历Vector，使用索引的随机访问方式最快，使用迭代器最慢。</p>
+<p><a name="anchor5"></a></p>
+<h1 id="第5部分-Vector示例"><a href="#第5部分-Vector示例" class="headerlink" title="第5部分 Vector示例"></a>第5部分 Vector示例</h1><p>下面通过示例学习如何使用Vector</p>
+<pre><code>import java.util.Vector;
+import java.util.List;
+import java.util.Iterator;
+import java.util.Enumeration;
+
+/**
+ * @desc Vector测试函数：遍历Vector和常用API 
+ *
+ * @author skywang
+ */
+public class VectorTest {
+    public static void main(String[] args) {
+        // 新建Vector
+        Vector vec = new Vector();
+
+        // 添加元素
+        vec.add(&quot;1&quot;);
+        vec.add(&quot;2&quot;);
+        vec.add(&quot;3&quot;);
+        vec.add(&quot;4&quot;);
+        vec.add(&quot;5&quot;);
+
+        // 设置第一个元素为100
+        vec.set(0, &quot;100&quot;);
+        // 将“500”插入到第3个位置
+        vec.add(2, &quot;300&quot;);
+        System.out.println(&quot;vec:&quot;+vec);
+
+        // (顺序查找)获取100的索引
+        System.out.println(&quot;vec.indexOf(100):&quot;+vec.indexOf(&quot;100&quot;));
+        // (倒序查找)获取100的索引
+        System.out.println(&quot;vec.lastIndexOf(100):&quot;+vec.lastIndexOf(&quot;100&quot;));
+        // 获取第一个元素
+        System.out.println(&quot;vec.firstElement():&quot;+vec.firstElement());
+        // 获取第3个元素
+        System.out.println(&quot;vec.elementAt(2):&quot;+vec.elementAt(2));
+        // 获取最后一个元素
+        System.out.println(&quot;vec.lastElement():&quot;+vec.lastElement());
+
+        // 获取Vector的大小
+        System.out.println(&quot;size:&quot;+vec.size());
+        // 获取Vector的总的容量
+        System.out.println(&quot;capacity:&quot;+vec.capacity());
+
+        // 获取vector的“第2”到“第4”个元素
+        System.out.println(&quot;vec 2 to 4:&quot;+vec.subList(1, 4));
+
+        // 通过Enumeration遍历Vector
+        Enumeration enu = vec.elements();
+        while(enu.hasMoreElements())
+            System.out.println(&quot;nextElement():&quot;+enu.nextElement());
+
+        Vector retainVec = new Vector();
+        retainVec.add(&quot;100&quot;);
+        retainVec.add(&quot;300&quot;);
+        // 获取“vec”中包含在“retainVec中的元素”的集合
+        System.out.println(&quot;vec.retain():&quot;+vec.retainAll(retainVec));
+        System.out.println(&quot;vec:&quot;+vec);
+
+        // 获取vec对应的String数组
+        String[] arr = (String[]) vec.toArray(new String[0]);
+        for (String str:arr)
+            System.out.println(&quot;str:&quot;+str);
+
+        // 清空Vector。clear()和removeAllElements()一样！
+        vec.clear();
+//        vec.removeAllElements();
+
+        // 判断Vector是否为空
+        System.out.println(&quot;vec.isEmpty():&quot;+vec.isEmpty());
+    }   
+}</code></pre><p>运行结果：</p>
+<pre><code>vec:[100, 2, 300, 3, 4, 5]
+vec.indexOf(100):0
+vec.lastIndexOf(100):0
+vec.firstElement():100
+vec.elementAt(2):300
+vec.lastElement():5
+size:6
+capacity:10
+vec 2 to 4:[2, 300, 3]
+nextElement():100
+nextElement():2
+nextElement():300
+nextElement():3
+nextElement():4
+nextElement():5
+vec.retain():true
+vec:[100, 300]
+str:100
+str:300
+vec.isEmpty():true</code></pre><h1 id="更多内容"><a href="#更多内容" class="headerlink" title="更多内容"></a>更多内容</h1><p><a href="/2012/02/01/collection-00-index">00. Java 集合系列目录(Category)</a><br><a href="/2012/02/01/collection-01-summary">01. Java 集合系列01之 总体框架</a><br><a href="/2012/02/02/collection-02-framework">02. Java 集合系列02之 Collection架构</a><br><a href="/2012/02/03/collection-03-arraylist">03. Java 集合系列03之 ArrayList详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/04/collection-04-fail-fast">04. Java 集合系列04之 fail-fast总结(通过ArrayList来说明fail-fast的原理、解决办法)</a><br><a href="/2012/02/05/collection-05-linkedlist">05. Java 集合系列05之 LinkedList详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/06/collection-06-vector">06. Java 集合系列06之 Vector详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/07/collection-07-stack">07. Java 集合系列07之 Stack详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/08/collection-08-List">08. Java 集合系列08之 List总结(LinkedList, ArrayList等使用场景和性能分析)</a><br><a href="/2012/02/09/collection-09-map">09. Java 集合系列09之 Map架构</a><br><a href="/2012/02/10/collection-10-hashmap">10. Java 集合系列10之 HashMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/11/collection-11-hashtable">11. Java 集合系列11之 Hashtable详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/12/collection-12-treemap">12. Java 集合系列12之 TreeMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/13/collection-13-weakhashmap">13. Java 集合系列13之 WeakHashMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/14/collection-14-mapsummary">14. Java 集合系列14之 Map总结(HashMap, Hashtable, TreeMap, WeakHashMap等使用场景)</a><br><a href="/2012/02/15/collection-15-set">15. Java 集合系列15之 Set架构</a><br><a href="/2012/02/16/collection-16-hashset">16. Java 集合系列16之 HashSet详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/17/collection-17-treeset">17. Java 集合系列17之 TreeSet详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/18/collection-18-iterator_enumeration">18. Java 集合系列18之 Iterator和Enumeration比较</a></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/88/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/90/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/88/">88</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/89/">89</a></li>
+        
+        <li><a class="pagination-link" href="/page/90/">90</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

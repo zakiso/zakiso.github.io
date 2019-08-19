@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/19/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/09/06/android/os/binder/2014-09-06-BinderCommunication-ThreadPool/" itemprop="url">Android Binder机制(八) MediaPlayerService服务的消息循环</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-09-06T01:01:00.000Z" itemprop="datePublished">9月 6 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            11 分钟 read (About 1598 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>在前面的3篇文章中，我们以MediaPlayerService为例，介绍了C-S中的Server服务是如何通过addService请求添加到ServiceManager中的。但是，在<a href="/2014/09/05/BinderCommunication-AddService03/">Android Binder机制(七) addService详解03之 请求的反馈</a>的结尾，我们提到过：MediaPlayerService仅仅只是将自己注册到了ServiceManager中，它还没有进入消息循环等待Client的请求。<br>本文，就接着介绍MediaPlayerService是如何进入消息循环的。</p>
+</blockquote>
+<blockquote>
+<p>注意：本文是基于Android 4.4.2版本进行介绍的！</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-MediaPlayerService的main-函数"><a href="#1-MediaPlayerService的main-函数" class="headerlink" title="1. MediaPlayerService的main()函数"></a>1. MediaPlayerService的main()函数</h1><pre><code>int main(int argc, char** argv)
+{
+    ...
+
+    if (doLog &amp;&amp; (childPid = fork()) != 0) {
+        ...
+    } else {
+        ...
+        MediaPlayerService::instantiate();
+        ...
+        ProcessState::self()-&gt;startThreadPool();
+        IPCThreadState::self()-&gt;joinThreadPool();
+    }
+}</code></pre><p>说明：该代码在frameworks/av/media/mediaserver/main_mediaserver.cpp中。对于MediaPlayerService::instantiate()，已经详细介绍过了；它的作用是将MediaPlayerService已经注册到ServiceManager中。下面看看startThreadPool()的流程。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-ProcessState-startThreadPool"><a href="#2-ProcessState-startThreadPool" class="headerlink" title="2. ProcessState::startThreadPool();"></a>2. ProcessState::startThreadPool();</h1><pre><code>void ProcessState::startThreadPool()
+{
+    AutoMutex _l(mLock);
+    if (!mThreadPoolStarted) {
+        mThreadPoolStarted = true;
+        spawnPooledThread(true);
+    }
+}</code></pre><p>说明：该代码定义在frameworks/native/libs/binder/ProcessState.cpp中。<br>mThreadPoolStarted的初始值为false，因此这里设置mThreadPoolStarted=true之后，就调用spawnPooledThread()。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-ProcessState-spawnPooledThread"><a href="#2-ProcessState-spawnPooledThread" class="headerlink" title="2. ProcessState::spawnPooledThread()"></a>2. ProcessState::spawnPooledThread()</h1><pre><code>void ProcessState::spawnPooledThread(bool isMain)
+{
+    if (mThreadPoolStarted) {
+        String8 name = makeBinderThreadName();
+        ALOGV(&quot;Spawning new pooled thread, name=%s\n&quot;, name.string());
+        sp&lt;Thread&gt; t = new PoolThread(isMain);
+        t-&gt;run(name.string());
+    }
+}</code></pre><p>说明：该代码定义在frameworks/native/libs/binder/ProcessState.cpp中。 此时mThreadPoolStarted=true，因此会先调用makeBinderThreadName()为线程取一个名称；然后新建PoolThread线程，并运行。<br>makeBinderThreadName()的代码比较简单，这里就不列出了。线程的名称是”Binder_X”(其实X是16进制数)，每新建一个线程X的值都会+1。下面看看PoolThread。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-ProcessState-spawnPooledThread"><a href="#3-ProcessState-spawnPooledThread" class="headerlink" title="3. ProcessState::spawnPooledThread()"></a>3. ProcessState::spawnPooledThread()</h1><pre><code>class PoolThread : public Thread
+{
+public:
+    PoolThread(bool isMain)
+        : mIsMain(isMain)
+    {
+    }
+
+protected:
+    virtual bool threadLoop()
+    {
+        IPCThreadState::self()-&gt;joinThreadPool(mIsMain);
+        return false;
+    }
+
+    const bool mIsMain;
+};</code></pre><p>说明：该代码定义在frameworks/native/libs/binder/ProcessState.cpp中。PoolThread继承于Thread，在线程启动之后，会调用threadLoop()进入消息循环中。 </p>
+<p>下面简单说说，当PoolThread启动之后，是如何调用到threadLoop()的。PoolThread继承于Thread，先看看Thread的构造函数，然后再看看run()的代码。</p>
+<p><a name="anchor4"></a></p>
+<h1 id="4-Thread-Thread"><a href="#4-Thread-Thread" class="headerlink" title="4. Thread::Thread"></a>4. Thread::Thread</h1><pre><code>Thread::Thread(bool canCallJava)
+    :   mCanCallJava(canCallJava),
+        mThread(thread_id_t(-1)),
+        mLock(&quot;Thread::mLock&quot;),
+        mStatus(NO_ERROR),
+        mExitPending(false), mRunning(false)
+        , mTid(-1)
+{
+}   </code></pre><p>说明：该代码定义在system/core/libutils/Threads.cpp中。新建Thread对象时，会进行一些列初始化。这里设置mCanCallJava=true。</p>
+<p><a name="anchor5"></a></p>
+<h1 id="5-Thread-run"><a href="#5-Thread-run" class="headerlink" title="5. Thread::run"></a>5. Thread::run</h1><pre><code>status_t Thread::run(const char* name, int32_t priority, size_t stack)
+{   
+    Mutex::Autolock _l(mLock);
+
+    ...
+
+    // 初始化
+    mStatus = NO_ERROR;
+    mExitPending = false;
+    mThread = thread_id_t(-1);
+    mHoldSelf = this;
+    mRunning = true;            
+
+    bool res;
+    if (mCanCallJava) {
+        res = createThreadEtc(_threadLoop,
+                this, name, priority, stack, &amp;mThread);
+    } else {
+        ...
+    }
+
+    ...
+    return NO_ERROR;
+}</code></pre><p>说明：该代码定义在system/core/libutils/Threads.cpp中。<br>(01) 先看看函数参数。name是spawnPooledThread()中创建的Binder线程名称，形式是”Binder_X”。priority是优先级(默认值为PRIORITY_DEFAULT)，stack是线程栈数量(默认是0)；它们都是使用默认值，在system/core/include/utils/Thread.h中定义。<br>(02) 先进行初始化；mCanCallJava的值在构造函数中被初始化为true。因此，会调用createThreadEtc()。</p>
+<p><a name="anchor6"></a></p>
+<h1 id="6-createThreadEtc"><a href="#6-createThreadEtc" class="headerlink" title="6. createThreadEtc"></a>6. createThreadEtc</h1><pre><code>// Create thread with lots of parameters
+inline bool createThreadEtc(thread_func_t entryFunction,
+                            void *userData,
+                            const char* threadName = &quot;android:unnamed_thread&quot;,             
+                            int32_t threadPriority = PRIORITY_DEFAULT,                     
+                            size_t threadStackSize = 0,                                    
+                            thread_id_t *threadId = 0)
+{
+    return androidCreateThreadEtc(entryFunction, userData, threadName,
+        threadPriority, threadStackSize, threadId) ? true : false;
+}</code></pre><p>说明：该代码定义在system/core/include/utils/AndroidThreads.h中。它会调用androidCreateThreadEtc()。</p>
+<p><a name="anchor7"></a></p>
+<h1 id="7-androidCreateThreadEtc"><a href="#7-androidCreateThreadEtc" class="headerlink" title="7. androidCreateThreadEtc"></a>7. androidCreateThreadEtc</h1><pre><code>static android_create_thread_fn gCreateThreadFn = androidCreateRawThreadEtc;
+
+int androidCreateThreadEtc(android_thread_func_t entryFunction,
+                            void *userData,
+                            const char* threadName,
+                            int32_t threadPriority,
+                            size_t threadStackSize,
+                            android_thread_id_t *threadId)
+{
+    return gCreateThreadFn(entryFunction, userData, threadName,
+        threadPriority, threadStackSize, threadId);
+}
+
+void androidSetCreateThreadFunc(android_create_thread_fn func)
+{
+    gCreateThreadFn = func;
+}</code></pre><p>说明：该代码定义在system/core/libutils/Threads.cpp中。 androidCreateThreadEtc()会调用gCreateThreadFn()。gCreateThreadFn()是个函数指针，它的值是androidCreateRawThreadEtc。</p>
+<p><a name="anchor8"></a></p>
+<h1 id="8-androidCreateRawThreadEtc"><a href="#8-androidCreateRawThreadEtc" class="headerlink" title="8. androidCreateRawThreadEtc"></a>8. androidCreateRawThreadEtc</h1><pre><code>int androidCreateRawThreadEtc(android_thread_func_t entryFunction,
+                               void *userData,
+                               const char* threadName,
+                               int32_t threadPriority,
+                               size_t threadStackSize,
+                               android_thread_id_t *threadId)
+{
+    ...
+    int result = pthread_create(&amp;thread, &amp;attr,
+                    (android_pthread_entry)entryFunction, userData);
+
+    ...
+    return 1;
+}</code></pre><p>说明：该代码定义在system/core/libutils/Threads.cpp中。 该函数会调用pthread_create()，而pthread_create()则是我们非常熟悉的Linux的标准接口，它的作用就是创建线程。线程创建成功之后运行时，会以执行entryFunction对应的函数。而entryFunction这个函数指针的值是_threadLoop。因此，当线程启动之后，会执行_threadLoop。</p>
+<p><a name="anchor9"></a></p>
+<h1 id="9-threadLoop"><a href="#9-threadLoop" class="headerlink" title="9. _threadLoop"></a>9. _threadLoop</h1><pre><code>int Thread::_threadLoop(void* user)
+{
+    ...
+
+    bool first = true;
+
+    do {
+        bool result;
+        if (first) {
+            first = false;
+            self-&gt;mStatus = self-&gt;readyToRun();
+            result = (self-&gt;mStatus == NO_ERROR);
+
+            if (result &amp;&amp; !self-&gt;exitPending()) {
+                result = self-&gt;threadLoop();
+            }
+        } else {
+            ...
+        }
+
+        ...
+    } while(strong != 0);
+
+    return 0;
+}</code></pre><p>说明：该代码定义在system/core/libutils/Threads.cpp中。first的初始值为true，因此进入到if(first)中。  readyToRun()的实现在Threads.cpp中，返回NO_ERROR。因此result为true，而mExitPending的默认值为false，即self0&gt;exitPending()返回false。因此会执行self-&gt;threadLoop()。由于PoolThread重载了threadLoop()，因此，这里的self-&gt;threadLoop()会调用PoolThread中的threadLoop()。</p>
+<p><a name="anchor10"></a></p>
+<h1 id="10-PoolThread-threadLoop"><a href="#10-PoolThread-threadLoop" class="headerlink" title="10. PoolThread::threadLoop()"></a>10. PoolThread::threadLoop()</h1><pre><code>virtual bool threadLoop()
+{
+    IPCThreadState::self()-&gt;joinThreadPool(mIsMain);
+    return false;
+}</code></pre><p>说明：这是PoolThread中实现的threadLoop()函数。它会先通过IPCThreadState::self()获取IPCThreadState对象，然后调用IPCThreadState::joinThreadPool(mIsMain)，其中mIsMain为true。</p>
+<p><a name="anchor11"></a></p>
+<h1 id="11-IPCThreadState-joinThreadPool"><a href="#11-IPCThreadState-joinThreadPool" class="headerlink" title="11. IPCThreadState::joinThreadPool()"></a>11. IPCThreadState::joinThreadPool()</h1><pre><code>void IPCThreadState::joinThreadPool(bool isMain)
+{
+    ...
+
+    mOut.writeInt32(isMain ? BC_ENTER_LOOPER : BC_REGISTER_LOOPER);
+
+    ...
+    do {  
+        ...
+        result = getAndExecuteCommand();
+
+        if (result &lt; NO_ERROR &amp;&amp; result != TIMED_OUT &amp;&amp; result != -ECONNREFUSED &amp;&amp; result != -EBADF) {
+            ...
+            abort();
+        } 
+
+        if(result == TIMED_OUT &amp;&amp; !isMain) {
+            break;
+        } 
+    } while (result != -ECONNREFUSED &amp;&amp; result != -EBADF);
+
+    ...
+
+    mOut.writeInt32(BC_EXIT_LOOPER);    
+    talkWithDriver(false);              
+}</code></pre><p>说明：该代码定义在frameworks/native/libs/binder/IPCThreadState.cpp中。在该函数中，便进入了消息循环！<br>(01) isMain=true，因此会先将BC_ENTER_LOOPER指令写入到mOut中。<br>(02) 接着调用getAndExecuteCommand()。  </p>
+<p><a name="anchor12"></a></p>
+<h1 id="12-IPCThreadState-getAndExecuteCommand"><a href="#12-IPCThreadState-getAndExecuteCommand" class="headerlink" title="12. IPCThreadState::getAndExecuteCommand()"></a>12. IPCThreadState::getAndExecuteCommand()</h1><pre><code>status_t IPCThreadState::getAndExecuteCommand()
+{
+    status_t result;
+    int32_t cmd;
+
+    // 和Binder驱动交互
+    result = talkWithDriver();
+    if (result &gt;= NO_ERROR) {
+        ...
+        // 读取mIn中的数据
+        cmd = mIn.readInt32();
+        ...
+
+        // 调用executeCommand()对数据进行处理。
+        result = executeCommand(cmd);
+        ...
+    }
+
+    return result;
+}</code></pre><p>说明：该函数会调用talkWithDriver()和Binder驱动进行交互。对于talkWithDriver()，前面已经多次提到。在此，talkWithDriver()会将BC_ENTER_LOOPER指令发送给Binder驱动，告诉Binder驱动，MediaPlayerService进入了消息循环状态。BC_ENTER_LOOPER的流程在<a href="/2014/09/03/Binder-ServiceManager-Daemon/">Android Binder机制(三) ServiceManager守护进程</a>中已经介绍过了。<br>当BC_ENTER_LOOPER处理完毕，MediaPlayerService再次调用ioctl()和Binder驱动通信时，由于MediaPlayerService对应的待处理事务列表为空，因此MediaPlayerService线程会进入中断等待状态。当有Client向MediaPlayerService发送请求时，MediaPlayerService就会被唤醒。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/18/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/20/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/18/">18</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/19/">19</a></li>
+        
+        <li><a class="pagination-link" href="/page/20/">20</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

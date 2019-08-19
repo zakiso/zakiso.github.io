@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/47/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/23/android/api_guide/app_component/fragment/2014-06-23-PreferenceFragment/" itemprop="url">Android组件--Fragment(二)之 PreferenceFragment</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-23T01:35:00.000Z" itemprop="datePublished">6月 23 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            5 分钟 read (About 705 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文介绍PreferenceFragment。PreferenceFragment是Android提供的设置碎片。</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="PreferenceFragment使用说明"><a href="#PreferenceFragment使用说明" class="headerlink" title="PreferenceFragment使用说明"></a>PreferenceFragment使用说明</h1><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/fragment/preference_fragment/01_basic" target="_blank" rel="noopener">PreferenceFragment的完整代码</a></p>
+<h2 id="1-创建配置文件"><a href="#1-创建配置文件" class="headerlink" title="1. 创建配置文件"></a>1. 创建配置文件</h2><p>新建res/xml/preferences.xml，内容如下：</p>
+<pre><code>&lt;PreferenceScreen xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;
+
+    &lt;PreferenceCategory
+        android:title=&quot;PreferenceCategory A&quot;&gt;
+
+        &lt;!-- 
+          (01) android:key是Preferece的id
+          (02) android:title是Preferece的大标题
+          (03) android:summary是Preferece的小标题
+          --&gt;
+        &lt;CheckBoxPreference
+            android:key=&quot;checkbox_preference&quot;
+            android:title=&quot;title_checkbox_preference&quot;
+            android:summary=&quot;summary_checkbox_preference&quot; /&gt;
+
+    &lt;/PreferenceCategory&gt;
+
+    &lt;PreferenceCategory
+        android:title=&quot;PreferenceCategory B&quot;&gt;
+
+        &lt;!-- 
+          android:dialogTitle是对话框的标题
+          android:defaultValue是默认值
+          --&gt;
+        &lt;EditTextPreference
+            android:key=&quot;edittext_preference&quot;
+            android:title=&quot;title_edittext_preference&quot;
+            android:summary=&quot;null&quot;  
+            android:dialogTitle=&quot;dialog_title_edittext_preference&quot;
+            android:defaultValue=&quot;null&quot; /&gt;
+
+        &lt;!-- 
+          android:entries是列表中各项的说明
+          android:entryValues是列表中各项的值
+          --&gt;
+        &lt;ListPreference  
+            android:key=&quot;list_preference&quot;  
+            android:dialogTitle=&quot;Choose font&quot;  
+            android:entries=&quot;@array/pref_font_types&quot;  
+            android:entryValues=&quot;@array/pref_font_types_values&quot;  
+            android:summary=&quot;sans&quot;  
+            android:title=&quot;Font&quot; 
+            android:defaultValue=&quot;sans&quot;/&gt; 
+    &lt;/PreferenceCategory&gt;
+
+
+    &lt;PreferenceCategory
+        android:title=&quot;PreferenceCategory C&quot;&gt;
+
+        &lt;SwitchPreference
+            android:key=&quot;switch_preferece&quot;
+            android:title=&quot;title_switch_preferece&quot;
+            android:defaultValue=&quot;true&quot; /&gt;
+
+        &lt;SeekBarPreference
+            android:key=&quot;seekbar_preference&quot;
+            android:title=&quot;title_seekbar_preference&quot;
+            android:max=&quot;100&quot;
+            android:defaultValue=&quot;30&quot; /&gt;
+
+    &lt;/PreferenceCategory&gt;
+
+&lt;/PreferenceScreen&gt;</code></pre><p>说明：PreferenceFragment的组件很多，包括CheckBoxPreference, EditTextPreference, ListPreference, SwitchPreference, SeekBarPreference, VolumePreference等。这些组建的属性定义如下。<br>(01) android:key是Preferece的id，它是Preferece的唯一标识。<br>(02) android:title是Preferece的大标题。<br>(03) android:summary是Preferece的小标题。<br>(04) android:dialogTitle是对话框的标题。<br>(05) android:defaultValue是默认值。<br>(06) android:entries是列表中各项的说明。<br>(07) android:entryValues是列表中各项的值。  </p>
+<p>注意：SwitchPreference是API 14(Android4.0)才支持的。所以，要想使用SwitchPreference的话，必须在manifest中定义apk支持的最小版本。</p>
+<pre><code>&lt;uses-sdk android:minSdkVersion=&quot;14&quot; /&gt;</code></pre><h2 id="2-自定义PreferenceFragment"><a href="#2-自定义PreferenceFragment" class="headerlink" title="2. 自定义PreferenceFragment"></a>2. 自定义PreferenceFragment</h2><pre><code>public class PrefsFragment extends PreferenceFragment 
+    implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener {
+    private static final String TAG = &quot;##PrefsFragment##&quot;;
+
+    private static final String CHECK_PREFERENCE    = &quot;checkbox_preference&quot;;
+    private static final String EDITTEXT_PREFERENCE = &quot;edittext_preference&quot;;
+    private static final String LIST_PREFERENCE     = &quot;list_preference&quot;;
+    private static final String SWITCH_PREFERENCE   = &quot;switch_preferece&quot;;
+    private static final String SEEKBAR_PREFERENCE  = &quot;seekbar_preference&quot;;
+
+    private Preference mEditText;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Load the preferences from an XML resource
+        addPreferencesFromResource(R.xml.preferences);
+
+        mEditText = (Preference) findPreference(EDITTEXT_PREFERENCE);
+        mEditText.setOnPreferenceClickListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        // Set summary to be the user-description for the selected value
+        Preference connectionPref = findPreference(key);
+        if (key.equals(CHECK_PREFERENCE)) {
+            boolean checked = sharedPreferences.getBoolean(key, false);
+            Log.d(TAG, &quot;CheckBox: checked=&quot;+checked);
+        } else if (key.equals(EDITTEXT_PREFERENCE)) {
+            String value = sharedPreferences.getString(key, &quot;&quot;);
+            connectionPref.setSummary(value);
+            Log.d(TAG, &quot;EditText: value=&quot;+value);
+        } else if (key.equals(LIST_PREFERENCE)) {
+            String value = sharedPreferences.getString(key, &quot;&quot;);
+            connectionPref.setSummary(value);
+            Log.d(TAG, &quot;List: value=&quot;+value);
+        } else if (key.equals(SWITCH_PREFERENCE)) {
+            boolean checked = sharedPreferences.getBoolean(key, false);
+            Log.d(TAG, &quot;Switch: checked=&quot;+checked);
+        } else if (key.equals(SEEKBAR_PREFERENCE)) {
+            int value = sharedPreferences.getInt(key, 0);
+            Log.d(TAG, &quot;Seekbar: value=&quot;+value);
+        } 
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+        SharedPreferences sharedPreferences = preference.getSharedPreferences();
+        String value = sharedPreferences.getString(preference.getKey(), &quot;&quot;);
+        Log.d(TAG, &quot;onPreferenceClick: value=&quot;+value);
+
+        return true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+    }
+
+    @Override
+    public void onPause() {
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
+}</code></pre><p>说明：PreferenceFragment中的每一项都是一个SharedPreferences对象，它们会像SharedPreferences存储在该APK的私有数据区。监听PreferenceFragment中的成员有多种方式，常用的两种就是：<br>(01) 监听数据的变化：通过实现SharedPreferences.OnSharedPreferenceChangeListener接口，来监听PreferenceFragment中每一项的数据变化。<br>(02) 监听点击事件：通过实现Preference.OnPreferenceClickListener接口，来监听PreferenceFragment中每一项的点击动作。 </p>
+<h2 id="3-使用PreferenceFragment"><a href="#3-使用PreferenceFragment" class="headerlink" title="3. 使用PreferenceFragment"></a>3. 使用PreferenceFragment</h2><p>前面已经定义好了一个PreferenceFragment。接下来，就可以实例化它的对象，并将其在Activity中进行显示。</p>
+<pre><code>public class FragmentTest extends Activity {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //setContentView(R.layout.main);
+
+        getFragmentManager().beginTransaction().replace(android.R.id.content,  
+                new PrefsFragment()).commit();  
+    }
+}</code></pre>
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/46/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/48/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/46/">46</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/47/">47</a></li>
+        
+        <li><a class="pagination-link" href="/page/48/">48</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

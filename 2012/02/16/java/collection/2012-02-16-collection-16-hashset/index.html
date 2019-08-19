@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Java 集合系列16之 HashSet详细介绍(源码解析)和使用示例 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="java collection">
+
+
+
+
+
+    <meta name="description" content="java collection">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 集合系列16之 HashSet详细介绍(源码解析)和使用示例">
+<meta property="og:url" content="https://apppills.com/2012/02/16/java/collection/2012-02-16-collection-16-hashset/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="java collection">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://apppills.com/media/pic/java/collection/collection16.jpg">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 集合系列16之 HashSet详细介绍(源码解析)和使用示例">
+<meta name="twitter:description" content="java collection">
+<meta name="twitter:image" content="https://apppills.com/media/pic/java/collection/collection16.jpg">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#第1部分-HashSet介绍">1&nbsp;&nbsp;<b>第1部分 HashSet介绍</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#HashSet-简介">1.1&nbsp;&nbsp;HashSet 简介</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#HashSet的构造函数">1.2&nbsp;&nbsp;HashSet的构造函数</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#HashSet的主要API">1.3&nbsp;&nbsp;HashSet的主要API</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第2部分-HashSet数据结构">2&nbsp;&nbsp;<b>第2部分 HashSet数据结构</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第3部分-HashSet源码解析-基于JDK1-6-0-45">3&nbsp;&nbsp;<b>第3部分 HashSet源码解析(基于JDK1.6.0_45)</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第4部分-HashSet遍历方式">4&nbsp;&nbsp;<b>第4部分 HashSet遍历方式</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#4-1-通过Iterator遍历HashSet">4.1&nbsp;&nbsp;4.1 通过Iterator遍历HashSet</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#4-2-通过for-each遍历HashSet">4.2&nbsp;&nbsp;4.2 通过for-each遍历HashSet</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第5部分-HashSet示例">5&nbsp;&nbsp;<b>第5部分 HashSet示例</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#更多内容">6&nbsp;&nbsp;<b>更多内容</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Java 集合系列16之 HashSet详细介绍(源码解析)和使用示例
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-02-16T01:01:00.000Z" itemprop="datePublished">2月 16 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            17 分钟 read (About 2589 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>这一章，我们对HashSet进行学习。<br>我们先对HashSet有个整体认识，然后再学习它的源码，最后再通过实例来学会使用HashSet。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1部分 HashSet介绍</a><br><a href="#anchor2">第2部分 HashSet数据结构</a><br><a href="#anchor3">第3部分 HashSet源码解析(基于JDK1.6.0_45)</a><br><a href="#anchor4">第4部分 HashSet遍历方式</a><br><a href="#anchor5">第5部分 HashSet示例</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第1部分-HashSet介绍"><a href="#第1部分-HashSet介绍" class="headerlink" title="第1部分 HashSet介绍"></a>第1部分 HashSet介绍</h1><h2 id="HashSet-简介"><a href="#HashSet-简介" class="headerlink" title="HashSet 简介"></a>HashSet 简介</h2><p>HashSet 是一个没有重复元素的集合。<br>它是由HashMap实现的，不保证元素的顺序，而且HashSet允许使用 null 元素。<br>HashSet是非同步的。如果多个线程同时访问一个哈希 set，而其中至少一个线程修改了该 set，那么它必须 保持外部同步。这通常是通过对自然封装该 set 的对象执行同步操作来完成的。如果不存在这样的对象，则应该使用 Collections.synchronizedSet 方法来“包装” set。最好在创建时完成这一操作，以防止对该 set 进行意外的不同步访问：</p>
+<pre><code>Set s = Collections.synchronizedSet(new HashSet(...));</code></pre><p>HashSet通过iterator()返回的迭代器是fail-fast的。</p>
+<h2 id="HashSet的构造函数"><a href="#HashSet的构造函数" class="headerlink" title="HashSet的构造函数"></a>HashSet的构造函数</h2><pre><code>// 默认构造函数
+public HashSet() 
+
+// 带集合的构造函数
+public HashSet(Collection&lt;? extends E&gt; c) 
+
+// 指定HashSet初始容量和加载因子的构造函数
+public HashSet(int initialCapacity, float loadFactor) 
+
+// 指定HashSet初始容量的构造函数
+public HashSet(int initialCapacity) 
+
+// 指定HashSet初始容量和加载因子的构造函数,dummy没有任何作用
+HashSet(int initialCapacity, float loadFactor, boolean dummy) </code></pre><h2 id="HashSet的主要API"><a href="#HashSet的主要API" class="headerlink" title="HashSet的主要API"></a>HashSet的主要API</h2><pre><code>boolean         add(E object)
+void            clear()
+Object          clone()
+boolean         contains(Object object)
+boolean         isEmpty()
+Iterator&lt;E&gt;     iterator()
+boolean         remove(Object object)
+int             size()</code></pre><p><a name="anchor2"></a></p>
+<h1 id="第2部分-HashSet数据结构"><a href="#第2部分-HashSet数据结构" class="headerlink" title="第2部分 HashSet数据结构"></a>第2部分 HashSet数据结构</h1><p>HashSet的继承关系如下：</p>
+<pre><code>java.lang.Object
+   ↳     java.util.AbstractCollection&lt;E&gt;
+         ↳     java.util.AbstractSet&lt;E&gt;
+               ↳     java.util.HashSet&lt;E&gt;</code></pre><p>public class HashSet<e><br>    extends AbstractSet<e><br>    implements Set<e>, Cloneable, java.io.Serializable { }</e></e></e></p>
+<p>HashSet与Map关系如下图：</p>
+<p><img src="/media/pic/java/collection/collection16.jpg" alt="img"></p>
+<p>从图中可以看出：<br>(01) HashSet继承于AbstractSet，并且实现了Set接口。<br>(02) HashSet的本质是一个”没有重复元素”的集合，它是通过HashMap实现的。HashSet中含有一个”HashMap类型的成员变量”map，HashSet的操作函数，实际上都是通过map实现的。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="第3部分-HashSet源码解析-基于JDK1-6-0-45"><a href="#第3部分-HashSet源码解析-基于JDK1-6-0-45" class="headerlink" title="第3部分 HashSet源码解析(基于JDK1.6.0_45)"></a>第3部分 HashSet源码解析(基于JDK1.6.0_45)</h1><p>为了更了解HashSet的原理，下面对HashSet源码代码作出分析。</p>
+<pre><code>package java.util;
+
+public class HashSet&lt;E&gt;
+    extends AbstractSet&lt;E&gt;
+    implements Set&lt;E&gt;, Cloneable, java.io.Serializable
+{
+    static final long serialVersionUID = -5024744406713321676L;
+
+    // HashSet是通过map(HashMap对象)保存内容的
+    private transient HashMap&lt;E,Object&gt; map;
+
+    // PRESENT是向map中插入key-value对应的value
+    // 因为HashSet中只需要用到key，而HashMap是key-value键值对；
+    // 所以，向map中添加键值对时，键值对的值固定是PRESENT
+    private static final Object PRESENT = new Object();
+
+    // 默认构造函数
+    public HashSet() {
+        // 调用HashMap的默认构造函数，创建map
+        map = new HashMap&lt;E,Object&gt;();
+    }
+
+    // 带集合的构造函数
+    public HashSet(Collection&lt;? extends E&gt; c) {
+        // 创建map。
+        // 为什么要调用Math.max((int) (c.size()/.75f) + 1, 16)，从 (c.size()/.75f) + 1 和 16 中选择一个比较大的树呢？        
+        // 首先，说明(c.size()/.75f) + 1
+        //   因为从HashMap的效率(时间成本和空间成本)考虑，HashMap的加载因子是0.75。
+        //   当HashMap的“阈值”(阈值=HashMap总的大小*加载因子) &lt; “HashMap实际大小”时，
+        //   就需要将HashMap的容量翻倍。
+        //   所以，(c.size()/.75f) + 1 计算出来的正好是总的空间大小。
+        // 接下来，说明为什么是 16 。
+        //   HashMap的总的大小，必须是2的指数倍。若创建HashMap时，指定的大小不是2的指数倍；
+        //   HashMap的构造函数中也会重新计算，找出比“指定大小”大的最小的2的指数倍的数。
+        //   所以，这里指定为16是从性能考虑。避免重复计算。
+        map = new HashMap&lt;E,Object&gt;(Math.max((int) (c.size()/.75f) + 1, 16));
+        // 将集合(c)中的全部元素添加到HashSet中
+        addAll(c);
+    }
+
+    // 指定HashSet初始容量和加载因子的构造函数
+    public HashSet(int initialCapacity, float loadFactor) {
+        map = new HashMap&lt;E,Object&gt;(initialCapacity, loadFactor);
+    }
+
+    // 指定HashSet初始容量的构造函数
+    public HashSet(int initialCapacity) {
+        map = new HashMap&lt;E,Object&gt;(initialCapacity);
+    }
+
+    HashSet(int initialCapacity, float loadFactor, boolean dummy) {
+        map = new LinkedHashMap&lt;E,Object&gt;(initialCapacity, loadFactor);
+    }
+
+    // 返回HashSet的迭代器
+    public Iterator&lt;E&gt; iterator() {
+        // 实际上返回的是HashMap的“key集合的迭代器”
+        return map.keySet().iterator();
+    }
+
+    public int size() {
+        return map.size();
+    }
+
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+
+    public boolean contains(Object o) {
+        return map.containsKey(o);
+    }
+
+    // 将元素(e)添加到HashSet中
+    public boolean add(E e) {
+        return map.put(e, PRESENT)==null;
+    }
+
+    // 删除HashSet中的元素(o)
+    public boolean remove(Object o) {
+        return map.remove(o)==PRESENT;
+    }
+
+    public void clear() {
+        map.clear();
+    }
+
+    // 克隆一个HashSet，并返回Object对象
+    public Object clone() {
+        try {
+            HashSet&lt;E&gt; newSet = (HashSet&lt;E&gt;) super.clone();
+            newSet.map = (HashMap&lt;E, Object&gt;) map.clone();
+            return newSet;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError();
+        }
+    }
+
+    // java.io.Serializable的写入函数
+    // 将HashSet的“总的容量，加载因子，实际容量，所有的元素”都写入到输出流中
+    private void writeObject(java.io.ObjectOutputStream s)
+        throws java.io.IOException {
+        // Write out any hidden serialization magic
+        s.defaultWriteObject();
+
+        // Write out HashMap capacity and load factor
+        s.writeInt(map.capacity());
+        s.writeFloat(map.loadFactor());
+
+        // Write out size
+        s.writeInt(map.size());
+
+        // Write out all elements in the proper order.
+        for (Iterator i=map.keySet().iterator(); i.hasNext(); )
+            s.writeObject(i.next());
+    }
+
+
+    // java.io.Serializable的读取函数
+    // 将HashSet的“总的容量，加载因子，实际容量，所有的元素”依次读出
+    private void readObject(java.io.ObjectInputStream s)
+        throws java.io.IOException, ClassNotFoundException {
+        // Read in any hidden serialization magic
+        s.defaultReadObject();
+
+        // Read in HashMap capacity and load factor and create backing HashMap
+        int capacity = s.readInt();
+        float loadFactor = s.readFloat();
+        map = (((HashSet)this) instanceof LinkedHashSet ?
+               new LinkedHashMap&lt;E,Object&gt;(capacity, loadFactor) :
+               new HashMap&lt;E,Object&gt;(capacity, loadFactor));
+
+        // Read in size
+        int size = s.readInt();
+
+        // Read in all elements in the proper order.
+        for (int i=0; i&lt;size; i++) {
+            E e = (E) s.readObject();
+            map.put(e, PRESENT);
+        }
+    }
+}</code></pre><p>说明： HashSet的代码实际上非常简单，通过上面的注释应该很能够看懂。它是通过HashMap实现的，若对HashSet的理解有困难，建议先学习以下HashMap；学完HashMap之后，在学习HashSet就非常容易了。</p>
+<p><a name="anchor4"></a></p>
+<h1 id="第4部分-HashSet遍历方式"><a href="#第4部分-HashSet遍历方式" class="headerlink" title="第4部分 HashSet遍历方式"></a>第4部分 HashSet遍历方式</h1><h2 id="4-1-通过Iterator遍历HashSet"><a href="#4-1-通过Iterator遍历HashSet" class="headerlink" title="4.1 通过Iterator遍历HashSet"></a>4.1 通过Iterator遍历HashSet</h2><p>第一步：根据iterator()获取HashSet的迭代器。</p>
+<p>第二步：遍历迭代器获取各个元素。</p>
+<pre><code>// 假设set是HashSet对象
+for(Iterator iterator = set.iterator();
+       iterator.hasNext(); ) { 
+    iterator.next();
+}   </code></pre><h2 id="4-2-通过for-each遍历HashSet"><a href="#4-2-通过for-each遍历HashSet" class="headerlink" title="4.2 通过for-each遍历HashSet"></a>4.2 通过for-each遍历HashSet</h2><p>第一步：根据toArray()获取HashSet的元素集合对应的数组。</p>
+<p>第二步：遍历数组，获取各个元素。</p>
+<pre><code>// 假设set是HashSet对象，并且set中元素是String类型
+String[] arr = (String[])set.toArray(new String[0]);
+for (String str:arr)
+    System.out.printf(&quot;for each : %s\n&quot;, str);</code></pre><p>HashSet的遍历测试程序如下： </p>
+<pre><code>import java.util.Random;
+import java.util.Iterator;
+import java.util.HashSet;
+
+/*
+ * @desc 介绍HashSet遍历方法
+ *
+ * @author skywang
+ */
+public class HashSetIteratorTest {
+
+    public static void main(String[] args) {
+        // 新建HashSet
+        HashSet set = new HashSet();
+
+        // 添加元素 到HashSet中
+        for (int i=0; i&lt;5; i++)
+            set.add(&quot;&quot;+i);
+
+        // 通过Iterator遍历HashSet
+        iteratorHashSet(set) ;
+
+        // 通过for-each遍历HashSet
+        foreachHashSet(set);
+    }
+
+    /*
+     * 通过Iterator遍历HashSet。推荐方式
+     */
+    private static void iteratorHashSet(HashSet set) {
+        for(Iterator iterator = set.iterator();
+               iterator.hasNext(); ) {
+            System.out.printf(&quot;iterator : %s\n&quot;, iterator.next());
+        }
+    }
+
+    /*
+     * 通过for-each遍历HashSet。不推荐！此方法需要先将Set转换为数组
+     */
+    private static void foreachHashSet(HashSet set) {
+        String[] arr = (String[])set.toArray(new String[0]);
+        for (String str:arr)
+            System.out.printf(&quot;for each : %s\n&quot;, str);
+    }
+}</code></pre><p>运行结果： </p>
+<p>iterator : 3<br>iterator : 2<br>iterator : 1<br>iterator : 0<br>iterator : 4<br>for each : 3<br>for each : 2<br>for each : 1<br>for each : 0<br>for each : 4</p>
+<p><a name="anchor5"></a></p>
+<h1 id="第5部分-HashSet示例"><a href="#第5部分-HashSet示例" class="headerlink" title="第5部分 HashSet示例"></a>第5部分 HashSet示例</h1><p>下面我们通过实例学习如何使用HashSet</p>
+<p>import java.util.Iterator;<br>import java.util.HashSet;</p>
+<p>/*</p>
+<ul>
+<li><p>@desc HashSet常用API的使用。</p>
+</li>
+<li></li>
+<li><p>@author skywang</p>
+</li>
+<li><p>/<br>public class HashSetTest {</p>
+<p>  public static void main(String[] args) {</p>
+<pre><code>// HashSet常用API
+testHashSetAPIs() ;</code></pre><p>  }</p>
+<p>  /*</p>
+<ul>
+<li><p>HashSet除了iterator()和add()之外的其它常用API</p>
+</li>
+<li><p>/<br>private static void testHashSetAPIs() {<br>  // 新建HashSet<br>  HashSet set = new HashSet();</p>
+<p>  // 将元素添加到Set中<br>  set.add(“a”);<br>  set.add(“b”);<br>  set.add(“c”);<br>  set.add(“d”);<br>  set.add(“e”);</p>
+<p>  // 打印HashSet的实际大小<br>  System.out.printf(“size : %d\n”, set.size());</p>
+<p>  // 判断HashSet是否包含某个值<br>  System.out.printf(“HashSet contains a :%s\n”, set.contains(“a”));<br>  System.out.printf(“HashSet contains g :%s\n”, set.contains(“g”));</p>
+<p>  // 删除HashSet中的“e”<br>  set.remove(“e”);</p>
+<p>  // 将Set转换为数组<br>  String[] arr = (String[])set.toArray(new String[0]);<br>  for (String str:arr)</p>
+<pre><code>System.out.printf(&quot;for each : %s\n&quot;, str);</code></pre><p>  // 新建一个包含b、c、f的HashSet<br>  HashSet otherset = new HashSet();<br>  otherset.add(“b”);<br>  otherset.add(“c”);<br>  otherset.add(“f”);</p>
+<p>  // 克隆一个removeset，内容和set一模一样<br>  HashSet removeset = (HashSet)set.clone();<br>  // 删除“removeset中，属于otherSet的元素”<br>  removeset.removeAll(otherset);<br>  // 打印removeset<br>  System.out.printf(“removeset : %s\n”, removeset);</p>
+<p>  // 克隆一个retainset，内容和set一模一样<br>  HashSet retainset = (HashSet)set.clone();<br>  // 保留“retainset中，属于otherSet的元素”<br>  retainset.retainAll(otherset);<br>  // 打印retainset<br>  System.out.printf(“retainset : %s\n”, retainset);</p>
+</li>
+</ul>
+</li>
+</ul>
+<pre><code>    // 遍历HashSet
+    for(Iterator iterator = set.iterator();
+           iterator.hasNext(); ) 
+        System.out.printf(&quot;iterator : %s\n&quot;, iterator.next());
+
+    // 清空HashSet
+    set.clear();
+
+    // 输出HashSet是否为空
+    System.out.printf(&quot;%s\n&quot;, set.isEmpty()?&quot;set is empty&quot;:&quot;set is not empty&quot;);
+}</code></pre><p>}</p>
+<p>运行结果： </p>
+<pre><code>size : 5
+HashSet contains a :true
+HashSet contains g :false
+for each : d
+for each : b
+for each : c
+for each : a
+removeset : [d, a]
+retainset : [b, c]
+iterator : d
+iterator : b
+iterator : c
+iterator : a
+set is empty</code></pre><h1 id="更多内容"><a href="#更多内容" class="headerlink" title="更多内容"></a>更多内容</h1><p><a href="/2012/02/01/collection-00-index">00. Java 集合系列目录(Category)</a><br><a href="/2012/02/01/collection-01-summary">01. Java 集合系列01之 总体框架</a><br><a href="/2012/02/02/collection-02-framework">02. Java 集合系列02之 Collection架构</a><br><a href="/2012/02/03/collection-03-arraylist">03. Java 集合系列03之 ArrayList详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/04/collection-04-fail-fast">04. Java 集合系列04之 fail-fast总结(通过ArrayList来说明fail-fast的原理、解决办法)</a><br><a href="/2012/02/05/collection-05-linkedlist">05. Java 集合系列05之 LinkedList详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/06/collection-06-vector">06. Java 集合系列06之 Vector详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/07/collection-07-stack">07. Java 集合系列07之 Stack详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/08/collection-08-List">08. Java 集合系列08之 List总结(LinkedList, ArrayList等使用场景和性能分析)</a><br><a href="/2012/02/09/collection-09-map">09. Java 集合系列09之 Map架构</a><br><a href="/2012/02/10/collection-10-hashmap">10. Java 集合系列10之 HashMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/11/collection-11-hashtable">11. Java 集合系列11之 Hashtable详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/12/collection-12-treemap">12. Java 集合系列12之 TreeMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/13/collection-13-weakhashmap">13. Java 集合系列13之 WeakHashMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/14/collection-14-mapsummary">14. Java 集合系列14之 Map总结(HashMap, Hashtable, TreeMap, WeakHashMap等使用场景)</a><br><a href="/2012/02/15/collection-15-set">15. Java 集合系列15之 Set架构</a><br><a href="/2012/02/16/collection-16-hashset">16. Java 集合系列16之 HashSet详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/17/collection-17-treeset">17. Java 集合系列17之 TreeSet详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/18/collection-18-iterator_enumeration">18. Java 集合系列18之 Iterator和Enumeration比较</a></p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/java/">#java</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2012/02/17/java/collection/2012-02-17-collection-17-treeset/">Java 集合系列17之 TreeSet详细介绍(源码解析)和使用示例</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2012/02/15/java/collection/2012-02-15-collection-15-set/">Java 集合系列15之 Set架构</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

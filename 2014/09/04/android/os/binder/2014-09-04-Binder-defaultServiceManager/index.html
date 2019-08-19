@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Android Binder机制(四) defaultServiceManager()的实现 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="android">
+
+
+
+
+
+    <meta name="description" content="android">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Binder机制(四) defaultServiceManager()的实现">
+<meta property="og:url" content="https://apppills.com/2014/09/04/android/os/binder/2014-09-04-Binder-defaultServiceManager/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="android">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/defaultServiceManager.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/defaultServiceManager_leitu.jpg">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Binder机制(四) defaultServiceManager()的实现">
+<meta name="twitter:description" content="android">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/defaultServiceManager.jpg">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#defaultServiceManager概述">1&nbsp;&nbsp;<b>defaultServiceManager概述</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-defaultServiceManager流程图">1.1&nbsp;&nbsp;1. defaultServiceManager流程图</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-defaultServiceManager相关类的类图">1.2&nbsp;&nbsp;2. defaultServiceManager相关类的类图</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#defaultServiceManager流程详解">2&nbsp;&nbsp;<b>defaultServiceManager流程详解</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-defaultServiceManager">2.1&nbsp;&nbsp;1. defaultServiceManager()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-ProcessState-self">2.2&nbsp;&nbsp;2. ProcessState::self()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-ProcessState-ProcessState">2.3&nbsp;&nbsp;3. ProcessState::ProcessState()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#4-ProcessState-open-driver">2.4&nbsp;&nbsp;4. ProcessState::open_driver()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#4-1-Binder驱动中binder-ioctl-的BINDER-SET-MAX-THREADS相关部分的源码">2.4.1&nbsp;&nbsp;4.1 Binder驱动中binder_ioctl()的BINDER_SET_MAX_THREADS相关部分的源码</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#5-mmap">2.5&nbsp;&nbsp;5. mmap()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#6-ProcessState-getContextObject">2.6&nbsp;&nbsp;6. ProcessState::getContextObject()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#7-ProcessState-getStrongProxyForHandle">2.7&nbsp;&nbsp;7. ProcessState::getStrongProxyForHandle()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#8-ProcessState-lookupHandleLocked">2.8&nbsp;&nbsp;8. ProcessState::lookupHandleLocked()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#9-BpBinder-BpBinder">2.9&nbsp;&nbsp;9. BpBinder::BpBinder</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#10-IPCThreadState-self">2.10&nbsp;&nbsp;10. IPCThreadState::self()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#11-IPCThreadState-IPCThreadState">2.11&nbsp;&nbsp;11. IPCThreadState::IPCThreadState()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#12-interface-cast">2.12&nbsp;&nbsp;12. interface_cast()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#13-IServiceManager-asInterface">2.13&nbsp;&nbsp;13. IServiceManager::asInterface()</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Android Binder机制(四) defaultServiceManager()的实现
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-09-04T01:04:00.000Z" itemprop="datePublished">9月 4 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            32 分钟 read (About 4732 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文介绍defaultServiceManager()的流程。这里的defaultServiceManager()返回的是”IServiceManager对象”，获取”IServiceManager对象”的目的是为了和”ServiceManager进程”进行通信。例如，Server要通过”IServiceManager对象”发送请求指令注册到”ServiceManager进程”中，Client要通过”IServiceManager对象”发送请求来获取”Server对象”。<br>这里要搞清楚：<strong>defaultServiceManager()获取到的，不是”ServiceManager进程”，而是”IServiceManager对象”</strong>。”ServiceManager进程”是一个守护进程，而defaultServiceManager()获取到的是C++层的IServiceManager类的一个实例。当然，通过该defaultServiceManager()返回的”IServiceManager对象”是可以和ServiceManager进行通信的。</p>
+</blockquote>
+<blockquote>
+<p>注意：本文是基于Android 4.4.2版本进行介绍的！</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">defaultServiceManager概述</a><br><strong>2</strong>. <a href="#anchor2">defaultServiceManager流程详解</a><br><strong>2.1</strong>. <a href="#anchor2_1">defaultServiceManager()</a><br><strong>2.2</strong>. <a href="#anchor2_2">ProcessState::self()</a><br><strong>2.3</strong>. <a href="#anchor2_3">ProcessState::ProcessState()</a><br><strong>2.4</strong>. <a href="#anchor2_4">ProcessState::open_driver()</a><br><strong>2.5</strong>. <a href="#anchor2_5">mmap()</a><br><strong>2.6</strong>. <a href="#anchor2_6">ProcessState::getContextObject()</a><br><strong>2.7</strong>. <a href="#anchor2_7">ProcessState::getStrongProxyForHandle()</a><br><strong>2.8</strong>. <a href="#anchor2_8">ProcessState::lookupHandleLocked()</a><br><strong>2.9</strong>. <a href="#anchor2_9">BpBinder::BpBinder</a><br><strong>2.10</strong>. <a href="#anchor2_10">IPCThreadState::self()</a><br><strong>2.11</strong>. <a href="#anchor2_11">IPCThreadState::IPCThreadState()</a><br><strong>2.12</strong>. <a href="#anchor2_12">interface_cast()</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="defaultServiceManager概述"><a href="#defaultServiceManager概述" class="headerlink" title="defaultServiceManager概述"></a>defaultServiceManager概述</h1><h2 id="1-defaultServiceManager流程图"><a href="#1-defaultServiceManager流程图" class="headerlink" title="1. defaultServiceManager流程图"></a>1. defaultServiceManager流程图</h2><p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/defaultServiceManager.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/defaultServiceManager.jpg" alt></a></p>
+<p>上面是defaultServiceManager()的时序图。<br>defaultServiceManager()会返回一个sp<iservicemanager>类型的对象。IServiceManager提供了addService()供MediaPlayerService等服务注册到ServiceManager中，提供了getService()供MediaPlayer等MediaPlayer等客户端获取服务。<br>它首先会调用ProcessState::self()获取到ProcessState对象，该ProcessState对象是采用单例模式创建的；因此，当ProcessState::self()第一次被调用时，会新建ProcessState对象。在ProcessState的构造函数中，会先通过open_driver()打开”/dev/binder”，接着调用mmap()映射内存到当前进程中。此时，ProcessState就初始化完毕，它将”/dev/binder”的文件句柄以及映射内存都保存在自己的私有成员中。<br>在获取到ProcessState对象之后，会通过该对象调用getContextObject()来获取一个IBinder对象。getContextObject()会调用getStrongProxyForHandle(0)来获取”句柄0的强引用代理对象”，这里的句柄0被赋予了特殊意义；它就是ServiceManager的句柄，在Binder驱动中，若获取到句柄的值是0，则会将其目标当作是ServiceManager。getStrongProxyForHandle(0)会先通过lookupHandleLocked()在”ProcessState的矢量数组mHandleToObject”中查找句柄为0的对象；找不到的话，则新建句柄为0的对象，并将其添加到mHandleToObject矢量数组中；这样，下次再通过getStrongProxyForHandle()查找时，就能快速的找到。由此可见，mHandleToObject是ProcessState中保存句柄的缓冲数组。  随后，会新建句柄0对应的BpBinder对象，BpBinder是IBinder的代理；这里就获取到了ServiceManager的BpBinder代理对象。简而言之，getContextObject()的目的就是获取ServiceManager对应的BpBinder代理对象。 在新建BpBinder时，会通过IPCThreadState::self()获取IPCThreadState对象；因为，需要通过IPCThreadState对象来与Binder驱动进行交互。<br>前面已经成功获取到了ServiceManager的BpBinder代理，而defaultServiceManager()返回的是IServiceManager对象。这里，使用了一个技巧，通过宏interface_cast而调用asInterface()函数，从而返回IServiceManager的代理BpServiceManager。这样，defaultServiceManager()就执行完毕了。</iservicemanager></p>
+<p>在上面的流程中，涉及到了比较多的类。下面通过类图理清它们之间的关系。</p>
+<h2 id="2-defaultServiceManager相关类的类图"><a href="#2-defaultServiceManager相关类的类图" class="headerlink" title="2. defaultServiceManager相关类的类图"></a>2. defaultServiceManager相关类的类图</h2><p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/defaultServiceManager_leitu.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/defaultServiceManager_leitu.jpg" alt></a></p>
+<p>上面是获取defaultServiceManager()时涉及到的类的类图。defaultServiceManager()虽然在IServiceManager.cpp中实现，但它并不属于IServiceManager的成员方法，而是一个全局方法。</p>
+<ol>
+<li><p>RefBase<br>它定义在system/core/include/utils/RefBase.h中。RefBase是一个公共父类，它声明了许多常用的接口。包括增加引用计数，获取引用计数，新增对象的弱引用等接口。</p>
+</li>
+<li><p>IInterface<br>它定义在frameworks/native/include/binder/IInterface.h中。和RefBase类似，它也是一个公共父类，IInterface中声明了asBinder()方法，用于获取对象的IBinder对象。</p>
+</li>
+<li><p>IBinder<br>它定义在frameworks/native/include/binder/IBinder.h中。IBinder也是一个抽象出来的类，它包括了localBinder(), remoteBinder()和transact()等非常重要的接口。IBinder有两个直接子类类：BpBinder和BBinder。<br>BpBinder是Binder代理类。通过remoteBinder()可以获取BpBinder对象；而且，对于C++层而言，它相当于一个远程Binder。BpBinder的事务接口transact()会调用IPCThreadState的transact()，进而实现与Binder驱动的事务交互。此外，BpBinder中有一个mHandle句柄成员，它用来保存Server位于Binder驱动中的”Binder引用的描述”。句柄0是ServiceManager的句柄。<br>BBinder是本地Binder。通过localBinder()可以获取BBinder对象。当Server收到请求之后，会调用BBinder的onTransact()函数进行处理。而不同的Server会重载onTransact()函数，从而可以根据各自的情况对事务进行处理。</p>
+</li>
+</ol>
+<ol start="4">
+<li><p>BpInterface<br>它定义在frameworks/native/include/binder/IInterface.h中。实际上，BpInterface是一个<interface>模板类，同时继承了BpRefBase和INTERFACE，这里的INTERFACE是模板。像IServiceManager，IMediaPlayerService等Server都是通过继承模板类是实现的。  </interface></p>
+</li>
+<li><p>BnInterface<br>它定义在frameworks/native/include/binder/IInterface.h中。和BpInterface类似，BnInterface也是一个<interface>模板类，它同时继承了BBinder和INTERFACE。像BnServiceManager，BnMediaPlayerService等本地Server都是通过继承模板类是实现的。  </interface></p>
+</li>
+<li><p>BpRefBase<br>它定义在frameworks/native/include/binder/Binder.h中。BpRefBase继承于RefBase，它有一个IBinder*类型的成员mRemote，同时提供了获取该mRemote的方法。实际上，该mRemote就是BpBinder对象。</p>
+</li>
+<li><p>ProcessState<br>它定义在frameworks/native/libs/binder/ProcessState.cpp中中。ProcessState的实例是采用单例模式实现的，它拥有两个非常重要的成员：mDriverFD和mHandleToObject。<br>mDriverFD是文件”/dev/binder”的句柄，而mHandleToObject是一个Vector矢量数组，矢量数组中的每个元素都保存了两个变量：Server的句柄，以及Server对应的BpBinder对象。实际上，Server的句柄是”Server在Binder驱动中的Binder引用的描述”；句柄0是ServiceManager的句柄。 关于Binder引用，可以回顾<a href="/2014/09/02/Binder-Datastruct/">Android Binder机制(二) Binder中的数据结构</a>。</p>
+</li>
+<li><p>IPCThreadState<br>它定义在frameworks/native/libs/binder/IPCThreadState.cpp中中。IPCThreadState的实例也是采用单例模式实现的，它是正在与Binder驱动进行交互的类。  </p>
+</li>
+</ol>
+<br>
+理解上面几个类的基本概念之后，现在在从整体上对它们进行一下介绍！  
+对于一个Server而言，它都会存在一个"远程BpBinder对象"和"本地BBinder对象"。   
+(01) 远程BpBinder对象的作用，是和Binder驱动进行交互。具体的方式是，当Server要向Binder发起事务请求时，会调用BpBinder的transact()接口，而该接口会调用到IPCThreadState::transact()接口，通过IPCThreadState类来和Binder驱动交互。此外，该BpBinder在Binder驱动中的Binder引用的描述会被保存到ProcessState的mHandleToObject矢量缓冲数组中。  
+(02) 本地BBinder对象的作用，是Server响应Client请求的类。当Client有请求发送给Server时，都会调用到BBinder的onTransact()函数，而每个Server都会覆盖onTransact()函数。这样，每个Server就可以在onTransact()中根据自己的情况对请求进行处理。
+
+
+
+<p><a name="anchor2"></a></p>
+<h1 id="defaultServiceManager流程详解"><a href="#defaultServiceManager流程详解" class="headerlink" title="defaultServiceManager流程详解"></a>defaultServiceManager流程详解</h1><p>接下来通过源码来查看defaultServiceManager()的实现。通过源码分析，会对上面的类图有更清楚的认识！</p>
+<p><a name="anchor2_1"></a></p>
+<h2 id="1-defaultServiceManager"><a href="#1-defaultServiceManager" class="headerlink" title="1. defaultServiceManager()"></a>1. defaultServiceManager()</h2><pre><code>sp&lt;IServiceManager&gt; defaultServiceManager()
+{
+    if (gDefaultServiceManager != NULL) return gDefaultServiceManager;
+
+    {
+        AutoMutex _l(gDefaultServiceManagerLock);
+        while (gDefaultServiceManager == NULL) {
+            gDefaultServiceManager = interface_cast&lt;IServiceManager&gt;(
+                ProcessState::self()-&gt;getContextObject(NULL));
+            if (gDefaultServiceManager == NULL)
+                sleep(1);
+        }
+    }
+
+    return gDefaultServiceManager;
+}</code></pre><p>说明：该代码定义在frameworks/native/libs/binder/IServiceManager.cpp中。它是获取IServiceManager对象，该函数的声明在frameworks/native/include/binder/IServiceManager.h中。虽然defaultServiceManager()在IServiceManager.cpp文件中实现，但是它并不是IServiceManager的一个成员方法，而是一个全局方法。<br>(01) gDefaultServiceManagerLock是全局互斥锁，gDefaultServiceManager是全局的IServiceManager对象。它们都定义在frameworks/native/libs/binder/Static.cpp中。<br>(02) gDefaultServiceManager是采用单例模式实现的，第一次调用该函数时，会创建gDefaultServiceManager对象。gDefaultServiceManager的实现可以简化为以下语句：</p>
+<pre><code>gDefaultServiceManager = interface_cast&lt;IServiceManager&gt;(ProcessState::self()-&gt;getContextObject(NULL));</code></pre><p>下面逐个对该语句中的代码进行解析。</p>
+<p><a name="anchor2_2"></a></p>
+<h2 id="2-ProcessState-self"><a href="#2-ProcessState-self" class="headerlink" title="2. ProcessState::self()"></a>2. ProcessState::self()</h2><pre><code>sp&lt;ProcessState&gt; ProcessState::self()
+{
+    Mutex::Autolock _l(gProcessMutex);
+    if (gProcess != NULL) {
+        return gProcess;
+    }
+    gProcess = new ProcessState;
+    return gProcess;
+}</code></pre><p>说明：该代码定义在frameworks/native/libs/binder/ProcessState.cpp中，它的作用是返回gProcess对象。gProcess也是单例模式对象，它也定义在frameworks/native/libs/binder/Static.cpp中。第一次执行self()时，会新建ProcessState对象。</p>
+<p><a name="anchor2_3"></a></p>
+<h2 id="3-ProcessState-ProcessState"><a href="#3-ProcessState-ProcessState" class="headerlink" title="3. ProcessState::ProcessState()"></a>3. ProcessState::ProcessState()</h2><pre><code>ProcessState::ProcessState()
+    : mDriverFD(open_driver())
+    , mVMStart(MAP_FAILED)
+    , mManagesContexts(false)
+    , mBinderContextCheckFunc(NULL)
+    , mBinderContextUserData(NULL)
+    , mThreadPoolStarted(false)
+    , mThreadPoolSeq(1)
+{
+    if (mDriverFD &gt;= 0) {
+        mVMStart = mmap(0, BINDER_VM_SIZE, PROT_READ, MAP_PRIVATE | MAP_NORESERVE, mDriverFD, 0);
+        if (mVMStart == MAP_FAILED) {
+            // *sigh*
+            ALOGE(&quot;Using /dev/binder failed: unable to mmap transaction memory.\n&quot;);
+            close(mDriverFD);
+            mDriverFD = -1;
+        }
+    }
+    ...
+}</code></pre><p>说明：在ProcessState的构造函数中，它会进行一系列的初始化。比较重要的有如下两步。<br>(01) 通过open_driver()打开”/open/binder”，并将文件句柄赋值给mDriverFD。<br>(02) 通过调用mmap()映射内存。<br>下面，看看这两步的代码。</p>
+<p><a name="anchor2_4"></a></p>
+<h2 id="4-ProcessState-open-driver"><a href="#4-ProcessState-open-driver" class="headerlink" title="4. ProcessState::open_driver()"></a>4. ProcessState::open_driver()</h2><pre><code>static int open_driver()
+{
+    // 打开文件/dev/binder
+    int fd = open(&quot;/dev/binder&quot;, O_RDWR);
+    if (fd &gt;= 0) {
+        fcntl(fd, F_SETFD, FD_CLOEXEC);
+        int vers;
+        // 检查/dev/binder的版本
+        status_t result = ioctl(fd, BINDER_VERSION, &amp;vers);
+        if (result == -1) {
+            close(fd);
+            ...
+        }
+        if (result != 0 || vers != BINDER_CURRENT_PROTOCOL_VERSION) {
+            close(fd);
+            ...
+        }
+
+        // 设置该进程最大线程数
+        size_t maxThreads = 15;
+        result = ioctl(fd, BINDER_SET_MAX_THREADS, &amp;maxThreads);
+        if (result == -1) {
+            ...
+        }
+    } else {
+        ...
+    }
+    return fd;
+}</code></pre><p>说明：<br>(01) open_driver()首先打开”/dev/binder”文件。它会对应执行Binder驱动的binder_open()函数，该函数在<a href="/2014/09/03/Binder-ServiceManager-Daemon/">Android Binder机制(三) ServiceManager守护进程</a>中已经详细介绍过了。<br>(02) 在成功打开文件之后，就会调用ioctl检查Binder版本，检查版本的部分非常简单(就是读取出版本号，判断读取的版本号与已有的版本号是否一样!)，这里就不再对Binder驱动的BINDER_VERSION进行展开了。<br>(03) 在检查版本通过之后，在调用ioctl(,BINDER_SET_MAX_THREADS,)设置该进程的最大线程数。它会对应调用Binder驱动的binder_ioctl()函数。    </p>
+<p><strong>注意</strong>：要区分”此处的open(“/dev/binder”,…)” 和 “ServiceManager守护进程中的open(“/dev/binder”,…)”。它们分别是属于不同的进程，本文的open(“/dev/binder”,…)是属于调用defaultServiceManager()的进程；而在ServiceManager中的open(“/dev/binder”,…)是属于ServiceManager进程的。</p>
+<h3 id="4-1-Binder驱动中binder-ioctl-的BINDER-SET-MAX-THREADS相关部分的源码"><a href="#4-1-Binder驱动中binder-ioctl-的BINDER-SET-MAX-THREADS相关部分的源码" class="headerlink" title="4.1 Binder驱动中binder_ioctl()的BINDER_SET_MAX_THREADS相关部分的源码"></a>4.1 Binder驱动中binder_ioctl()的BINDER_SET_MAX_THREADS相关部分的源码</h3><pre><code>static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+{
+  int ret;
+  struct binder_proc *proc = filp-&gt;private_data;
+  struct binder_thread *thread;
+  unsigned int size = _IOC_SIZE(cmd);
+  void __user *ubuf = (void __user *)arg;
+
+  ret = wait_event_interruptible(binder_user_error_wait, binder_stop_on_user_error &lt; 2);
+
+  // 在proc进程中查找该线程对应的binder_thread；若查找失败，则新建一个binder_thread，并添加到proc-&gt;threads中。
+  thread = binder_get_thread(proc);
+  ...
+
+  switch (cmd) {
+    case BINDER_SET_MAX_THREADS:
+        if (copy_from_user(&amp;proc-&gt;max_threads, ubuf, sizeof(proc-&gt;max_threads))) {
+            ret = -EINVAL;
+            goto err;
+        }
+        break;
+
+  ...
+  }
+  ret = 0;
+
+  ...
+  return ret;
+}</code></pre><p>说明：BINDER_SET_MAX_THREADS的代码很简单，就是将最大线程数目从用户空间拷贝到内核空间，进而赋值给binder_proc-&gt;max_threads。</p>
+<p><a name="anchor2_5"></a></p>
+<h2 id="5-mmap"><a href="#5-mmap" class="headerlink" title="5. mmap()"></a>5. mmap()</h2><p>在执行完open_driver()之后，将调用mmap()映射内存到当前进程的虚拟地址空间。mmap()详细代码在<a href="/2014/09/03/Binder-ServiceManager-Daemon/">Android Binder机制(三) ServiceManager守护进程</a>中已经详细分析过，这里就不再重复说明了。</p>
+<p><br> 到目前为止，ProcessState::self()就分析完毕。gDefaultServiceManager的赋值语句可以进一步的简化：</p>
+<pre><code>gDefaultServiceManager = interface_cast&lt;IServiceManager&gt;(ProcessState::getContextObject(NULL));</code></pre><p><a name="anchor2_6"></a></p>
+<h2 id="6-ProcessState-getContextObject"><a href="#6-ProcessState-getContextObject" class="headerlink" title="6. ProcessState::getContextObject()"></a>6. ProcessState::getContextObject()</h2><pre><code>sp&lt;IBinder&gt; ProcessState::getContextObject(const sp&lt;IBinder&gt;&amp; caller)
+{
+    return getStrongProxyForHandle(0);
+}</code></pre><p>说明：getContextObject()调用了getStrongProxyForHandle(0)。这里的0是代表Service Manager的句柄。</p>
+<p><a name="anchor2_7"></a></p>
+<h2 id="7-ProcessState-getStrongProxyForHandle"><a href="#7-ProcessState-getStrongProxyForHandle" class="headerlink" title="7. ProcessState::getStrongProxyForHandle()"></a>7. ProcessState::getStrongProxyForHandle()</h2><pre><code>sp&lt;IBinder&gt; ProcessState::getStrongProxyForHandle(int32_t handle)
+{
+    sp&lt;IBinder&gt; result;
+
+    AutoMutex _l(mLock);
+
+    // 在矢量数组mHandleToObject中查找&quot;句柄值为handle的handle_entry对象&quot;；
+    // 找到的话，则直接返回；找不到的话，则新建handle对应的handle_entry，并将其添加到mHandleToObject中。
+    handle_entry* e = lookupHandleLocked(handle);
+
+    if (e != NULL) {
+        IBinder* b = e-&gt;binder;
+        if (b == NULL || !e-&gt;refs-&gt;attemptIncWeak(this)) {
+            // 当handle==0(即是Service Manager的句柄)时，尝试去ping Binder驱动。
+            if (handle == 0) {
+                Parcel data;
+                status_t status = IPCThreadState::self()-&gt;transact(
+                        0, IBinder::PING_TRANSACTION, data, NULL, 0);
+                if (status == DEAD_OBJECT)
+                   return NULL;
+            }
+
+            // 新建BpBinder代理
+            b = new BpBinder(handle);
+            e-&gt;binder = b;
+            if (b) e-&gt;refs = b-&gt;getWeakRefs();
+            result = b;
+        } else {
+            ...
+        }
+    }
+
+    return result;
+}</code></pre><p>说明：getStrongProxyForHandle()的目的是返回句柄为handle的IBinder代理，这里是返回Service Manager的IBinder代理。<br>(01) lookupHandleLocked()，是在矢量数组mHandleToObject中查找是否有句柄为handle的handle_entry对象。有的话，则返回该handle_entry对象；没有的话，则新建handle对应的handle_entry，并将其添加到矢量数组mHandleToObject中，然后再返回。mHandleToObject是用于保存各个IBinder代理对象的矢量数组，它相当于一个缓冲。<br>(02) 很显然，此时e!=NULL为true，进入if(e!=NULL)中。而此时e-&gt;binder=NULL，并且handle=0；则调用IPCThreadState::self()-&gt;transact()尝试去和Binder驱动通信(尝试去ping内核中Binder驱动)。由于Binder驱动已启动，ping通信是能够成功的。ping通信涉及到”Binder机制中Server和Client的通信”，后面再专门对Server和Client的交互进行介绍；这里只要了解ping通信能够成功即可。<br>(03) 接着，新建BpBinder对象，并赋值给e-&gt;binder。然后，将该BpBinder对象返回。</p>
+<p>上面对流程进行了整体介绍，下面逐个进行分析！</p>
+<p><a name="anchor2_8"></a></p>
+<h2 id="8-ProcessState-lookupHandleLocked"><a href="#8-ProcessState-lookupHandleLocked" class="headerlink" title="8. ProcessState::lookupHandleLocked()"></a>8. ProcessState::lookupHandleLocked()</h2><pre><code>ProcessState::handle_entry* ProcessState::lookupHandleLocked(int32_t handle)
+{               
+    const size_t N=mHandleToObject.size();
+    if (N &lt;= (size_t)handle) {
+        handle_entry e;
+        e.binder = NULL;
+        e.refs = NULL;
+        status_t err = mHandleToObject.insertAt(e, N, handle+1-N);
+        if (err &lt; NO_ERROR) return NULL;
+    }   
+    return &amp;mHandleToObject.editItemAt(handle);
+}           </code></pre><p>说明：mHandleToObject是Vector矢量数组。mHandleToObject的初始大小为0，因此if (N &lt;= handle)为true。接下来，就新建handle_entry，并将其添加到mHandleToObject中，然后返回该handle_entry。mHandleToObject和handle_entry的定义如下：</p>
+<pre><code>class ProcessState : public virtual RefBase
+{
+    ...
+private:
+    ...
+    struct handle_entry {
+        IBinder* binder;
+        RefBase::weakref_type* refs;
+    };
+
+    ...
+
+    Vector&lt;handle_entry&gt;mHandleToObject;
+    ...
+}</code></pre><p>说明：该代码定义在frameworks/native/include/binder/ProcessState.h中。前面说过，mHandleToObject是个缓冲矢量数组。它的成员binder是保存的Server的BpBinder对象，而refs是保存的Server在Binder驱动中的Binder引用的描述。</p>
+<p><a name="anchor2_9"></a></p>
+<h2 id="9-BpBinder-BpBinder"><a href="#9-BpBinder-BpBinder" class="headerlink" title="9. BpBinder::BpBinder"></a>9. BpBinder::BpBinder</h2><p>new BpBinder(0)会新建BpBinder对象，下面看看BpBinder的构造函数。</p>
+<pre><code>BpBinder::BpBinder(int32_t handle)
+    : mHandle(handle)
+    , mAlive(1)
+    , mObitsSent(0)
+    , mObituaries(NULL)
+{
+    ALOGV(&quot;Creating BpBinder %p handle %d\n&quot;, this, mHandle);
+
+    extendObjectLifetime(OBJECT_LIFETIME_WEAK);
+    IPCThreadState::self()-&gt;incWeakHandle(handle);
+}</code></pre><p>说明：该代码定义在frameworks/native/libs/binder/BpBinder.cpp中。主要工作是初始化。<br>(01) 将句柄handle保存到私有成员mHandle中。这里是将ServiceManager的句柄保存到mHandle中。<br>(02) 增加IPCThreadState的引用计数。IPCThreadState::self()是获取IPCThreadState对象，实际上，在前面介绍的ProcessState::getStrongProxyForHandle()中已经调用过该函数。下面看看它的代码。</p>
+<p><a name="anchor2_10"></a></p>
+<h2 id="10-IPCThreadState-self"><a href="#10-IPCThreadState-self" class="headerlink" title="10. IPCThreadState::self()"></a>10. IPCThreadState::self()</h2><pre><code>static pthread_mutex_t gTLSMutex = PTHREAD_MUTEX_INITIALIZER;
+static bool gHaveTLS = false;
+static pthread_key_t gTLS = 0;
+static bool gShutdown = false;
+static bool gDisableBackgroundScheduling = false;
+
+IPCThreadState* IPCThreadState::self()
+{
+    if (gHaveTLS) {
+restart:
+        const pthread_key_t k = gTLS;
+        IPCThreadState* st = (IPCThreadState*)pthread_getspecific(k);
+        if (st) return st;
+        return new IPCThreadState;
+    }
+
+    if (gShutdown) return NULL;
+
+    pthread_mutex_lock(&amp;gTLSMutex);
+    if (!gHaveTLS) {
+        if (pthread_key_create(&amp;gTLS, threadDestructor) != 0) {
+            pthread_mutex_unlock(&amp;gTLSMutex);
+            return NULL;
+        }
+        gHaveTLS = true;
+    }
+    pthread_mutex_unlock(&amp;gTLSMutex);
+    goto restart;
+}</code></pre><p>说明：该代码定义在frameworks/native/libs/binder/IPCThreadState.cpp中。self()的源码比较简单，它的作用是获取IPCThreadState对象。若该对象已经存在，则直接返回；否则，新建IPCThreadState对象。</p>
+<p><a name="anchor2_11"></a></p>
+<h2 id="11-IPCThreadState-IPCThreadState"><a href="#11-IPCThreadState-IPCThreadState" class="headerlink" title="11. IPCThreadState::IPCThreadState()"></a>11. IPCThreadState::IPCThreadState()</h2><pre><code>IPCThreadState::IPCThreadState()
+    : mProcess(ProcessState::self()),
+      mMyThreadId(androidGetTid()),
+      mStrictModePolicy(0),
+      mLastTransactionBinderFlags(0)
+{
+    pthread_setspecific(gTLS, this);
+    clearCaller();
+    mIn.setDataCapacity(256);
+    mOut.setDataCapacity(256);
+}</code></pre><p>说明：<br>(01) 获取ProcessState对象，并将其赋值给成员mProcess。ProcessState::self()在前面已经介绍国，它是获取全局的ProcessState对象。<br>(02) 设置mIn和mOut的容量为256字节。IPCThreadState是和Binder驱动交互的类，mOut是用来保存”IPCThreadState需要发送给Binder驱动的内容的”，而mIn则是用来保存”Binder驱动反馈给IPCThreadState的内容的”。后面在介绍”Server和Client”通信中用到它们时，再进一步说明。</p>
+<br>
+到目前为止，ProcessState::getContextObject()就分析完了。gDefaultServiceManager的赋值语句可以进一步的简化：
+
+<pre><code>gDefaultServiceManager = interface_cast&lt;IServiceManager&gt;(new BpBinder(0));</code></pre><p>接下来，看看interface_cast<iservicemanager>。</iservicemanager></p>
+<p><a name="anchor2_12"></a></p>
+<h2 id="12-interface-cast"><a href="#12-interface-cast" class="headerlink" title="12. interface_cast()"></a>12. interface_cast()</h2><pre><code>template&lt;typename INTERFACE&gt;
+inline sp&lt;INTERFACE&gt; interface_cast(const sp&lt;IBinder&gt;&amp; obj)
+{
+    return INTERFACE::asInterface(obj);
+}   </code></pre><p>说明：该代码在frameworks/native/include/binder/IInterface.h中。它是一个模板函数，对于interface_cast<iservicemanager>而言，返回的结果是IServiceManager::asInterface()。</iservicemanager></p>
+<p><a name="anchor2_13"></a></p>
+<h2 id="13-IServiceManager-asInterface"><a href="#13-IServiceManager-asInterface" class="headerlink" title="13. IServiceManager::asInterface()"></a>13. IServiceManager::asInterface()</h2><p>接下来，就是查找IServiceManager::asInterface()的实现了。在IServiceManager.cpp中不存在，追踪代码，发现asInterface()是通过DECLARE_META_INTERFACE()来声明，并通过IMPLEMENT_META_INTERFACE()来实现的。</p>
+<p>(01) IServiceManager中的DECLARE_META_INTERFACE()声明和IMPLEMENT_META_INTERFACE()实现，分别在头文件frameworks/native/include/binder/IServiceManager.h 以及 frameworks/native/libs/binder/IServiceManager.cpp中。</p>
+<pre><code>// IServiceManager.h中的声明
+class IServiceManager : public IInterface
+{
+public:
+    DECLARE_META_INTERFACE(ServiceManager);
+    ...
+}
+
+// IServiceManager.pp中的实现
+IMPLEMENT_META_INTERFACE(ServiceManager, &quot;android.os.IServiceManager&quot;);</code></pre><p>(02) DECLARE_META_INTERFACE()和IMPLEMENT_META_INTERFACE()的定义在frameworks/native/include/binder/IInterface.h中。 </p>
+<pre><code>#define DECLARE_META_INTERFACE(INTERFACE)                               \
+    static const android::String16 descriptor;                          \
+    static android::sp&lt;I##INTERFACE&gt; asInterface(                       \
+            const android::sp&lt;android::IBinder&gt;&amp; obj);                  \
+    virtual const android::String16&amp; getInterfaceDescriptor() const;    \
+    I##INTERFACE();                                                     \
+    virtual ~I##INTERFACE();                                            \
+
+#define IMPLEMENT_META_INTERFACE(INTERFACE, NAME)                       \
+    const android::String16 I##INTERFACE::descriptor(NAME);             \
+    const android::String16&amp;                                            \
+            I##INTERFACE::getInterfaceDescriptor() const {              \
+        return I##INTERFACE::descriptor;                                \
+    }                                                                   \
+    android::sp&lt;I##INTERFACE&gt; I##INTERFACE::asInterface(                \
+            const android::sp&lt;android::IBinder&gt;&amp; obj)                   \
+    {                                                                   \
+        android::sp&lt;I##INTERFACE&gt; intr;                                 \
+        if (obj != NULL) {                                              \
+            intr = static_cast&lt;I##INTERFACE*&gt;(                          \
+                obj-&gt;queryLocalInterface(                               \
+                        I##INTERFACE::descriptor).get());               \
+            if (intr == NULL) {                                         \
+                intr = new Bp##INTERFACE(obj);                          \
+            }                                                           \
+        }                                                               \
+        return intr;                                                    \
+    }                                                                   \
+    I##INTERFACE::I##INTERFACE() { }                                    \
+    I##INTERFACE::~I##INTERFACE() { }                                   \
+
+
+#define CHECK_INTERFACE(interface, data, reply)                         \
+    if (!data.checkInterface(this)) { return PERMISSION_DENIED; }       \</code></pre><p>用ServiceManager替换INTERFACE之后，得到结果如下：<br>IMPLEMENT_META_INTERFACE(ServiceManager, “android.os.IServiceManager”);</p>
+<pre><code>#define DECLARE_META_INTERFACE(IServiceManager)                         \
+    static const android::String16 descriptor;                          \
+    static android::sp&lt;IServiceManager&gt; asInterface(                    \
+            const android::sp&lt;android::IBinder&gt;&amp; obj);                  \
+    virtual const android::String16&amp; getInterfaceDescriptor() const;    \
+    IServiceManager();                                                  \
+    virtual ~IServiceManager();                                         \
+
+
+#define IMPLEMENT_META_INTERFACE(IServiceManager, &quot;android.os.IServiceManager&quot;)        \
+    const android::String16 IServiceManager::descriptor(&quot;android.os.IServiceManager&quot;); \
+    const android::String16&amp;                                                           \
+            IServiceManager::getInterfaceDescriptor() const {                          \
+        return IServiceManager::descriptor;                                            \
+    }                                                                                  \
+    android::sp&lt;IServiceManager&gt; IServiceManager::asInterface(                         \
+            const android::sp&lt;android::IBinder&gt;&amp; obj)                                  \
+    {                                                                                  \
+        android::sp&lt;IServiceManager&gt; intr;                                             \
+        if (obj != NULL) {                                                             \
+            intr = static_cast&lt;IServiceManager*&gt;(                                      \
+                obj-&gt;queryLocalInterface(                                              \
+                        IServiceManager::descriptor).get());                           \
+            if (intr == NULL) {                                                        \
+                intr = new BpServiceManager(obj);                                      \
+            }                                                                          \
+        }                                                                              \
+        return intr;                                                                   \
+    }                                                                                  \
+    IServiceManager::IServiceManager() { }                                             \
+    IServiceManager::~IServiceManager() { }</code></pre><p>因此，得到IServiceManager::asInterface()的源码如下：</p>
+<pre><code>android::sp&lt;IServiceManager&gt; IServiceManager::asInterface(const android::sp&lt;android::IBinder&gt;&amp; obj)
+{
+    android::sp&lt;IServiceManager&gt; intr;
+    if (obj != NULL) {
+        intr = static_cast&lt;IServiceManager*&gt;(
+            obj-&gt;queryLocalInterface(
+                    IServiceManager::descriptor).get());
+        if (intr == NULL) {
+            intr = new BpServiceManager(obj);
+        }
+    }
+    return intr;
+}</code></pre><p>说明：asInterface()的作用是获取IServiceManager接口。<br>(01) obj是传入的BpBinder对象，不为NULL。因此，执行obj-&gt;queryLocalInterface(“android.os.IServiceManager”)来查找名称为”android.os.IServiceManager”的本地接口，queryLocalInterface()的实现在BpBinder的父类IBinder中，具体在文件frameworks/native/libs/binder/Binder.cpp中。很显然，IServiceManager接口还没创建，因此intr=NULL。<br>(02) 新建BpServiceManager(obj)对象，并返回。BpServiceManager的实现在frameworks/native/libs/binder/IServiceManager.cpp中。  </p>
+<pre><code>sp&lt;IInterface&gt;  IBinder::queryLocalInterface(const String16&amp; descriptor)
+{   
+    return NULL;
+}   </code></pre><br>
+到目前为止，gDefaultServiceManager的创建流程就分析完了，它实际返回的是一个BpServiceManager对象，该对象包含IBinder的代理BpBinder。以下是转换后的获取gDefaultServiceManager的语句。
+
+<pre><code>gDefaultServiceManager = new BpServiceManager(new BpBinder(0));</code></pre>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/android/">#android</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2014/09/05/android/os/binder/2014-09-05-BinderCommunication-AddService01/">Android Binder机制(五) addService详解01之 请求的发送</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2014/09/03/android/os/binder/2014-09-03-Binder-ServiceManager-Daemon/">Android Binder机制(三) ServiceManager守护进程</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

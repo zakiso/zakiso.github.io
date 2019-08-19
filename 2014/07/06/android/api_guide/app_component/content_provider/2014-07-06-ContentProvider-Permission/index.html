@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Android 之ContentProvider(三)之 Permission权限设置 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="android training">
+
+
+
+
+
+    <meta name="description" content="android training">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 之ContentProvider(三)之 Permission权限设置">
+<meta property="og:url" content="https://apppills.com/2014/07/06/android/api_guide/app_component/content_provider/2014-07-06-ContentProvider-Permission/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="android training">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 之ContentProvider(三)之 Permission权限设置">
+<meta name="twitter:description" content="android training">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#Permission介绍">1&nbsp;&nbsp;<b>Permission介绍</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#自定义Permission示例">2&nbsp;&nbsp;<b>自定义Permission示例</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-设置权限">2.1&nbsp;&nbsp;1. 设置权限</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-获取权限">2.2&nbsp;&nbsp;2. 获取权限</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Android 之ContentProvider(三)之 Permission权限设置
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-07-06T04:11:00.000Z" itemprop="datePublished">7月 6 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            3 分钟 read (About 451 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>前面自定义Permission权限。自定义权限除了用在ContentProvider中之外，也可以用在Activity与Service中。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">Permission介绍</a><br><strong>2</strong>. <a href="#anchor2">自定义Permission示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="Permission介绍"><a href="#Permission介绍" class="headerlink" title="Permission介绍"></a>Permission介绍</h1><pre><code>&lt;permission
+    android:name=&quot;com.skw.permission.myprovider&quot;
+    android:protectionLevel=&quot;normal&quot;
+    android:label=&quot;@string/permission_label&quot;
+    android:description=&quot;@string/permission_description&quot;
+    /&gt;</code></pre><p>说明：permission常用的几个属性如下：<br>(01) <strong>android:name</strong>: 必需的。权限的名称，通常应遵循android 命名方案(<em>.permission.</em>)。<br>(02) <strong>android:protectionLevel</strong>: 必需的。权限的安全级别，共包括”normal, dangerous, signature, signatureOrSystem”四种。  </p>
+<blockquote>
+<p>normal 表示权限是低风险的，不会对系统、用户或其他应用程序造成危害；<br>dangerous 表示权限是高风险的，系统将可能要求用户输入相关信息，才会授予此权限；<br>signature 表示只有当应用程序所用数字签名与声明引权限的应用程序所用数字签名相同时，才能将权限授给它；<br>signatureOrSystem 表示将权限授给具有相同数字签名的应用程序或android 包类。</p>
+</blockquote>
+<p>(03) <strong>android:permissionGroup</strong>: 非必需的。可以将权限放在一个组中，但对于自定义权限，应该避免设置此属性。<br>(04) <strong>android:label</strong>: 非必需的。标签。<br>(05) <strong>android:description</strong>: 非必需的。描述。<br>(06) <strong>android:icon</strong>非必需的。图标。  </p>
+<p><a name="anchor2"></a></p>
+<h1 id="自定义Permission示例"><a href="#自定义Permission示例" class="headerlink" title="自定义Permission示例"></a>自定义Permission示例</h1><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/contentprovider/02_permission/MyProvider" target="_blank" rel="noopener">自定义Permission完整源码</a></p>
+<h2 id="1-设置权限"><a href="#1-设置权限" class="headerlink" title="1. 设置权限"></a>1. 设置权限</h2><pre><code>&lt;application 
+    android:exported=&quot;true&quot;
+    android:label=&quot;@string/app_name&quot; 
+    android:icon=&quot;@drawable/ic_launcher&quot;&gt;
+    &lt;provider 
+        android:name=&quot;MyProvider&quot;
+        android:authorities=&quot;com.skw.myprovider&quot;
+        android:permission=&quot;com.skw.permission.myprovider&quot;&gt;
+        &lt;intent-filter&gt;
+            &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;
+            &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;
+        &lt;/intent-filter&gt;
+    &lt;/provider&gt;
+&lt;/application&gt;
+
+&lt;permission
+    android:name=&quot;com.skw.permission.myprovider&quot;
+    android:protectionLevel=&quot;normal&quot;
+    android:label=&quot;@string/permission_label&quot;
+    android:description=&quot;@string/permission_description&quot;
+    /&gt;</code></pre><p>说明：上面是自定义权限的manifest文件内容。<br>(01) 首先，在需要定义权限的ContentProvider中声明权限android:permission=”com.skw.permission.myprovider”。<br>(02) 接着，再定义permission。permission对应的name与声明的权限对应。 </p>
+<h2 id="2-获取权限"><a href="#2-获取权限" class="headerlink" title="2. 获取权限"></a>2. 获取权限</h2><p>在需要使用ContentProvider的APK的manifest中需要声明使用该权限。声明方法如下：</p>
+<pre><code>&lt;uses-permission android:name=&quot;com.skw.permission.myprovider&quot; /&gt;</code></pre>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/android/">#android</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2014/07/21/android/tools/compile/2014-07-21-Decompile/">Android反编译</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2014/07/06/android/api_guide/app_component/content_provider/2014-07-06-ContentProvider-Usage/">Android 之ContentProvider(二)之 ContentProvider基本用法</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

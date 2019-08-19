@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/15/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/09/08/android/os/binder/2014-09-08-Binder-Java/" itemprop="url">Android Binder机制(十二) Binder机制的Java调用流程</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-09-08T01:01:00.000Z" itemprop="datePublished">9月 8 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            23 分钟 read (About 3468 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>前面几篇文章，是基于Binder驱动和C/C++层对Binder机制进行了介绍。本文将从Java引用开始，逐步的分析Client是如何与Server进行交互的。本文的例子还是选取MediaPlayer。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">MediaPlayer的使用示例</a><br><strong>2</strong>. <a href="#anchor2">MediaPlayer示例分析</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-MediaPlayer的使用示例"><a href="#1-MediaPlayer的使用示例" class="headerlink" title="1. MediaPlayer的使用示例"></a>1. MediaPlayer的使用示例</h1><p>下面是一个调用MediaPlayer播放音乐(test.mp3)的示例代码。</p>
+<pre><code>public class MainActivity extends Activity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.main);
+        testMediaPlayer();
+    }   
+
+    private void testMediaPlayer() {
+        try {
+            MediaPlayer mp = new MediaPlayer();
+            mp.setDataSource(&quot;/sdcard/test.mp3&quot;);
+            mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mp.prepare();
+            mp.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }   
+    }   
+}</code></pre><p>说明：源码很简单，只需要关注testMediaPlayer()部分即可。首先，新建一个MediaPlayer对象。接着，设置数据源和音频流类型。最后，调用prepare()进行准备之后，再通过start()进行播放。</p>
+<p>下面，我们就对该过程进行分析，看看该Binder机制是如何参与其中的。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-MediaPlayer示例分析"><a href="#2-MediaPlayer示例分析" class="headerlink" title="2. MediaPlayer示例分析"></a>2. MediaPlayer示例分析</h1><p>我们将MediaPlayer示例就看作一个MediaPlayer进程，接下来，就看看这个MediaPlayer进程是如何通过Binder机制来和MediaPlayerService通信的。重点需要关注的是mp.setDataSource()的实现。</p>
+<p><a name="anchor2_1"></a></p>
+<h2 id="2-1-MediaPlayer的构造函数"><a href="#2-1-MediaPlayer的构造函数" class="headerlink" title="2.1 MediaPlayer的构造函数"></a>2.1 MediaPlayer的构造函数</h2><p>先看看MediaPlayer的构造函数。</p>
+<pre><code>public MediaPlayer() {
+
+    ...
+    native_setup(new WeakReference&lt;MediaPlayer&gt;(this));
+}
+
+private static native final void native_init();
+private native final void native_setup(Object mediaplayer_this);</code></pre><p>说明：该代码在frameworks/base/media/java/android/media/MediaPlayer.java中。在MediaPlayer中，会调用本地方法native_setup()；而且在native_setup()之前，会调用静态方法native_init()进行初始化。下面就看看native_init()和native_setup()各自的代码。</p>
+<p><a name="anchor2_2"></a></p>
+<h2 id="2-2-native-init-和native-setup-的注册信息"><a href="#2-2-native-init-和native-setup-的注册信息" class="headerlink" title="2.2 native_init()和native_setup()的注册信息"></a>2.2 native_init()和native_setup()的注册信息</h2><pre><code>static JNINativeMethod gMethods[] = {
+    ...
+    {&quot;_setDataSource&quot;,       &quot;(Ljava/io/FileDescriptor;JJ)V&quot;,    (void *)android_media_MediaPlayer_setDataSourceFD},
+    ...
+    {&quot;_start&quot;,              &quot;()V&quot;,                              (void *)android_media_MediaPlayer_start},
+    ...
+    {&quot;native_init&quot;,         &quot;()V&quot;,                              (void *)android_media_MediaPlayer_native_init},
+    {&quot;native_setup&quot;,        &quot;(Ljava/lang/Object;)V&quot;,            (void *)android_media_MediaPlayer_native_setup},
+    ...
+};
+
+static int register_android_media_MediaPlayer(JNIEnv *env)
+{
+    return AndroidRuntime::registerNativeMethods(env,
+                &quot;android/media/MediaPlayer&quot;, gMethods, NELEM(gMethods));
+}
+
+jint JNI_OnLoad(JavaVM* vm, void* reserved)
+{
+    ...
+    if (register_android_media_MediaPlayer(env) &lt; 0) {
+        ...
+    }
+    ...
+}</code></pre><p>说明：该代码在frameworks/base/media/jni/android_media_MediaPlayer.cpp中。gMethods是JNI本地方法的注册表；在Dalvik虚拟机启动之后，会调用JNI_OnLoad()；进而将上面的方法注册到系统中。<br>这里，我们只需要了解native_init()与android_media_MediaPlayer_native_init()对应，而native_setup()和android_media_MediaPlayer_native_setup()对应即可。</p>
+<p><a name="anchor2_3"></a></p>
+<h2 id="2-3-native-init-的实现"><a href="#2-3-native-init-的实现" class="headerlink" title="2.3 native_init()的实现"></a>2.3 native_init()的实现</h2><p>由于native_init()与android_media_MediaPlayer_native_init()对应，下面就看看native_init()的实现。</p>
+<pre><code>static void
+android_media_MediaPlayer_native_init(JNIEnv *env)
+{
+    jclass clazz;
+
+    clazz = env-&gt;FindClass(&quot;android/media/MediaPlayer&quot;);
+    ..
+
+    fields.context = env-&gt;GetFieldID(clazz, &quot;mNativeContext&quot;, &quot;I&quot;);
+    ...
+}</code></pre><p>说明：该代码在frameworks/base/media/jni/android_media_MediaPlayer.cpp中。<br>env-&gt;FindClass(“android/media/MediaPlayer”)会加载Java层的MediaPlayer类；进而将fields.context初始化为MediaPlayer类中的mNativeContext成员。</p>
+<p><a name="anchor2_4"></a></p>
+<h2 id="2-4-native-setup-的实现"><a href="#2-4-native-setup-的实现" class="headerlink" title="2.4 native_setup()的实现"></a>2.4 native_setup()的实现</h2><p>由于native_setup()和android_media_MediaPlayer_native_setup()对应，下面就看看native_setup()的实现。</p>
+<pre><code>static void
+android_media_MediaPlayer_native_setup(JNIEnv *env, jobject thiz, jobject weak_this)
+{
+    sp&lt;MediaPlayer&gt; mp = new MediaPlayer();
+    ...
+
+    setMediaPlayer(env, thiz, mp);
+}</code></pre><p>说明：该函数会新建一个MediaPlayer对象，然后调用setMediaPlayer()来保存该MediaPlayer对象。下面看看setMediaPlayer()是如何保存MediaPlayer对象的。</p>
+<p><a name="anchor2_5"></a></p>
+<h2 id="2-5-setMediaPlayer"><a href="#2-5-setMediaPlayer" class="headerlink" title="2.5 setMediaPlayer()"></a>2.5 setMediaPlayer()</h2><pre><code>static sp&lt;MediaPlayer&gt; setMediaPlayer(JNIEnv* env, jobject thiz, const sp&lt;MediaPlayer&gt;&amp; player)
+{
+    sp&lt;MediaPlayer&gt; old = (MediaPlayer*)env-&gt;GetIntField(thiz, fields.context);
+    ...
+    env-&gt;SetIntField(thiz, fields.context, (int)player.get());
+    return old;
+}</code></pre><p>说明：通过SetIntField()会将MediaPlayer对象保存到fields.context中。而在前面的，我们将fields.context初始化为MediaPlayer类(Java层)中的mNativeContext成员。这也就意味着，设置了Java层的MediaPlayer中的mNativeContext成员的值为C++层MediaPlayer对象。</p>
+<br>
+至此，就分析完了MediaPlayer的构造函数。下面继续看Java示例代码中的mp.setDataSource("/sdcard/test.mp3")。
+
+
+<p><a name="anchor2_6"></a></p>
+<h2 id="2-6-setDataSource"><a href="#2-6-setDataSource" class="headerlink" title="2.6 setDataSource()"></a>2.6 setDataSource()</h2><pre><code>public void setDataSource(String path)
+        throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
+    setDataSource(path, null, null);
+}
+
+private void setDataSource(String path, String[] keys, String[] values)
+        throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
+
+    ...
+    final File file = new File(path);
+    if (file.exists()) {
+        FileInputStream is = new FileInputStream(file);
+        FileDescriptor fd = is.getFD();
+        setDataSource(fd);
+        is.close();
+    } else {
+        ...
+    }
+    ...
+}
+
+public void setDataSource(FileDescriptor fd)
+        throws IOException, IllegalArgumentException, IllegalStateException {
+    setDataSource(fd, 0, 0x7ffffffffffffffL);
+}
+
+public void setDataSource(FileDescriptor fd, long offset, long length)
+        throws IOException, IllegalArgumentException, IllegalStateException {
+    ...
+    _setDataSource(fd, offset, length);
+}
+
+private native void _setDataSource(FileDescriptor fd, long offset, long length)
+        throws IOException, IllegalArgumentException, IllegalStateException;</code></pre><p>说明：该代码在frameworks/base/media/java/android/media/MediaPlayer.java中。setDataSource()最终会调用到本地方法_setDataSource()。在前面的gMethods本地方法注册表中，将_setDataSource()和android_media_MediaPlayer_setDataSourceFD()匹配。下面，看看_setDataSource()的实现。</p>
+<p><a name="anchor2_7"></a></p>
+<h2 id="2-7-android-media-MediaPlayer-setDataSourceFD"><a href="#2-7-android-media-MediaPlayer-setDataSourceFD" class="headerlink" title="2.7 android_media_MediaPlayer_setDataSourceFD()"></a>2.7 android_media_MediaPlayer_setDataSourceFD()</h2><pre><code>static void
+android_media_MediaPlayer_setDataSourceFD(JNIEnv *env, jobject thiz, jobject fileDescriptor, jlong offset, jlong length)
+{
+    sp&lt;MediaPlayer&gt; mp = getMediaPlayer(env, thiz);
+    ...
+
+    int fd = jniGetFDFromFileDescriptor(env, fileDescriptor);
+    ...
+    process_media_player_call( env, thiz, mp-&gt;setDataSource(fd, offset, length), &quot;java/io/IOException&quot;, &quot;setDataSourceFD failed.&quot; );
+}</code></pre><p>说明：该代码在frameworks/base/media/jni/android_media_MediaPlayer.cpp中。该函数会先通过getMediaPlayer()获取MediaPlayer对象，然后在执行mp-&gt;setDataSource()时会调用MediaPlayer的setDataSource()方法。</p>
+<p><a name="anchor2_8"></a></p>
+<h2 id="2-8-getMediaPlayer"><a href="#2-8-getMediaPlayer" class="headerlink" title="2.8 getMediaPlayer()"></a>2.8 getMediaPlayer()</h2><pre><code>static sp&lt;MediaPlayer&gt; getMediaPlayer(JNIEnv* env, jobject thiz)
+{
+    ...
+    MediaPlayer* const p = (MediaPlayer*)env-&gt;GetIntField(thiz, fields.context);
+    return sp&lt;MediaPlayer&gt;(p);
+}</code></pre><p>说明：前面在native_setup()中，将fields.context设置为MediaPlayer对象。这里就是返回fields.context中保存的MediaPlayer对象。</p>
+<p><a name="anchor2_9"></a></p>
+<h2 id="2-9-MediaPlayer-setDataSource"><a href="#2-9-MediaPlayer-setDataSource" class="headerlink" title="2.9 MediaPlayer::setDataSource"></a>2.9 MediaPlayer::setDataSource</h2><pre><code>status_t MediaPlayer::setDataSource(
+        const char *url, const KeyedVector&lt;String8, String8&gt; *headers)
+{
+    ...
+    status_t err = BAD_VALUE;
+    if (url != NULL) {
+        // 通过getMediaPlayerService()的代理BpMediaPlayerService。
+        const sp&lt;IMediaPlayerService&gt;&amp; service(getMediaPlayerService());
+        if (service != 0) {
+            // 通过BpMediaPlayerService创建一个IMediaPlayer客户端
+            sp&lt;IMediaPlayer&gt; player(service-&gt;create(this, mAudioSessionId));
+            ...
+            // 保存player
+            err = attachNewPlayer(player);
+        }
+    }
+    return err;
+}</code></pre><p>说明：该代码在frameworks/av/media/libmedia/mediaplayer.cpp中。<br>(01) 它会新建一个service对象，而service是通过getMediaPlayerService()获取到的。getMediaPlayerService()已经在”<a href="/2014/09/07/BinderCommunication-GetService01/">介绍getService请求</a>“时，详细分析过了。它会返回IMediaPlayerService的代理，即BpMediaPlayerService对象。<br>(02) 接着，会调用service-&gt;create()返回一个IMediaPlayer对象。下面看看这个MediaPlayer进程是如何通过BpMediaPlayerService这个远程代理来获取IMediaPlayer对象的。</p>
+<p><a name="anchor2_10"></a></p>
+<h2 id="2-10-BpMediaPlayerService-create"><a href="#2-10-BpMediaPlayerService-create" class="headerlink" title="2.10 BpMediaPlayerService::create()"></a>2.10 BpMediaPlayerService::create()</h2><pre><code>class BpMediaPlayerService: public BpInterface&lt;IMediaPlayerService&gt;
+{
+    ...
+    virtual sp&lt;IMediaPlayer&gt; create(
+            const sp&lt;IMediaPlayerClient&gt;&amp; client, int audioSessionId) {
+        Parcel data, reply;
+        data.writeInterfaceToken(IMediaPlayerService::getInterfaceDescriptor());
+        data.writeStrongBinder(client-&gt;asBinder());
+        data.writeInt32(audioSessionId);
+
+        remote()-&gt;transact(CREATE, data, &amp;reply);
+        return interface_cast&lt;IMediaPlayer&gt;(reply.readStrongBinder());
+    }
+    ...
+}</code></pre><p>说明：该代码在frameworks/av/media/libmedia/IMediaPlayerService.cpp中。<br>这里无非是CREATE请求数据打包之后发送给Binder驱动，再由Binder驱动转发给MediaPlayerService进程。数据的发送和解析，在前面介绍”addService”和”getService”时已经多次介绍过了；这里就不再展开说明了。</p>
+<p>Binder驱动在收到MediaPlayer的数据之后，会将添加一个事务到MediaPlayerService的待处理事务列表中，然后唤醒MediaPlayerService。下面就从MediaPlayerService被唤醒之后开始说明。</p>
+<p><a name="anchor2_11"></a></p>
+<h2 id="2-11-Binder驱动中binder-thread-read-的源码"><a href="#2-11-Binder驱动中binder-thread-read-的源码" class="headerlink" title="2.11 Binder驱动中binder_thread_read()的源码"></a>2.11 Binder驱动中binder_thread_read()的源码</h2><p>又回到了熟悉的binder_thread_read()中。</p>
+<pre><code>static int binder_thread_read(struct binder_proc *proc,
+                struct binder_thread *thread,
+                void  __user *buffer, int size,
+                signed long *consumed, int non_block)
+{
+    ...
+    if (wait_for_proc_work) {
+      ...
+      if (non_block) {
+          ...
+      } else
+          // 阻塞式的读取，则阻塞等待事务的发生。
+          ret = wait_event_interruptible_exclusive(proc-&gt;wait, binder_has_proc_work(proc, thread));
+    } else {
+      ...
+    }
+    ...
+
+    while (1) {
+        struct binder_transaction_data tr;
+        struct binder_work *w;
+        struct binder_transaction *t = NULL;
+
+        if (!list_empty(&amp;thread-&gt;todo))
+            w = list_first_entry(&amp;thread-&gt;todo, struct binder_work, entry);
+        else if (!list_empty(&amp;proc-&gt;todo) &amp;&amp; wait_for_proc_work)
+            ...
+        else {
+            ...
+        }
+
+        ...
+
+        switch (w-&gt;type) {
+            case BINDER_WORK_TRANSACTION: {
+                t = container_of(w, struct binder_transaction, work);
+            } break;
+            ...
+        }
+
+        if (!t)
+            continue;
+
+        // t-&gt;buffer-&gt;target_node是目标节点。
+        // 这里，MediaPlayer的CREATE请求的目标是MediaPlayerService，因此target_node是MediaPlayerService对应的节点；
+        if (t-&gt;buffer-&gt;target_node) {
+            // 事务目标对应的Binder实体(即，MediaPlayerService对应的Binder实体)
+            struct binder_node *target_node = t-&gt;buffer-&gt;target_node;
+            // Binder实体在用户空间的地址。
+            // MediaPlayerService的ptr为本地Binder的弱引用，即BBinder的弱引用
+            tr.target.ptr = target_node-&gt;ptr;
+            // Binder实体在用户空间的其它数据
+            // MediaPlayerService的cookie为本地Binder本身，即BBinder对象
+            tr.cookie =  target_node-&gt;cookie;
+            t-&gt;saved_priority = task_nice(current);
+            if (t-&gt;priority &lt; target_node-&gt;min_priority &amp;&amp;
+                !(t-&gt;flags &amp; TF_ONE_WAY))
+                binder_set_nice(t-&gt;priority);
+            else if (!(t-&gt;flags &amp; TF_ONE_WAY) ||
+                 t-&gt;saved_priority &gt; target_node-&gt;min_priority)
+                binder_set_nice(target_node-&gt;min_priority);
+            cmd = BR_TRANSACTION;
+        } else {
+            ...
+        }
+        // 交易码，即CREATE
+        tr.code = t-&gt;code;
+        tr.flags = t-&gt;flags;
+        tr.sender_euid = t-&gt;sender_euid;
+
+        if (t-&gt;from) {
+            struct task_struct *sender = t-&gt;from-&gt;proc-&gt;tsk;
+            tr.sender_pid = task_tgid_nr_ns(sender,
+                            current-&gt;nsproxy-&gt;pid_ns);
+        } else {
+            tr.sender_pid = 0;
+        }
+
+        // 数据大小
+        tr.data_size = t-&gt;buffer-&gt;data_size;
+        // 数据中对象的偏移数组的大小(即对象的个数)
+        tr.offsets_size = t-&gt;buffer-&gt;offsets_size;
+        // 数据
+        tr.data.ptr.buffer = (void *)t-&gt;buffer-&gt;data +
+                    proc-&gt;user_buffer_offset;
+        // 数据中对象的偏移数组
+        tr.data.ptr.offsets = tr.data.ptr.buffer +
+                    ALIGN(t-&gt;buffer-&gt;data_size,
+                        sizeof(void *));
+
+        // 将cmd(即BR_TRANSACTION)指令写入到ptr，即传递到用户空间
+        if (put_user(cmd, (uint32_t __user *)ptr))
+            return -EFAULT;
+        // 将tr数据拷贝到用户空间
+        ptr += sizeof(uint32_t);
+        if (copy_to_user(ptr, &amp;tr, sizeof(tr)))
+            return -EFAULT;
+        ptr += sizeof(tr);
+
+        ...
+        // 删除已处理的事务
+        list_del(&amp;t-&gt;work.entry);
+        t-&gt;buffer-&gt;allow_user_free = 1;
+        // 设置回复信息
+        if (cmd == BR_TRANSACTION &amp;&amp; !(t-&gt;flags &amp; TF_ONE_WAY)) {
+            t-&gt;to_parent = thread-&gt;transaction_stack;
+            t-&gt;to_thread = thread;
+            thread-&gt;transaction_stack = t;
+        } else {
+            ...
+        }
+        break;
+    }
+
+done:
+
+    // 更新bwr.read_consumed的值
+    *consumed = ptr - buffer;
+
+    ...
+    return 0;
+}</code></pre><p>说明：MediaPlayerService被唤醒之后，binder_has_thread_work()为true。因为MediaPlayerService的待处理事务队列中有个待处理事务(即，MediaPlayer添加的CREATE请求)。<br>(01) 进入while循环后，首先取出待处理事务。<br>(02) 事务的类型是BINDER_WORK_TRANSACTION，得到对应的binder_transaction*类型指针t之后，跳出switch语句。很显然，此时t不为NULL，因此继续往下执行。下面的工作的目的，是将t中的数据转移到tr中(tr是事务交互数据包结构体binder_transaction_data对应的指针)，然后将指令和tr数据都拷贝到用户空间，让MediaPlayerService读取后进行处理。  </p>
+<p>这里，共添加了两个指令到bwr.read_consumed中：BR_NOOP和BR_TRANSACTION。其中，BR_TRANSACTION指令对应的数据中包含了CREATE请求的数据。</p>
+<p>接下来，binder_thread_read()返回到binder_ioctl()中；binder_ioctl()将数据拷贝到用户空间之后，便返回到用户空间继续执行。<br>而在<a href="/2014/09/06/BinderCommunication-ThreadPool/">Android Binder机制(八) MediaPlayerService服务的消息循环</a>中介绍过，MediaPlayerService是通过调用IPCThreadState::joinThreadPool()进入消息循环的，而joinThreadPool()又会通过getAndExecuteCommand()调用到talkWithDriver()来和Binder驱动交互的。因此，Binder驱动返回到用户空间之后，会进入talkWithDriver()。</p>
+<p><a name="anchor2_12"></a></p>
+<h2 id="2-12-IPCThreadState-talkWithDriver"><a href="#2-12-IPCThreadState-talkWithDriver" class="headerlink" title="2.12 IPCThreadState::talkWithDriver()"></a>2.12 IPCThreadState::talkWithDriver()</h2><pre><code>status_t IPCThreadState::talkWithDriver(bool doReceive)
+{
+    ...
+    do {
+        ...
+        if (ioctl(mProcess-&gt;mDriverFD, BINDER_WRITE_READ, &amp;bwr) &gt;= 0)
+            err = NO_ERROR;
+        else
+            ...
+        ...
+    } while (err == -EINTR);
+
+    ...
+
+    if (err &gt;= NO_ERROR) {
+        // 清空已写的数据
+        if (bwr.write_consumed &gt; 0) {
+            if (bwr.write_consumed &lt; (ssize_t)mOut.dataSize())
+                mOut.remove(0, bwr.write_consumed);
+            else
+                mOut.setDataSize(0);
+        }
+        // 设置已读数据
+        if (bwr.read_consumed &gt; 0) {
+            mIn.setDataSize(bwr.read_consumed);
+            mIn.setDataPosition(0);
+        }
+        ...
+        return NO_ERROR;
+    }
+
+    return err;
+}</code></pre><p>说明：ioctl()返回之后，talkWithDriver()会清除已经发送的数据。然后，便返回到getAndExecuteCommand()中。</p>
+<p><a name="anchor2_13"></a></p>
+<h2 id="13-IPCThreadState-getAndExecuteCommand"><a href="#13-IPCThreadState-getAndExecuteCommand" class="headerlink" title="13. IPCThreadState::getAndExecuteCommand()"></a>13. IPCThreadState::getAndExecuteCommand()</h2><pre><code>status_t IPCThreadState::getAndExecuteCommand()
+{
+    status_t result;
+    int32_t cmd;
+
+    // 和Binder驱动交互
+    result = talkWithDriver();
+    if (result &gt;= NO_ERROR) {
+        ...
+        // 读取mIn中的数据
+        cmd = mIn.readInt32();
+        ...
+
+        // 调用executeCommand()对数据进行处理。
+        result = executeCommand(cmd);
+        ...
+    }
+
+    return result;
+}</code></pre><p>说明：getAndExecuteCommand()会取出Binder反馈的指令，然后再调用executeCommand()根据指令进行解析。前面说过，Binder驱动共反馈了BR_NOOP和BR_TRANSACTION两个指令。而BR_NOOP指令什么也不会做。因此，我们直接分析BR_TRANSACTION指令。</p>
+<p><a name="anchor2_14"></a></p>
+<h2 id="14-IPCThreadState-executeCommand"><a href="#14-IPCThreadState-executeCommand" class="headerlink" title="14. IPCThreadState::executeCommand()"></a>14. IPCThreadState::executeCommand()</h2><pre><code>status_t IPCThreadState::executeCommand(int32_t cmd) 
+{
+    BBinder* obj; 
+    RefBase::weakref_type* refs;
+    status_t result = NO_ERROR;
+
+    switch (cmd) {
+        ...
+        case BR_TRANSACTION:
+        {
+            binder_transaction_data tr;
+            result = mIn.read(&amp;tr, sizeof(tr));
+            ...
+
+            Parcel buffer;
+            buffer.ipcSetDataReference(
+                reinterpret_cast&lt;const uint8_t*&gt;(tr.data.ptr.buffer),
+                tr.data_size,
+                reinterpret_cast&lt;const size_t*&gt;(tr.data.ptr.offsets),
+                tr.offsets_size/sizeof(size_t), freeBuffer, this);
+
+            ...
+
+            Parcel reply;
+            ...
+            if (tr.target.ptr) {
+                sp&lt;BBinder&gt; b((BBinder*)tr.cookie);
+                const status_t error = b-&gt;transact(tr.code, buffer, &amp;reply, tr.flags);
+                if (error &lt; NO_ERROR) reply.setError(error);
+
+            } else {
+                ...
+            }
+
+            if ((tr.flags &amp; TF_ONE_WAY) == 0) {
+                sendReply(reply, 0);
+            } else {
+                ...
+            }
+            ...
+
+        }
+        break;
+
+        ...
+    }
+
+    ...
+    return result;
+}</code></pre><p>说明：进入BR_TRANSACTION分支后，首先通过mIn.read()读取事务数据。接着，调用ipcSetDataReference()将事务数据解析出来。很显然，tr.target.ptr不为空，它的值是”MediaPlayerService的BBinder的弱引用”。然后，就将tr.cookie转换为BBinder*对象b；而b实际上是MediaPlayerService的本地Binder实例，即BnMediaPlayerService的实例。最终，通过b-&gt;transact()进行事务处理。</p>
+<p>下面看看BBinder的transact()代码。</p>
+<pre><code>status_t BBinder::transact(
+    uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags)
+{
+    data.setDataPosition(0);
+
+    status_t err = NO_ERROR;
+    switch (code) {
+        case PING_TRANSACTION:
+            reply-&gt;writeInt32(pingBinder());
+            break;
+        default:
+            err = onTransact(code, data, reply, flags);
+            break;
+    }
+
+    if (reply != NULL) {
+        reply-&gt;setDataPosition(0);
+    }
+
+    return err;
+}</code></pre><p>该代码在frameworks/native/libs/binder/Binder.cpp中。此时的code是CREATE，因此，它会调用onTransact()对事务进行处理。而BnMediaPlayerService重写了onTransact()方法；因此会调用到BnMediaPlayerService的onTransact()方法。在Binder机制中也是根据这种方式来实现不同Server的对各自的的请求进行区分处理的：Server的本地Binder实现类，通过覆盖onTransact()方法来处理事务。</p>
+<p>下面看看BnMediaPlayerService的onTransact()方法。</p>
+<p><a name="anchor2_15"></a></p>
+<h2 id="15-BnMediaPlayerService-onTransact"><a href="#15-BnMediaPlayerService-onTransact" class="headerlink" title="15. BnMediaPlayerService::onTransact()"></a>15. BnMediaPlayerService::onTransact()</h2><pre><code>status_t BnMediaPlayerService::onTransact(
+    uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags)
+{
+    switch (code) {
+        case CREATE: {
+            ...
+            sp&lt;IMediaPlayerClient&gt; client =
+                interface_cast&lt;IMediaPlayerClient&gt;(data.readStrongBinder());
+            int audioSessionId = data.readInt32();
+            sp&lt;IMediaPlayer&gt; player = create(client, audioSessionId);
+            reply-&gt;writeStrongBinder(player-&gt;asBinder());
+            return NO_ERROR;
+        } break;
+        ...
+    }
+    ...
+}</code></pre><p>说明：该代码在frameworks/av/media/libmedia/IMediaPlayerService.cpp中。<br>(01) 先通过interface_cast宏获取IMediaPlayerClient对象，该对象是BpMediaPlayerClient实例。BpMediaPlayerClient定义在frameworks/av/media/libmedia/IMediaPlayer.cpp中。<br>(02) 接着，通过create()创建IMediaPlayerService对象。该create()的实现是在BnMediaPlayerService的子类MediaPlayerService.cpp中，即在frameworks/av/media/libmediaplayerservice/MediaPlayerService.cpp中实现。在create()中会新建一个Client，并返回。<br>(03) 最后，将这个Client通过Binder返回给MediaPlayer。</p>
+<p>后面的流程就不再多说了。本文的核心是Binder机制，而不是MediaPlayer的框架，让我们了解MediaPlayer进程是如何与MediaPlayerService交互即可！而目前，通过CREATE请求，我们已经知道了MediaPlayer是如何和MediaPlayerService进行事务交互的。后面的内容更多的涉及到MediaPlayerService的框架，它不是本章的重点；感兴趣的读者可以自行研究。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/14/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/16/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/14/">14</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/15/">15</a></li>
+        
+        <li><a class="pagination-link" href="/page/16/">16</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

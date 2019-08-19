@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Android 触摸事件机制(三) View中触摸事件详解 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="android">
+
+
+
+
+
+    <meta name="description" content="android">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 触摸事件机制(三) View中触摸事件详解">
+<meta property="og:url" content="https://apppills.com/2015/01/03/android/os/event/2015-01-03-TouchEvent-View/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="android">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 触摸事件机制(三) View中触摸事件详解">
+<meta name="twitter:description" content="android">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-View中触摸事件的概述">1&nbsp;&nbsp;<b>1. View中触摸事件的概述</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#2-View中触摸事件的源码解析">2&nbsp;&nbsp;<b>2. View中触摸事件的源码解析</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-1-View中的dispatchTouchEvent">2.1&nbsp;&nbsp;2.1 View中的dispatchTouchEvent</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-1-1-View中的onFilterTouchEventForSecurity">2.1.1&nbsp;&nbsp;2.1.1 View中的onFilterTouchEventForSecurity()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-2-View中的onTouchEvent">2.2&nbsp;&nbsp;2.2 View中的onTouchEvent</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Android 触摸事件机制(三) View中触摸事件详解
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2015-01-03T01:01:00.000Z" itemprop="datePublished">1月 3 2015</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            14 分钟 read (About 2054 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文将对View中触摸事件相关的内容进行介绍。重点介绍的是dispatchTouchEvent(), onTouchEvent()这两个API以及OnTouchListener接口。</p>
+</blockquote>
+<blockquote>
+<p>注意：本文是基于Android 4.4.2版本进行介绍的！</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">View中触摸事件的概述</a><br><strong>2</strong>. <a href="#anchor2">View中触摸事件的源码解析</a><br><strong>2.1</strong>. <a href="#anchor2_1">View中的dispatchTouchEvent</a><br><strong>2.2</strong>. <a href="#anchor2_2">View中的onTouchEvent</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-View中触摸事件的概述"><a href="#1-View中触摸事件的概述" class="headerlink" title="1. View中触摸事件的概述"></a>1. View中触摸事件的概述</h1><p>  View中与触摸事件相关的内容可以分为两部分。</p>
+<p><strong>第一部分</strong> dispatchTouchEvent()和onTouchEvent()这两个API</p>
+<p>dispatchTouchEvent()是传递触摸事件的API，而onTouchEvent()则是View处理触摸事件的API。<br>View中dispatchTouchEvent()将事件传递给”自己的onTouch()”, “自己的onTouchEvent()”进行处理。 onTouch()是OnTouchListener接口中API，属于View提供的，让用户自己处理触摸事件的接口。而onTouchEvent()是Android系统提供的，用于处理触摸事件的接口；在onTouchEvent()中会进行一系列的动作，例如获取焦点、设置按下状态，调用onClick()等。</p>
+<p><strong>第二部分</strong> OnTouchListener, OnClickListener, OnLongClickListener等接口</p>
+<p>这部分主要是接口。但本文主要介绍的是OnTouchListener接口中的onTouch()。为什么呢？<br>这是因为，onTouch()与onTouchEvent()都是用户处理触摸事件的API。<br>但不同的是：(01), onTouch()是View提供给用户，让用户自己处理触摸事件的接口。而onTouchEvent()是Android系统自己实现的接口。(02)，onTouch()的优先级比onTouchEvent()的优先级更高。dispatchTouchEvent()中分发事件的时候，会先将事件分配给onTouch()进行处理，然后才分配给onTouchEvent()进行处理。  如果onTouch()对触摸事件进行了处理，并且返回true；那么，该触摸事件就不会分配在分配给onTouchEvent()进行处理了。只有当onTouch()没有处理，或者处理了但返回false时，才会分配给onTouchEvent()进行处理。</p>
+<pre><code>public interface OnTouchListener {
+    boolean onTouch(View v, MotionEvent event);
+}</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-View中触摸事件的源码解析"><a href="#2-View中触摸事件的源码解析" class="headerlink" title="2. View中触摸事件的源码解析"></a>2. View中触摸事件的源码解析</h1><p><a name="anchor2_1"></a></p>
+<h2 id="2-1-View中的dispatchTouchEvent"><a href="#2-1-View中的dispatchTouchEvent" class="headerlink" title="2.1 View中的dispatchTouchEvent"></a>2.1 View中的dispatchTouchEvent</h2><pre><code>public boolean dispatchTouchEvent(MotionEvent event) {
+    if (mInputEventConsistencyVerifier != null) {
+        mInputEventConsistencyVerifier.onTouchEvent(event, 0);
+    }
+
+    // 如果该View被遮蔽，并且该View在被遮蔽时不响应点击事件；
+    // 此时，返回false；不会执行onTouch()或onTouchEvent()，即过滤调用该点击事件。
+    // 否则，返回true。
+    // 被遮蔽的意思是：该View不是位于顶部，有其他的View在它之上。
+    if (onFilterTouchEventForSecurity(event)) {
+        //noinspection SimplifiableIfStatement
+        ListenerInfo li = mListenerInfo;
+        if (li != null &amp;&amp; li.mOnTouchListener != null &amp;&amp; (mViewFlags &amp; ENABLED_MASK) == ENABLED
+                &amp;&amp; li.mOnTouchListener.onTouch(this, event)) {
+            return true;
+        }
+
+        if (onTouchEvent(event)) {
+            return true;
+        }
+    }
+
+    if (mInputEventConsistencyVerifier != null) {
+        mInputEventConsistencyVerifier.onUnhandledEvent(event, 0);
+    }
+    return false;
+}</code></pre><p>说明：该代码定义在frameworks/base/core/java/android/view/View.java中。<br>(01) mInputEventConsistencyVerifier是调试用的，这里不用理会。重点看onFilterTouchEventForSecurity()部分。<br>(02) onFilterTouchEventForSecurity()表示是否要分发该触摸事件；如果该View不是位于顶部，并且有设置属性使该View不在顶部时不响应触摸事件，则不分发该触摸事件，即不会执行onTouch()与onTouchEvent()。 否则的话，则将事件分发给onTouch(), onTouchEvent()进行处理。<br>(03) 如果将事件进行分发的话，会先尝试分发给onTouch()；然后才分发给onTouchEvent()。</p>
+<h3 id="2-1-1-View中的onFilterTouchEventForSecurity"><a href="#2-1-1-View中的onFilterTouchEventForSecurity" class="headerlink" title="2.1.1 View中的onFilterTouchEventForSecurity()"></a>2.1.1 View中的onFilterTouchEventForSecurity()</h3><pre><code>public boolean onFilterTouchEventForSecurity(MotionEvent event) {
+    //noinspection RedundantIfStatement
+    if ((mViewFlags &amp; FILTER_TOUCHES_WHEN_OBSCURED) != 0
+            &amp;&amp; (event.getFlags() &amp; MotionEvent.FLAG_WINDOW_IS_OBSCURED) != 0) {
+        // Window is obscured, drop this touch.
+        return false;
+    }
+    return true;
+}</code></pre><p>说明：onFilterTouchEventForSecurity()返回true，表示可以分发该触摸事件；否则，不能分发该触摸事件。不能分发事件的情况，只有mViewFlags&amp;FILTER_TOUCHES_WHEN_OBSCURED!=0，并且event.getFlags()&amp;MotionEvent.FLAG_WINDOW_IS_OBSCURED!=0同时成立。<br>(01) FILTER_TOUCHES_WHEN_OBSCURED是android:filterTouchesWhenObscured属性所对应的位。android:filterTouchesWhenObscured是true的话，则表示其他视图在该视图之上，导致该视图被隐藏时，该视图就不再响应触摸事件。<br>(02) MotionEvent.FLAG_WINDOW_IS_OBSCURED为true的话，则表示该视图的窗口是被隐藏的。  </p>
+<p><a name="anchor2_2"></a></p>
+<h2 id="2-2-View中的onTouchEvent"><a href="#2-2-View中的onTouchEvent" class="headerlink" title="2.2 View中的onTouchEvent"></a>2.2 View中的onTouchEvent</h2><pre><code>public boolean onTouchEvent(MotionEvent event) {
+    final int viewFlags = mViewFlags;
+
+    // 如果View被禁用的话，则返回它是否可以点击。
+    if ((viewFlags &amp; ENABLED_MASK) == DISABLED) {
+        if (event.getAction() == MotionEvent.ACTION_UP &amp;&amp; (mPrivateFlags &amp; PFLAG_PRESSED) != 0) {
+            setPressed(false);
+        }
+        return (((viewFlags &amp; CLICKABLE) == CLICKABLE ||
+                (viewFlags &amp; LONG_CLICKABLE) == LONG_CLICKABLE));
+    }
+
+    // 如果该View的mTouchDelegate不为null的话，将触摸消息分发给mTouchDelegate。
+    // mTouchDelegate的默认值是null。
+    if (mTouchDelegate != null) {
+        if (mTouchDelegate.onTouchEvent(event)) {
+            return true;
+        }
+    }
+
+    // 如果View可以被点击的话，则执行if里面的内容。
+    // 这其中涉及到的主要是获取焦点，设置按下状态，触发onClick(), onLongClick()事件等等。
+    if (((viewFlags &amp; CLICKABLE) == CLICKABLE ||
+            (viewFlags &amp; LONG_CLICKABLE) == LONG_CLICKABLE)) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_UP:
+                boolean prepressed = (mPrivateFlags &amp; PFLAG_PREPRESSED) != 0;
+                if ((mPrivateFlags &amp; PFLAG_PRESSED) != 0 || prepressed) {
+                    // take focus if we don&apos;t have it already and we should in
+                    // touch mode.
+                    boolean focusTaken = false;
+                    if (isFocusable() &amp;&amp; isFocusableInTouchMode() &amp;&amp; !isFocused()) {
+                        focusTaken = requestFocus();
+                    }
+
+                    if (prepressed) {
+                        // The button is being released before we actually
+                        // showed it as pressed.  Make it show the pressed
+                        // state now (before scheduling the click) to ensure
+                        // the user sees it.
+                        setPressed(true);
+                   }
+
+
+                    if (!mHasPerformedLongPress) {
+                        // This is a tap, so remove the longpress check
+                        removeLongPressCallback();
+
+                        // Only perform take click actions if we were in the pressed state
+                        if (!focusTaken) {
+                            // Use a Runnable and post this rather than calling
+                            // performClick directly. This lets other visual state
+                            // of the view update before click actions start.
+                            if (mPerformClick == null) {
+                                mPerformClick = new PerformClick();
+                            }
+                            if (!post(mPerformClick)) {
+                                performClick();
+                            }
+                        }
+                    }
+
+                    if (mUnsetPressedState == null) {
+                        mUnsetPressedState = new UnsetPressedState();
+                    }
+
+                    if (prepressed) {
+                        postDelayed(mUnsetPressedState,
+                                ViewConfiguration.getPressedStateDuration());
+                    } else if (!post(mUnsetPressedState)) {
+                        // If the post failed, unpress right now
+                        mUnsetPressedState.run();
+                    }
+                    removeTapCallback();
+                }
+                break;
+
+            case MotionEvent.ACTION_DOWN:
+                mHasPerformedLongPress = false;
+
+                if (performButtonActionOnTouchDown(event)) {
+                    break;
+                }
+
+                // Walk up the hierarchy to determine if we&apos;re inside a scrolling container.
+                boolean isInScrollingContainer = isInScrollingContainer();
+                // For views inside a scrolling container, delay the pressed feedback for
+                // a short period in case this is a scroll.
+                if (isInScrollingContainer) {
+                    mPrivateFlags |= PFLAG_PREPRESSED;
+                    if (mPendingCheckForTap == null) {
+                        mPendingCheckForTap = new CheckForTap();
+                    }
+                    postDelayed(mPendingCheckForTap, ViewConfiguration.getTapTimeout());
+                } else {
+                    // Not inside a scrolling container, so show the feedback right away
+                    setPressed(true);
+                    checkForLongClick(0);
+                }
+                break;
+
+            case MotionEvent.ACTION_CANCEL:
+                setPressed(false);
+                removeTapCallback();
+                removeLongPressCallback();
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                final int x = (int) event.getX();
+                final int y = (int) event.getY();
+
+                // Be lenient about moving outside of buttons
+                if (!pointInView(x, y, mTouchSlop)) {
+                    // Outside button
+                    removeTapCallback();
+                    if ((mPrivateFlags &amp; PFLAG_PRESSED) != 0) {
+                        // Remove any future long press/tap checks
+                        removeLongPressCallback();
+
+                        setPressed(false);
+                    }
+                }
+                break;
+        }
+        return true;
+    }
+
+    return false;
+}</code></pre><p>说明：onTouchEvent()是Android系统实现的View对触摸事件的处理。<br>(01) 如果View被禁用的话，则返回它是否可以点击。当我们调用了setEnabled(false)时，View就被禁用了；默认情况下，View是可用的。当调用setClickable(true)或者android:clickable为true时，View就是可点击状态；默认情况下，View是不可点击的。<br>(02) 如果该View的mTouchDelegate不为null的话，将触摸消息分发给mTouchDelegate。例如，假设有两个视图v1和v2，它们的布局相互之间不重叠；如果设置了v1.setTouchDelegate(v2)的话，v1的触摸事件就会分发给v2。 注意：mTouchDelegate的默认值是null。<br>(03) 如果View可以被点击的话，则执行if里面的内容。if里面涉及的内容很多，这里与本文的主题关联不大，暂且不表；如果要细将的话，估计得好几篇文章。例如，setPressed()是设置View的按下状态，如果用户有设置View在不同状态的图片时，setPressed()时会导致View的图片的更新。</p>
+<p>View中关于触摸事件的代码就分析至此。总的来说：<br>(01) <strong>View中的dispatchTouchEvent()会将事件传递给”自己的onTouch()”, “自己的onTouchEvent()”进行处理。而且onTouch()的优先级比onTouchEvent()的优先级要高。</strong><br>(02) <strong>onTouch()与onTouchEvent()都是View中用户处理触摸事件的API。onTouch是OnTouchListener接口中的函数，OnTouchListener接口需要用户自己实现。onTouchEvent()是View自带的接口，Android系统提供了默认的实现；当然，用户可以重载该API。</strong><br>(03) <strong>onTouch()与onTouchEvent()有两个不同之处：(01), onTouch()是View提供给用户，让用户自己处理触摸事件的接口。而onTouchEvent()是Android系统自己实现的接口。(02)，onTouch()的优先级比onTouchEvent()的优先级更高。dispatchTouchEvent()中分发事件的时候，会先将事件分配给onTouch()进行处理，然后才分配给onTouchEvent()进行处理。  如果onTouch()对触摸事件进行了处理，并且返回true；那么，该触摸事件就不会分配在分配给onTouchEvent()进行处理了。只有当onTouch()没有处理，或者处理了但返回false时，才会分配给onTouchEvent()进行处理。</strong></p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/android/">#android</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2015/01/04/android/os/event/2015-01-04-TouchEvent-ViewGroup/">Android 触摸事件机制(四) ViewGroup中触摸事件详解</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2015/01/02/android/os/event/2015-01-02-TouchEvent-Activity/">Android 触摸事件机制(二) Activity中触摸事件详解</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

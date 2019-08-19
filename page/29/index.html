@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/29/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/07/25/android/api_guide/animation/view_animation/2014-07-24-ViewAnimation-BasicUsage/" itemprop="url">Android 之Animation动画(六)之 View Animation</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-07-25T01:00:00.000Z" itemprop="datePublished">7月 25 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            6 分钟 read (About 930 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本章介绍Android中的View Animation。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">View Animation简介</a><br><strong>2</strong>. <a href="#anchor2">View Animation的语法规则</a><br><strong>3</strong>. <a href="#anchor3">View Animation的示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="View-Animation简介"><a href="#View-Animation简介" class="headerlink" title="View Animation简介"></a>View Animation简介</h1><p>View Animation(Tween Animation): 补间动画，给出两个关键帧，通过一些算法将给定属性值在给定的时间内在两个关键帧间渐变。</p>
+<p>View Animation只能用来实现四种基本动作：透明/伸缩/移动/旋转。它与”Property Animation适用于任意Object类型不同”，View Animation只适用于View。但是View Animation相比于Property Animation的使用更加简单。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="View-Animation的语法规则"><a href="#View-Animation的语法规则" class="headerlink" title="View Animation的语法规则"></a>View Animation的语法规则</h1><h2 id="1-View-Animation的样式"><a href="#1-View-Animation的样式" class="headerlink" title="1. View Animation的样式"></a>1. View Animation的样式</h2><p>View Animation通常在<strong>res/anim</strong>目录下新建一个xml文件来定义。xml文件的格式如下：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;set xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:interpolator=&quot;@[package:]anim/interpolator_resource&quot;
+    android:shareInterpolator=[&quot;true&quot; | &quot;false&quot;] &gt;
+    &lt;alpha
+        android:fromAlpha=&quot;float&quot;
+        android:toAlpha=&quot;float&quot; /&gt;
+    &lt;scale
+        android:fromXScale=&quot;float&quot;
+        android:toXScale=&quot;float&quot;
+        android:fromYScale=&quot;float&quot;
+        android:toYScale=&quot;float&quot;
+        android:pivotX=&quot;float&quot;
+        android:pivotY=&quot;float&quot; /&gt;
+    &lt;translate
+        android:fromXDelta=&quot;float&quot;
+        android:toXDelta=&quot;float&quot;
+        android:fromYDelta=&quot;float&quot;
+        android:toYDelta=&quot;float&quot; /&gt;
+    &lt;rotate
+        android:fromDegrees=&quot;float&quot;
+        android:toDegrees=&quot;float&quot;
+        android:pivotX=&quot;float&quot;
+        android:pivotY=&quot;float&quot; /&gt;
+    &lt;set&gt;
+        ...
+    &lt;/set&gt;
+&lt;/set&gt;</code></pre><p>说明：<br>(01) <strong>set</strong>: 是动画的集合，相当于一个容器。<br>(02) <strong>interpolator</strong>: 动画的动作类型，比如accelerate_interpolator类型的动画是加速的，它会越来越快。<br>(03) <strong>shareInterpolator</strong>: 将set的interpolator应用到set所包行的动画中。<br>(04) <strong>alpha</strong>: 透明度。<br>&nbsp;&nbsp; a) <strong>fromAlpha</strong>: 起始动画的透明度。它的值是0<del>1.0之间；0表示完全透明，1.0表示完全不透明。<br>&nbsp;&nbsp; b) <strong>toAlpha</strong>: 结束动画的透明度。它的值是0</del>1.0之间；0表示完全透明，1.0表示完全不透明。<br>(05) <strong>scale</strong>: 缩放。<br>&nbsp;&nbsp; a) <strong>fromXScale</strong>: 起始动画在X轴上的缩放倍数。0表示没有，2表示2倍。<br>&nbsp;&nbsp; b) <strong>toXScale</strong>: 结束动画在X轴上的缩放倍数。0表示没有，2表示2倍。<br>&nbsp;&nbsp; c) <strong>fromYScale</strong>: 起始动画在Y轴上的缩放倍数。0表示没有，2表示2倍。<br>&nbsp;&nbsp; d) <strong>toYScale</strong>: 结束动画在Y轴上的缩放倍数。0表示没有，2表示2倍。<br>&nbsp;&nbsp; e) <strong>pivotX</strong>: 动画缩放时，中心点在X轴上的位置(相对于原始的视图)。50%表示在视图的X轴中间。<br>&nbsp;&nbsp; f) <strong>pivotY</strong>: 动画缩放时，中心点在Y轴上的位置(相对于原始的视图)。50%表示在视图的Y轴中间。<br>(06) <strong>training</strong>: 移动。<br>&nbsp;&nbsp; a) <strong>fromXDelta</strong>: 起始动画在X轴上的偏移像素(相对于视图左上角)。<br>&nbsp;&nbsp; b) <strong>toXDelta</strong>: 结束动画在X轴上的偏移像素(相对于视图左上角)。<br>&nbsp;&nbsp; c) <strong>fromYDelta</strong>: 起始动画在Y轴上的偏移像素(相对于视图左上角)。<br>&nbsp;&nbsp; d) <strong>toYDelta</strong>: 结束动画在Y轴上的偏移像素(相对于视图左上角)。<br>(07) <strong>rotate</strong>: 旋转。<br>&nbsp;&nbsp; a) <strong>fromDegrees</strong>: 起始动画在的角度。可以是负数，也可以大于360。<br>&nbsp;&nbsp; b) <strong>toDegrees</strong>: 起始动画在的角度。可以是负数，也可以大于360。<br>&nbsp;&nbsp; c) <strong>pivotX</strong>: 动画旋转时，中心点在X轴上的位置(相对于原始的视图)。50%表示在视图的X轴中间。<br>&nbsp;&nbsp; d) <strong>pivotY</strong>: 动画旋转时，中心点在Y轴上的位置(相对于原始的视图)。50%表示在视图的Y轴中间。<br>rotate既可以顺时针旋转，也可以逆时针旋转。 </p>
+<h2 id="2-interpolator的样式"><a href="#2-interpolator的样式" class="headerlink" title="2. interpolator的样式"></a>2. interpolator的样式</h2><p>系统自带的interpolator样式如下：</p>
+<p>@android:anim/accelerate_decelerate_interpolator<br>@android:anim/accelerate_interpolator<br>@android:anim/anticipate_interpolator<br>@android:anim/anticipate_overshoot_interpolator<br>@android:anim/bounce_interpolator<br>@android:anim/cycle_interpolator<br>@android:anim/decelerate_interpolator<br>@android:anim/linear_interpolator<br>@android:anim/overshoot_interpolator</p>
+<p><a name="anchor3"></a></p>
+<h1 id="View-Animation的示例"><a href="#View-Animation的示例" class="headerlink" title="View Animation的示例"></a>View Animation的示例</h1><p>点击查看: <a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/animation/view_animation/01_basic/AnimationTest" target="_blank" rel="noopener">View Animation的示例源码</a></p>
+<p>该示例包括View Animation的”透明/伸缩/移动/旋转”，也包括”它们的组合”。</p>
+<p>View Animation的具体播放代码如下：</p>
+<pre><code>Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_alpha);
+view.startAnimation(anim);</code></pre><p>说明：view是一个View对象。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/28/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/30/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/28/">28</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/29/">29</a></li>
+        
+        <li><a class="pagination-link" href="/page/30/">30</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

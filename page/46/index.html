@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/46/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/23/android/api_guide/app_component/fragment/2014-06-23-ListFragment/" itemprop="url">Android组件--Fragment(四)之 ListFragment</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-23T01:45:00.000Z" itemprop="datePublished">6月 23 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            5 分钟 read (About 706 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文介绍ListFragment。</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="ListFragment简介"><a href="#ListFragment简介" class="headerlink" title="ListFragment简介"></a>ListFragment简介</h1><p>ListFragment继承于Fragment。因此它具有Fragment的特性，能够作为activity中的一部分，目的也是为了使页面设计更加灵活。</p>
+<p>相比Fragment，ListFragment的内容是以列表(list)的形式显示的。ListFragment的布局默认包含一个ListView。因此，在ListFragment对应的布局文件中，必须指定一个 android:id 为 “@android:id/list” 的ListView控件! </p>
+<h1 id="ListFragment使用示例"><a href="#ListFragment使用示例" class="headerlink" title="ListFragment使用示例"></a>ListFragment使用示例</h1><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/fragment/list_fragment/01_simple" target="_blank" rel="noopener">ListFragment的完整代码</a></p>
+<p>下面介绍在Activity中显示ListFragment的步骤。</p>
+<h2 id="1-Activity对应的代码"><a href="#1-Activity对应的代码" class="headerlink" title="1. Activity对应的代码"></a>1. Activity对应的代码</h2><pre><code>public class FragmentTest extends Activity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+    }   
+}</code></pre><h2 id="2-Activity对应的布局"><a href="#2-Activity对应的布局" class="headerlink" title="2. Activity对应的布局"></a>2. Activity对应的布局</h2><pre><code>&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:tools=&quot;http://schemas.android.com/tools&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;horizontal&quot; &gt;
+
+    &lt;fragment 
+        android:name=&quot;com.skw.fragmenttest.MyListFragment&quot;
+        android:id=&quot;@+id/myfragment&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot; /&gt;
+
+&lt;/LinearLayout&gt;</code></pre><p>说明：该Activity的布局中只包行了一个Fragment。下面看看MyListFragment的内容。</p>
+<h2 id="3-MyListFragment的内容"><a href="#3-MyListFragment的内容" class="headerlink" title="3. MyListFragment的内容"></a>3. MyListFragment的内容</h2><pre><code>public class MyListFragment extends ListFragment {
+    private static final String TAG = &quot;##MyListFragment##&quot;;
+
+    private ListView selfList;
+
+    String[] cities = {
+         &quot;Shenzhen&quot;,
+         &quot;Beijing&quot;,
+         &quot;Shanghai&quot;,
+         &quot;Guangzhou&quot;,
+         &quot;Wuhan&quot;,
+         &quot;Tianjing&quot;,
+         &quot;Changsha&quot;,
+         &quot;Xi&apos;an&quot;,
+         &quot;Chongqing&quot;,
+         &quot;Guilin&quot;,
+    };
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+            Bundle savedInstanceState) {
+        Log.d(TAG, &quot;onCreateView&quot;);
+        return inflater.inflate(R.layout.list_fragment, container, false);
+    }
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, &quot;onCreate&quot;);
+        super.onCreate(savedInstanceState);
+        // 设置ListFragment默认的ListView，即@id/android:list
+        this.setListAdapter(new ArrayAdapter&lt;String&gt;(getActivity(), 
+                android.R.layout.simple_list_item_1, cities));
+
+    }
+
+    public void onListItemClick(ListView parent, View v, 
+            int position, long id) {
+        Log.d(TAG, &quot;onListItemClick&quot;);
+        Toast.makeText(getActivity(), &quot;You have selected &quot; + cities[position],
+                Toast.LENGTH_SHORT).show();
+    }    
+}</code></pre><p>说明：MyListFragment是自定义的ListFragment。它使用了list_fragment.xml作为布局，并通过android.R.layout.simple_list_item_1显示ListView中的每一项。</p>
+<h2 id="4-list-fragment-xml的内容"><a href="#4-list-fragment-xml的内容" class="headerlink" title="4. list_fragment.xml的内容"></a>4. list_fragment.xml的内容</h2><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;vertical&quot; &gt;
+
+    &lt;!-- ListFragment对应的android:id值固定为&quot;@id/android:list&quot; --&gt;
+    &lt;ListView
+        android:id=&quot;@id/android:list&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot; 
+        android:drawSelectorOnTop=&quot;false&quot;
+        /&gt;
+
+&lt;/LinearLayout&gt;</code></pre><h1 id="自定义ListFragment"><a href="#自定义ListFragment" class="headerlink" title="自定义ListFragment"></a>自定义ListFragment</h1><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/fragment/list_fragment/02_self_layout" target="_blank" rel="noopener">自定义ListFragment的完整代码</a></p>
+<p>“Activity的布局以及代码”和前面一样，这里就不再重复说明。</p>
+<h2 id="3-MyListFragment的内容-1"><a href="#3-MyListFragment的内容-1" class="headerlink" title="3. MyListFragment的内容"></a>3. MyListFragment的内容</h2><pre><code>public class MyListFragment extends ListFragment {
+    private static final String TAG = &quot;##MyListFragment##&quot;;
+
+    private ListView selfList;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+            Bundle savedInstanceState) {
+        Log.d(TAG, &quot;onCreateView&quot;);
+        return inflater.inflate(R.layout.list_fragment, container, false);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        final String[] from = new String[] {&quot;title&quot;, &quot;info&quot;};
+        final int[] to = new int[] {R.id.text1, R.id.text2};
+
+        Log.d(TAG, &quot;onCreate&quot;);
+        super.onCreate(savedInstanceState);
+        // 建立SimpleAdapter，将from和to对应起来
+        SimpleAdapter adapter = new SimpleAdapter(
+                this.getActivity(), getSimpleData(), 
+                R.layout.item, from, to);
+        this.setListAdapter(adapter);
+    }
+
+    public void onListItemClick(ListView parent, View v, 
+            int position, long id) {
+        Log.d(TAG, &quot;onListItemClick&quot;);
+        Toast.makeText(getActivity(), 
+                &quot;You have selected &quot; + position,
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private List&lt;Map&lt;String, Object&gt;&gt; getSimpleData() {
+        List&lt;Map&lt;String, Object&gt;&gt; list = new ArrayList&lt;Map&lt;String, Object&gt;&gt;();
+
+        Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
+        map.put(&quot;title&quot;, &quot;Ferris wheel&quot;);
+        map.put(&quot;info&quot;, &quot;Suzhou Ferris wheel&quot;);
+        list.add(map);
+
+        map = new HashMap&lt;String, Object&gt;();
+        map.put(&quot;title&quot;, &quot;Flower&quot;);
+        map.put(&quot;info&quot;, &quot;Roser&quot;);
+        list.add(map);
+
+        map = new HashMap&lt;String, Object&gt;();
+        map.put(&quot;title&quot;, &quot;Disk&quot;);
+        map.put(&quot;info&quot;, &quot;Song Disk&quot;);
+        list.add(map);
+
+        return list;
+    }
+}</code></pre><p>说明：MyListFragment使用了R.layout.list_fragment作为布局，并且对于ListView中的每一项都使用了R.layout.item作为布局。</p>
+<h2 id="4-list-fragment-xml的内容-1"><a href="#4-list-fragment-xml的内容-1" class="headerlink" title="4. list_fragment.xml的内容"></a>4. list_fragment.xml的内容</h2><pre><code>&lt;!-- ListFragment对应的android:id值固定为&quot;@id/android:list&quot; --&gt;
+&lt;ListView
+    android:id=&quot;@id/android:list&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot; 
+    android:drawSelectorOnTop=&quot;false&quot;
+    /&gt;</code></pre><h2 id="5-item-xml的内容"><a href="#5-item-xml的内容" class="headerlink" title="5. item.xml的内容"></a>5. item.xml的内容</h2><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;vertical&quot; &gt;
+
+    &lt;TextView android:id=&quot;@+id/text1&quot;
+        android:textSize=&quot;12sp&quot;
+        android:textStyle=&quot;bold&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;/&gt;
+
+    &lt;TextView android:id=&quot;@+id/text2&quot;
+        android:textSize=&quot;24sp&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/45/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/47/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/45/">45</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/46/">46</a></li>
+        
+        <li><a class="pagination-link" href="/page/47/">47</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

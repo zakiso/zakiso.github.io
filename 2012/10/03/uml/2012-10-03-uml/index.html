@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>UML系列03之  UML类图(二) - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="uml">
+
+
+
+
+
+    <meta name="description" content="uml">
+<meta name="keywords" content="uml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UML系列03之  UML类图(二)">
+<meta property="og:url" content="https://apppills.com/2012/10/03/uml/2012-10-03-uml/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="uml">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml03-01.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml03-02.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml03-03.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml03-04.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml03-05.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml03-06.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml03-07.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml03-08.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml03-09.jpg">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="UML系列03之  UML类图(二)">
+<meta name="twitter:description" content="uml">
+<meta name="twitter:image" content="https://apppills.com/media/pic/uml/uml03-01.jpg">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#UML类图的几种关系">1&nbsp;&nbsp;<b>UML类图的几种关系</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-泛化-Generalization">1.1&nbsp;&nbsp;1. 泛化(Generalization)</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-实现-Realization">1.2&nbsp;&nbsp;2. 实现(Realization)</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-关联-Association">1.3&nbsp;&nbsp;3. 关联(Association)</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-1-自关联">1.3.1&nbsp;&nbsp;3.1 自关联</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-2-单向关联">1.3.2&nbsp;&nbsp;3.2 单向关联</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-3-双向关联">1.3.3&nbsp;&nbsp;3.3 双向关联</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-4-多重性关联">1.3.4&nbsp;&nbsp;3.4 多重性关联</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-5-聚合">1.3.5&nbsp;&nbsp;3.5 聚合</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-6-组合">1.3.6&nbsp;&nbsp;3.6 组合</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#4-依赖-Dependency">1.4&nbsp;&nbsp;4. 依赖(Dependency)</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            UML系列03之  UML类图(二)
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-10-03T01:01:00.000Z" itemprop="datePublished">10月 3 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/pattern/">pattern</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            12 分钟 read (About 1813 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>在”<a href="/2012/10/02/uml">UML系列02之 UML类图(一)</a>“中介绍了类图的基本构成–类的UML表示方法。本文是接着前文，继续对”UML的类图”中几种关系进行介绍。</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="UML类图的几种关系"><a href="#UML类图的几种关系" class="headerlink" title="UML类图的几种关系"></a>UML类图的几种关系</h1><p>在UML类图中，关系可以分为4种: <strong>泛化, 实现, 关联 和 依赖</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>关系名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>泛化</td>
+<td>表示”类与类之间的继承关系”</td>
+</tr>
+<tr>
+<td>实现</td>
+<td>表示”类与接口之间的实现”</td>
+</tr>
+<tr>
+<td>关联</td>
+<td>表示”类与类之间的拥有关系”。即，一个类是另一个类的成员。关联又包括：自关联, 单向关联, 双向关联, 多重性关联, 组合, 聚合</td>
+</tr>
+<tr>
+<td>依赖</td>
+<td>表示”类与类之间的使用关系”。即，一个类是另一类的局部变量, 形式参数, 或者调用了静态方法/成员等</td>
+</tr>
+</tbody></table>
+<p>这几种关系表示的”类与类之间关系的强弱顺序”是：<strong>泛化 = 实现 &gt; 关联 &gt; 依赖</strong></p>
+<h2 id="1-泛化-Generalization"><a href="#1-泛化-Generalization" class="headerlink" title="1. 泛化(Generalization)"></a>1. 泛化(Generalization)</h2><p>关系说明: 泛化是一种继承关系。它指定了子类如何特化父类的所有特征和行为。例如：老虎是动物的一种。</p>
+<p>代码说明: 父类与子类。</p>
+<p>UML图形: 带三角箭头的实线，箭头指向父类。</p>
+<p>示例:  Fruit是”水果”；Apple是”苹果”，它继承了Fruit，是水果中的一种。</p>
+<p>UML示例图</p>
+<p><img src="/media/pic/uml/uml03-01.jpg" alt="img"></p>
+<p>对应的Java代码</p>
+<pre><code>public class Fruit {
+    protected int price;
+    public int getPrice() {
+        return price;
+    }
+    public void setPrice() {
+        return price;
+    }
+}
+public class Apple extends Fruit {
+}</code></pre><h2 id="2-实现-Realization"><a href="#2-实现-Realization" class="headerlink" title="2. 实现(Realization)"></a>2. 实现(Realization)</h2><p>关系说明: 实现是一种类与接口的关系，表示类是接口所有特征和行为的实现。</p>
+<p>代码说明: 实现类与接口。</p>
+<p>UML图形: 带三角箭头的虚线，箭头指向接口。</p>
+<p>示例: Runnable接口表示”一个任务”，TimeTask是”计时任务”，它实现了Runnable接口。</p>
+<p>UML示例图</p>
+<p><img src="/media/pic/uml/uml03-02.jpg" alt="img"></p>
+<p>对应的Java代码</p>
+<pre><code>public interface Runnable {
+    abstract public void run();
+}
+public class TimeTask implements Runnable{
+    @Override
+    public void run() {
+    }
+}</code></pre><h2 id="3-关联-Association"><a href="#3-关联-Association" class="headerlink" title="3. 关联(Association)"></a>3. 关联(Association)</h2><p>关联表示”类与类之间的拥有关系”。即，一个类是另一个类的成员。关联包括：自关联, 单向关联, 双向关联, 多重性关联, 聚合, 组合。</p>
+<h3 id="3-1-自关联"><a href="#3-1-自关联" class="headerlink" title="3.1 自关联"></a>3.1 自关联</h3><p>关系说明: 一个类包含自己。例如，单向链表中的节点，包含下一个节点的信息。</p>
+<p>代码说明: 成员变量</p>
+<p>UML图形: 带普通箭头的实心线，指向被自己。</p>
+<p>示例: Node是单向链表中的节点，它包含下一个节点的指针。</p>
+<p>UML示例图</p>
+<p><img src="/media/pic/uml/uml03-03.jpg" alt="img"></p>
+<p>对应的Java代码</p>
+<pre><code>public class Node {
+    private Node node;
+}</code></pre><h3 id="3-2-单向关联"><a href="#3-2-单向关联" class="headerlink" title="3.2 单向关联"></a>3.2 单向关联</h3><p>关系说明: “类A”中有”类B”成员变量，”类B”中没有”类A”成员变量。</p>
+<p>代码说明: 成员变量</p>
+<p>UML图形: 带普通单向箭头的实心线，指向被拥有者。</p>
+<p>示例: Person表示”人”，IdCard表示”身份证信息”，身份证包括id和”身份证编号snum”。一个人拥有唯一的身份证信息。</p>
+<p>UML示例图</p>
+<p><img src="/media/pic/uml/uml03-04.jpg" alt="img"></p>
+<p>对应的Java代码</p>
+<pre><code>public class Person {
+    private IdCard idcard;
+}
+public class IdCard {
+    private int id;
+    private String snum;
+}</code></pre><h3 id="3-3-双向关联"><a href="#3-3-双向关联" class="headerlink" title="3.3 双向关联"></a>3.3 双向关联</h3><p>关系说明: “类A”中有”类B”成员变量，”类B”也有”类A”成员变量。</p>
+<p>代码说明: 成员变量</p>
+<p>UML图形: 带普通双向箭头的实心线 或者 不带箭头的实心线。</p>
+<p>示例:  Cusomer表示”客户”，Product表示”产品”。客户可以购买产品，产品也属于客户。</p>
+<p>UML示例图</p>
+<p><img src="/media/pic/uml/uml03-05.jpg" alt="img"></p>
+<p>对应的Java代码</p>
+<pre><code>public class Customer {
+    private Address address;
+}
+public class Address {
+    private Customer customer;
+}</code></pre><h3 id="3-4-多重性关联"><a href="#3-4-多重性关联" class="headerlink" title="3.4 多重性关联"></a>3.4 多重性关联</h3><p>关系说明: 多重性关联是两个类之间在关联对象上的数量关系。有如下几种：</p>
+<table>
+<thead>
+<tr>
+<th>表示方法</th>
+<th>多重性关联说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1..1</td>
+<td>表示另一个类的一个对象只与该类的一个对象有关系</td>
+</tr>
+<tr>
+<td>0..*</td>
+<td>表示另一个类的一个对象与该类的零个或多个对象有关系</td>
+</tr>
+<tr>
+<td>1..*</td>
+<td>表示另一个类的一个对象与该类的一个或多个对象有关系</td>
+</tr>
+<tr>
+<td>0..1</td>
+<td>表示另一个类的一个对象没有或只与该类的一个对象有关系</td>
+</tr>
+<tr>
+<td>m..n</td>
+<td>表示另一个类的一个对象与该类最少m，最多n个对象有关系(m≤n)</td>
+</tr>
+</tbody></table>
+<p>代码说明: 成员变量</p>
+<p>UML图形: 实心线表示，单向关联则包括箭头，双向关联包括”两个箭头”或”不包含任何箭头”。</p>
+<p>示例:  Album是”相册”，Picture是”图片”，相册有N(N&gt;=0)张图片。</p>
+<p>UML示例图</p>
+<p><img src="/media/pic/uml/uml03-06.jpg" alt="img"></p>
+<p>对应的Java代码</p>
+<pre><code>public class Album {
+    private Picture[] pics;
+}
+public class Picture {
+}</code></pre><h3 id="3-5-聚合"><a href="#3-5-聚合" class="headerlink" title="3.5 聚合"></a>3.5 聚合</h3><p>关系说明: 聚合是整体与部分的关系。聚合关系是类与类之间关系比较密切的关联关系；要区分聚合和其它的关联关系，必须考察具体的逻辑关系。在聚合关系中，成员对象是整体对象的一部分，但是成员对象可以脱离整体对象独立存在。如车和轮胎是整体和部分的关系。</p>
+<p>代码说明: 成员变量</p>
+<p>UML图形: 带空心菱形的实心线，菱形指向整体</p>
+<p>示例:  Car表示”汽车”，Tire表示”轮胎”。”轮胎”本身是个独立个体。</p>
+<p>UML示例图</p>
+<p><img src="/media/pic/uml/uml03-07.jpg" alt="img"></p>
+<p>对应的Java代码</p>
+<pre><code>public class Company {
+    private Nose nose;
+
+    private class Nose {
+    }
+}</code></pre><h3 id="3-6-组合"><a href="#3-6-组合" class="headerlink" title="3.6 组合"></a>3.6 组合</h3><p>关系说明: 组合是整体与部分的关系。组合关系是比聚合关系还要强的关联关系。但是在组合关系中整体对象可以控制成员对象的生命周期，一旦整体对象不存在，成员对象也将不存在，成员对象与整体对象之间具有同生共死的关系。例如，身体和鼻子，身体包括鼻子，鼻子不能脱离身体而独立存在。</p>
+<p>代码说明: 成员变量</p>
+<p>UML图形: 带实心菱形的实线，菱形指向整体</p>
+<p>示例: Body表示”身体”，Nose表示”鼻子”。身体包含鼻子，鼻子离不开身体。</p>
+<p>UML示例图</p>
+<p><img src="/media/pic/uml/uml03-08.jpg" alt="img"></p>
+<p>对应的Java代码</p>
+<pre><code>public class Company {
+    private Nose nose;
+
+    private class Nose {
+    }
+}</code></pre><h2 id="4-依赖-Dependency"><a href="#4-依赖-Dependency" class="headerlink" title="4. 依赖(Dependency)"></a>4. 依赖(Dependency)</h2><p>关系说明: 依赖是一种使用的关系。在需要表示一个事物使用另一个事物时使用依赖关系，尽量不使用双向的互相依赖。</p>
+<p>代码说明: 局部变量、方法的参数或者对静态方法的调用</p>
+<p>UML图形: 带箭头的虚线，指向被使用者</p>
+<p>示例:  人过河。人是”Person”类，它包括过河函数acrossRiver()，acrossRiver()的参数是过河工具，返回值是过河时间。此处的过河工具是船，船对应的类是Boat。</p>
+<p>UML示例图</p>
+<p><img src="/media/pic/uml/uml03-09.jpg" alt="img"></p>
+<p>对应的Java代码</p>
+<pre><code>public class Person {
+    public int acrossRiver(Boat boat);
+}
+public class Boat {
+}</code></pre>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/uml/">#uml</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2012/10/04/uml/2012-10-04-uml/">UML系列04之  UML时序图</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2012/10/02/uml/2012-10-02-uml/">UML系列02之  UML类图(一)</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

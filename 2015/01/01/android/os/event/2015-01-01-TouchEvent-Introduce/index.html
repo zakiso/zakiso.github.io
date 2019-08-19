@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Android 触摸事件机制(一) 简介 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="android">
+
+
+
+
+
+    <meta name="description" content="android">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 触摸事件机制(一) 简介">
+<meta property="og:url" content="https://apppills.com/2015/01/01/android/os/event/2015-01-01-TouchEvent-Introduce/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="android">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 触摸事件机制(一) 简介">
+<meta name="twitter:description" content="android">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-触摸事件概述">1&nbsp;&nbsp;<b>1. 触摸事件概述</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#2-Activity-ViewGroup-View中的触摸事件API">2&nbsp;&nbsp;<b>2. Activity, ViewGroup, View中的触摸事件API</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#3-OnTouchListener接口">3&nbsp;&nbsp;<b>3. OnTouchListener接口</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Android 触摸事件机制(一) 简介
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2015-01-01T01:01:00.000Z" itemprop="datePublished">1月 1 2015</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            7 分钟 read (About 1007 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本系列文章将介绍Android中触摸事件，即Touch Event的传递机制。</p>
+</blockquote>
+<blockquote>
+<p>注意：本文是基于Android 4.4.2版本进行介绍的！</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">触摸事件概述</a><br><strong>2</strong>. <a href="#anchor2">Activity, ViewGroup, View中的触摸事件API</a><br><strong>3</strong>. <a href="#anchor3">OnTouchListener接口</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-触摸事件概述"><a href="#1-触摸事件概述" class="headerlink" title="1. 触摸事件概述"></a>1. 触摸事件概述</h1><p>本文介绍的触摸事件API和接口主要是：dispatchTouchEvent(), onTouchEvent(), onInterceptTouchEvent()和OnTouchListener接口。这些内容中，最复杂的莫过于dispatchTouchEvent(), onTouchEvent()和onInterceptTouchEvent()这三者之间的关系。如果你能认真读完本系列文章，相信对它们之间的关系，它们的原理和用法，很有很清晰的认识。</p>
+<p>本文先对这些接口做个大致介绍，建立一个整体概念。后续再通过阅读Activity, View和ViewGroup中触摸事件API的源码，来对认识这些API；最后，再通过几个示例来进一步了解它们，同时也了解它们的用法。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-Activity-ViewGroup-View中的触摸事件API"><a href="#2-Activity-ViewGroup-View中的触摸事件API" class="headerlink" title="2. Activity, ViewGroup, View中的触摸事件API"></a>2. Activity, ViewGroup, View中的触摸事件API</h1><p><strong>1. Activity中的触摸事件API</strong><br>public boolean dispatchTouchEvent(MotionEvent ev)；<br>public boolean onTouchEvent(MotionEvent ev); </p>
+<p><strong>2. ViewGroup中的触摸事件API</strong><br>public boolean dispatchTouchEvent(MotionEvent ev)；<br>public boolean onTouchEvent(MotionEvent ev);<br>public boolean onInterceptTouchEvent(MotionEvent ev);</p>
+<p><strong>3. View中的触摸事件API</strong><br>public boolean dispatchTouchEvent(MotionEvent ev)；<br>public boolean onTouchEvent(MotionEvent ev); </p>
+<p>下面简单的说明一下涉及到的三个API的作用。</p>
+<p><strong>dispatchTouchEvent</strong>：它是传递触摸事件的接口。<br>(01) Activity将触摸事件传递给ViewGroup，ViewGroup将触摸事件传递给另一个ViewGroup，以及ViewGroup将触摸事件传递给View；这些都是通过dispatchTouchEvent()来传递的。<br>(02) dispatchTouchEvent(), onInterceptTouchEvent(), onTouchEvent()以及onTouch()它们之间的联系，都是通过dispatchTouchEvent()体现的。它们都是在dispatchTouchEvent()中调度的！因此，理解dispatchTouchEvent()是理解Android事件机制的关机；而其中，最关机的就是ViewGroup中的dispatchTouchEvent()<br>(03) 返回值：true，表示触摸事件被消费了；false，则表示触摸事件没有被消费。<br><strong>onTouchEvent</strong>：它是处理触摸事件的接口。<br>(01) 无论是Activity, ViewGroup还是View，对触摸事件的处理，基本上都是在onTouchEvent()中进行的。因此，我们说它是处理触摸事件的接口。<br>(02) 返回值：返回true，表示触摸事件被它处理过了；或者，换句话说，表示它消费了触摸事件。否则，表示它没有消费该触摸事件。<br><strong>onInterceptTouchEvent</strong>：它是拦截触摸事件的接口。<br>(01) 只有ViewGroup中才有该接口。如果ViewGroup不想将触摸事件传递给它的子View，则可以在onInterceptTouchEvent中进行拦截。<br>(02) 返回值：true，表示ViewGroup拦截了该触摸事件；那么，该事件就不会分发给它的子View或者子ViewGroup。否则，表示ViewGroup没有拦截该事件，该事件就会分发给它的子View和子ViewGroup。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-OnTouchListener接口"><a href="#3-OnTouchListener接口" class="headerlink" title="3. OnTouchListener接口"></a>3. OnTouchListener接口</h1><p>OnTouchListener一个interface接口，它是在View中声明的。OnTouchListener中只包含了onTouch()函数。<br>那么，onTouch()和onTouchEvent()有什么相同和不同点呢？</p>
+<p><strong>相同点</strong><br>onTouch()与onTouchEvent()都是用户处理触摸事件的API。</p>
+<p><strong>不同点</strong><br>(01)，onTouch()是View专门提供给用户的接口，目的是为了方便用户自己处理触摸事件。而onTouchEvent()是Android系统自己实现的接口。<br>(02)，onTouch()的优先级比onTouchEvent()的优先级更高。<br>    dispatchTouchEvent()中分发事件的时候，会先将事件分配给onTouch()进行处理，然后才分配给onTouchEvent()进行处理。  如果onTouch()对触摸事件进行了处理，并且返回true；那么，该触摸事件就不会分配在分配给onTouchEvent()进行处理了。只有当onTouch()没有处理，或者处理了但返回false时，才会分配给onTouchEvent()进行处理。</p>
+<p>关于它们之间的内容，在讲解View的dispatchTouchEvent()时，会详细说明。</p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/android/">#android</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2015/01/02/android/os/event/2015-01-02-TouchEvent-Activity/">Android 触摸事件机制(二) Activity中触摸事件详解</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2014/09/08/android/os/binder/2014-09-08-Binder-Java/">Android Binder机制(十二) Binder机制的Java调用流程</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

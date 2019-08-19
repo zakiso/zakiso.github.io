@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="java threads">
+
+
+
+
+
+    <meta name="description" content="java threads">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式">
+<meta property="og:url" content="https://apppills.com/2012/08/02/java/threads/2012-08-02-threads-basic/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="java threads">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式">
+<meta name="twitter:description" content="java threads">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-Thread和Runnable简介">1&nbsp;&nbsp;<b>1. Thread和Runnable简介</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#2-Thread和Runnable的异同点">2&nbsp;&nbsp;<b>2. Thread和Runnable的异同点</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#3-Thread和Runnable的多线程示例">3&nbsp;&nbsp;<b>3. Thread和Runnable的多线程示例</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-1-Thread的多线程示例">3.1&nbsp;&nbsp;3.1 Thread的多线程示例</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-2-Runnable的多线程示例">3.2&nbsp;&nbsp;3.2 Runnable的多线程示例</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-08-02T01:01:00.000Z" itemprop="datePublished">8月 2 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            7 分钟 read (About 1042 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本章，我们学习“常用的实现多线程的2种方式”：Thread 和 Runnable。<br>之所以说是常用的，是因为通过还可以通过java.util.concurrent包中的线程池来实现多线程。关于线程池的内容，我们以后会详细介绍；现在，先对的Thread和Runnable进行了解。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. Thread和Runnable简介</a><br><a href="#anchor2">2. Thread和Runnable的异同点</a><br><a href="#anchor3">3. Thread和Runnable的多线程示例</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-Thread和Runnable简介"><a href="#1-Thread和Runnable简介" class="headerlink" title="1. Thread和Runnable简介"></a>1. Thread和Runnable简介</h1><p>Runnable 是一个接口，该接口中只包含了一个run()方法。它的定义如下：</p>
+<pre><code>public interface Runnable {
+    public abstract void run();
+}</code></pre><p>Runnable的作用，实现多线程。我们可以定义一个类A实现Runnable接口；然后，通过new Thread(new A())等方式新建线程。</p>
+<p>Thread 是一个类。Thread本身就实现了Runnable接口。它的声明如下：</p>
+<pre><code>public class Thread implements Runnable {}</code></pre><p>Thread的作用，实现多线程。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-Thread和Runnable的异同点"><a href="#2-Thread和Runnable的异同点" class="headerlink" title="2. Thread和Runnable的异同点"></a>2. Thread和Runnable的异同点</h1><p>Thread 和 Runnable 的相同点：都是“多线程的实现方式”。</p>
+<p>Thread 和 Runnable 的不同点：<br>Thread 是类，而Runnable是接口；Thread本身是实现了Runnable接口的类。我们知道“一个类只能有一个父类，但是却能实现多个接口”，因此Runnable具有更好的扩展性。<br>此外，Runnable还可以用于“资源的共享”。即，多个线程都是基于某一个Runnable对象建立的，它们会共享Runnable对象上的资源。</p>
+<p>通常，建议通过“Runnable”实现多线程！</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-Thread和Runnable的多线程示例"><a href="#3-Thread和Runnable的多线程示例" class="headerlink" title="3. Thread和Runnable的多线程示例"></a>3. Thread和Runnable的多线程示例</h1><h2 id="3-1-Thread的多线程示例"><a href="#3-1-Thread的多线程示例" class="headerlink" title="3.1 Thread的多线程示例"></a>3.1 Thread的多线程示例</h2><p>下面通过示例更好的理解Thread和Runnable，借鉴网上一个例子比较具有说服性的例子。</p>
+<pre><code>// ThreadTest.java 源码
+class MyThread extends Thread{
+    private int ticket=10;  
+    public void run(){
+        for(int i=0;i&lt;20;i++){ 
+            if(this.ticket&gt;0){
+                System.out.println(this.getName()+&quot; 卖票：ticket&quot;+this.ticket--);
+            }
+        }
+    } 
+};
+
+public class ThreadTest {  
+    public static void main(String[] args) {  
+        // 启动3个线程t1,t2,t3；每个线程各卖10张票！
+        MyThread t1=new MyThread();
+        MyThread t2=new MyThread();
+        MyThread t3=new MyThread();
+        t1.start();
+        t2.start();
+        t3.start();
+    }  
+} </code></pre><p>运行结果：</p>
+<pre><code>Thread-0 卖票：ticket10
+Thread-1 卖票：ticket10
+Thread-2 卖票：ticket10
+Thread-1 卖票：ticket9
+Thread-0 卖票：ticket9
+Thread-1 卖票：ticket8
+Thread-2 卖票：ticket9
+Thread-1 卖票：ticket7
+Thread-0 卖票：ticket8
+Thread-1 卖票：ticket6
+Thread-2 卖票：ticket8
+Thread-1 卖票：ticket5
+Thread-0 卖票：ticket7
+Thread-1 卖票：ticket4
+Thread-2 卖票：ticket7
+Thread-1 卖票：ticket3
+Thread-0 卖票：ticket6
+Thread-1 卖票：ticket2
+Thread-2 卖票：ticket6
+Thread-2 卖票：ticket5
+Thread-2 卖票：ticket4
+Thread-1 卖票：ticket1
+Thread-0 卖票：ticket5
+Thread-2 卖票：ticket3
+Thread-0 卖票：ticket4
+Thread-2 卖票：ticket2
+Thread-0 卖票：ticket3
+Thread-2 卖票：ticket1
+Thread-0 卖票：ticket2
+Thread-0 卖票：ticket1</code></pre><p>结果说明：<br>(01) MyThread继承于Thread，它是自定义个线程。每个MyThread都会卖出10张票。<br>(02) 主线程main创建并启动3个MyThread子线程。每个子线程都各自卖出了10张票。</p>
+<h2 id="3-2-Runnable的多线程示例"><a href="#3-2-Runnable的多线程示例" class="headerlink" title="3.2 Runnable的多线程示例"></a>3.2 Runnable的多线程示例</h2><p>下面，我们对上面的程序进行修改。通过Runnable实现一个接口，从而实现多线程。</p>
+<pre><code>// RunnableTest.java 源码
+class MyThread implements Runnable{  
+    private int ticket=10;  
+    public void run(){
+        for(int i=0;i&lt;20;i++){ 
+            if(this.ticket&gt;0){
+                System.out.println(Thread.currentThread().getName()+&quot; 卖票：ticket&quot;+this.ticket--);
+            }
+        }
+    } 
+}; 
+
+public class RunnableTest {  
+    public static void main(String[] args) {  
+        MyThread mt=new MyThread();
+
+        // 启动3个线程t1,t2,t3(它们共用一个Runnable对象)，这3个线程一共卖10张票！
+        Thread t1=new Thread(mt);
+        Thread t2=new Thread(mt);
+        Thread t3=new Thread(mt);
+        t1.start();
+        t2.start();
+        t3.start();
+    }  
+}</code></pre><p>运行结果：</p>
+<pre><code>Thread-0 卖票：ticket10
+Thread-2 卖票：ticket8
+Thread-1 卖票：ticket9
+Thread-2 卖票：ticket6
+Thread-0 卖票：ticket7
+Thread-2 卖票：ticket4
+Thread-1 卖票：ticket5
+Thread-2 卖票：ticket2
+Thread-0 卖票：ticket3
+Thread-1 卖票：ticket1</code></pre><p>结果说明：<br>(01) 和上面“MyThread继承于Thread”不同；这里的MyThread实现了Thread接口。<br>(02) 主线程main创建并启动3个子线程，而且这3个子线程都是基于“mt这个Runnable对象”而创建的。运行结果是这3个子线程一共卖出了10张票。这说明它们是共享了MyThread接口的。</p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/java/">#java</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2012/08/03/java/threads/2012-08-03-threads-basic/">Java多线程系列--“基础篇”03之  Thread中start()和run()的区别</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2012/08/01/java/threads/2012-08-01-threads-basic/">Java多线程系列--“基础篇”01之 基本概念</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

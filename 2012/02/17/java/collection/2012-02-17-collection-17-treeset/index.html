@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Java 集合系列17之 TreeSet详细介绍(源码解析)和使用示例 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="java collection">
+
+
+
+
+
+    <meta name="description" content="java collection">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 集合系列17之 TreeSet详细介绍(源码解析)和使用示例">
+<meta property="og:url" content="https://apppills.com/2012/02/17/java/collection/2012-02-17-collection-17-treeset/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="java collection">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://apppills.com/media/pic/java/collection/collection17.jpg">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 集合系列17之 TreeSet详细介绍(源码解析)和使用示例">
+<meta name="twitter:description" content="java collection">
+<meta name="twitter:image" content="https://apppills.com/media/pic/java/collection/collection17.jpg">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#第1部分-TreeSet介绍">1&nbsp;&nbsp;<b>第1部分 TreeSet介绍</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#TreeSet简介">1.1&nbsp;&nbsp;TreeSet简介</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#TreeSet的构造函数">1.2&nbsp;&nbsp;TreeSet的构造函数</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第2部分-TreeSet数据结构">2&nbsp;&nbsp;<b>第2部分 TreeSet数据结构</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第3部分-TreeSet源码解析-基于JDK1-6-0-45">3&nbsp;&nbsp;<b>第3部分 TreeSet源码解析(基于JDK1.6.0_45)</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第4部分-TreeSet遍历方式">4&nbsp;&nbsp;<b>第4部分 TreeSet遍历方式</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#4-1-Iterator顺序遍历">4.1&nbsp;&nbsp;4.1 Iterator顺序遍历</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#4-2-Iterator顺序遍历">4.2&nbsp;&nbsp;4.2 Iterator顺序遍历</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#4-3-for-each遍历HashSet">4.3&nbsp;&nbsp;4.3 for-each遍历HashSet</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第5部分-TreeSet示例">5&nbsp;&nbsp;<b>第5部分 TreeSet示例</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#更多内容">6&nbsp;&nbsp;<b>更多内容</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Java 集合系列17之 TreeSet详细介绍(源码解析)和使用示例
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-02-17T01:01:00.000Z" itemprop="datePublished">2月 17 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            24 分钟 read (About 3549 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>这一章，我们对TreeSet进行学习。<br>我们先对TreeSet有个整体认识，然后再学习它的源码，最后再通过实例来学会使用TreeSet。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1部分 TreeSet介绍</a><br><a href="#anchor2">第2部分 TreeSet数据结构</a><br><a href="#anchor3">第3部分 TreeSet源码解析(基于JDK1.6.0_45)</a><br><a href="#anchor4">第4部分 TreeSet遍历方式</a><br><a href="#anchor5">第5部分 TreeSet示例</a>   </p>
+</blockquote>
+<p>转载请注明出处：<a href="http://www.cnblogs.com/skywang12345/admin/EditPosts.aspx?postid=3311268" target="_blank" rel="noopener">http://www.cnblogs.com/skywang12345/admin/EditPosts.aspx?postid=3311268</a></p>
+<p><a name="anchor1"></a></p>
+<h1 id="第1部分-TreeSet介绍"><a href="#第1部分-TreeSet介绍" class="headerlink" title="第1部分 TreeSet介绍"></a>第1部分 TreeSet介绍</h1><h2 id="TreeSet简介"><a href="#TreeSet简介" class="headerlink" title="TreeSet简介"></a>TreeSet简介</h2><p>TreeSet 是一个有序的集合，它的作用是提供有序的Set集合。它继承于AbstractSet抽象类，实现了NavigableSet<e>, Cloneable, java.io.Serializable接口。<br>TreeSet 继承于AbstractSet，所以它是一个Set集合，具有Set的属性和方法。<br>TreeSet 实现了NavigableSet接口，意味着它支持一系列的导航方法。比如查找与指定目标最匹配项。<br>TreeSet 实现了Cloneable接口，意味着它能被克隆。<br>TreeSet 实现了java.io.Serializable接口，意味着它支持序列化。</e></p>
+<p>TreeSet是基于TreeMap实现的。TreeSet中的元素支持2种排序方式：自然排序 或者 根据创建TreeSet 时提供的 Comparator 进行排序。这取决于使用的构造方法。<br>TreeSet为基本操作（add、remove 和 contains）提供受保证的 log(n) 时间开销。<br>另外，TreeSet是非同步的。 它的iterator 方法返回的迭代器是fail-fast的。</p>
+<h2 id="TreeSet的构造函数"><a href="#TreeSet的构造函数" class="headerlink" title="TreeSet的构造函数"></a>TreeSet的构造函数</h2><pre><code>// 默认构造函数。使用该构造函数，TreeSet中的元素按照自然排序进行排列。
+TreeSet()
+
+// 创建的TreeSet包含collection
+TreeSet(Collection&lt;? extends E&gt; collection)
+
+// 指定TreeSet的比较器
+TreeSet(Comparator&lt;? super E&gt; comparator)
+
+// 创建的TreeSet包含set
+TreeSet(SortedSet&lt;E&gt; set)</code></pre><p>TreeSet的API</p>
+<pre><code>boolean                   add(E object)
+boolean                   addAll(Collection&lt;? extends E&gt; collection)
+void                      clear()
+Object                    clone()
+boolean                   contains(Object object)
+E                         first()
+boolean                   isEmpty()
+E                         last()
+E                         pollFirst()
+E                         pollLast()
+E                         lower(E e)
+E                         floor(E e)
+E                         ceiling(E e)
+E                         higher(E e)
+boolean                   remove(Object object)
+int                       size()
+Comparator&lt;? super E&gt;     comparator()
+Iterator&lt;E&gt;               iterator()
+Iterator&lt;E&gt;               descendingIterator()
+SortedSet&lt;E&gt;              headSet(E end)
+NavigableSet&lt;E&gt;           descendingSet()
+NavigableSet&lt;E&gt;           headSet(E end, boolean endInclusive)
+SortedSet&lt;E&gt;              subSet(E start, E end)
+NavigableSet&lt;E&gt;           subSet(E start, boolean startInclusive, E end, boolean endInclusive)
+NavigableSet&lt;E&gt;           tailSet(E start, boolean startInclusive)
+SortedSet&lt;E&gt;              tailSet(E start)</code></pre><p>说明：</p>
+<p>(01) TreeSet是有序的Set集合，因此支持add、remove、get等方法。<br>(02) 和NavigableSet一样，TreeSet的导航方法大致可以区分为两类，一类时提供元素项的导航方法，返回某个元素；另一类时提供集合的导航方法，返回某个集合。<br>lower、floor、ceiling 和 higher 分别返回小于、小于等于、大于等于、大于给定元素的元素，如果不存在这样的元素，则返回 null。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="第2部分-TreeSet数据结构"><a href="#第2部分-TreeSet数据结构" class="headerlink" title="第2部分 TreeSet数据结构"></a>第2部分 TreeSet数据结构</h1><p>TreeSet的继承关系</p>
+<pre><code>java.lang.Object
+   ↳     java.util.AbstractCollection&lt;E&gt;
+         ↳     java.util.AbstractSet&lt;E&gt;
+               ↳     java.util.TreeSet&lt;E&gt;</code></pre><p>TreeSet的声明</p>
+<pre><code>public class TreeSet&lt;E&gt; extends AbstractSet&lt;E&gt;        
+implements NavigableSet&lt;E&gt;, Cloneable, java.io.Serializable{}</code></pre><p>TreeSet与Collection关系如下图：</p>
+<p><img src="/media/pic/java/collection/collection17.jpg" alt="img"></p>
+<p>从图中可以看出：<br>(01) TreeSet继承于AbstractSet，并且实现了NavigableSet接口。<br>(02) TreeSet的本质是一个”有序的，并且没有重复元素”的集合，它是通过TreeMap实现的。TreeSet中含有一个”NavigableMap类型的成员变量”m，而m实际上是”TreeMap的实例”。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="第3部分-TreeSet源码解析-基于JDK1-6-0-45"><a href="#第3部分-TreeSet源码解析-基于JDK1-6-0-45" class="headerlink" title="第3部分 TreeSet源码解析(基于JDK1.6.0_45)"></a>第3部分 TreeSet源码解析(基于JDK1.6.0_45)</h1><p>为了更了解TreeSet的原理，下面对TreeSet源码代码作出分析。</p>
+<pre><code>package java.util;
+
+public class TreeSet&lt;E&gt; extends AbstractSet&lt;E&gt;
+    implements NavigableSet&lt;E&gt;, Cloneable, java.io.Serializable
+{
+    // NavigableMap对象
+    private transient NavigableMap&lt;E,Object&gt; m;
+
+    // TreeSet是通过TreeMap实现的，
+    // PRESENT是键-值对中的值。
+    private static final Object PRESENT = new Object();
+
+    // 不带参数的构造函数。创建一个空的TreeMap
+    public TreeSet() {
+        this(new TreeMap&lt;E,Object&gt;());
+    }
+
+    // 将TreeMap赋值给 &quot;NavigableMap对象m&quot;
+    TreeSet(NavigableMap&lt;E,Object&gt; m) {
+        this.m = m;
+    }
+
+    // 带比较器的构造函数。
+    public TreeSet(Comparator&lt;? super E&gt; comparator) {
+        this(new TreeMap&lt;E,Object&gt;(comparator));
+    }
+
+    // 创建TreeSet，并将集合c中的全部元素都添加到TreeSet中
+    public TreeSet(Collection&lt;? extends E&gt; c) {
+        this();
+        // 将集合c中的元素全部添加到TreeSet中
+        addAll(c);
+    }
+
+    // 创建TreeSet，并将s中的全部元素都添加到TreeSet中
+    public TreeSet(SortedSet&lt;E&gt; s) {
+        this(s.comparator());
+        addAll(s);
+    }
+
+    // 返回TreeSet的顺序排列的迭代器。
+    // 因为TreeSet时TreeMap实现的，所以这里实际上时返回TreeMap的“键集”对应的迭代器
+    public Iterator&lt;E&gt; iterator() {
+        return m.navigableKeySet().iterator();
+    }
+
+    // 返回TreeSet的逆序排列的迭代器。
+    // 因为TreeSet时TreeMap实现的，所以这里实际上时返回TreeMap的“键集”对应的迭代器
+    public Iterator&lt;E&gt; descendingIterator() {
+        return m.descendingKeySet().iterator();
+    }
+
+    // 返回TreeSet的大小
+    public int size() {
+        return m.size();
+    }
+
+    // 返回TreeSet是否为空
+    public boolean isEmpty() {
+        return m.isEmpty();
+    }
+
+    // 返回TreeSet是否包含对象(o)
+    public boolean contains(Object o) {
+        return m.containsKey(o);
+    }
+
+    // 添加e到TreeSet中
+    public boolean add(E e) {
+        return m.put(e, PRESENT)==null;
+    }
+
+    // 删除TreeSet中的对象o
+    public boolean remove(Object o) {
+        return m.remove(o)==PRESENT;
+    }
+
+    // 清空TreeSet
+    public void clear() {
+        m.clear();
+    }
+
+    // 将集合c中的全部元素添加到TreeSet中
+    public  boolean addAll(Collection&lt;? extends E&gt; c) {
+        // Use linear-time version if applicable
+        if (m.size()==0 &amp;&amp; c.size() &gt; 0 &amp;&amp;
+            c instanceof SortedSet &amp;&amp;
+            m instanceof TreeMap) {
+            SortedSet&lt;? extends E&gt; set = (SortedSet&lt;? extends E&gt;) c;
+            TreeMap&lt;E,Object&gt; map = (TreeMap&lt;E, Object&gt;) m;
+            Comparator&lt;? super E&gt; cc = (Comparator&lt;? super E&gt;) set.comparator();
+            Comparator&lt;? super E&gt; mc = map.comparator();
+            if (cc==mc || (cc != null &amp;&amp; cc.equals(mc))) {
+                map.addAllForTreeSet(set, PRESENT);
+                return true;
+            }
+        }
+        return super.addAll(c);
+    }
+
+    // 返回子Set，实际上是通过TreeMap的subMap()实现的。
+    public NavigableSet&lt;E&gt; subSet(E fromElement, boolean fromInclusive,
+                                  E toElement,   boolean toInclusive) {
+        return new TreeSet&lt;E&gt;(m.subMap(fromElement, fromInclusive,
+                                       toElement,   toInclusive));
+    }
+
+    // 返回Set的头部，范围是：从头部到toElement。
+    // inclusive是是否包含toElement的标志
+    public NavigableSet&lt;E&gt; headSet(E toElement, boolean inclusive) {
+        return new TreeSet&lt;E&gt;(m.headMap(toElement, inclusive));
+    }
+
+    // 返回Set的尾部，范围是：从fromElement到结尾。
+    // inclusive是是否包含fromElement的标志
+    public NavigableSet&lt;E&gt; tailSet(E fromElement, boolean inclusive) {
+        return new TreeSet&lt;E&gt;(m.tailMap(fromElement, inclusive));
+    }
+
+    // 返回子Set。范围是：从fromElement(包括)到toElement(不包括)。
+    public SortedSet&lt;E&gt; subSet(E fromElement, E toElement) {
+        return subSet(fromElement, true, toElement, false);
+    }
+
+    // 返回Set的头部，范围是：从头部到toElement(不包括)。
+    public SortedSet&lt;E&gt; headSet(E toElement) {
+        return headSet(toElement, false);
+    }
+
+    // 返回Set的尾部，范围是：从fromElement到结尾(不包括)。
+    public SortedSet&lt;E&gt; tailSet(E fromElement) {
+        return tailSet(fromElement, true);
+    }
+
+    // 返回Set的比较器
+    public Comparator&lt;? super E&gt; comparator() {
+        return m.comparator();
+    }
+
+    // 返回Set的第一个元素
+    public E first() {
+        return m.firstKey();
+    }
+
+    // 返回Set的最后一个元素
+    public E first() {
+    public E last() {
+        return m.lastKey();
+    }
+
+    // 返回Set中小于e的最大元素
+    public E lower(E e) {
+        return m.lowerKey(e);
+    }
+
+    // 返回Set中小于/等于e的最大元素
+    public E floor(E e) {
+        return m.floorKey(e);
+    }
+
+    // 返回Set中大于/等于e的最小元素
+    public E ceiling(E e) {
+        return m.ceilingKey(e);
+    }
+
+    // 返回Set中大于e的最小元素
+    public E higher(E e) {
+        return m.higherKey(e);
+    }
+
+    // 获取第一个元素，并将该元素从TreeMap中删除。
+    public E pollFirst() {
+        Map.Entry&lt;E,?&gt; e = m.pollFirstEntry();
+        return (e == null)? null : e.getKey();
+    }
+
+    // 获取最后一个元素，并将该元素从TreeMap中删除。
+    public E pollLast() {
+        Map.Entry&lt;E,?&gt; e = m.pollLastEntry();
+        return (e == null)? null : e.getKey();
+    }
+
+    // 克隆一个TreeSet，并返回Object对象
+    public Object clone() {
+        TreeSet&lt;E&gt; clone = null;
+        try {
+            clone = (TreeSet&lt;E&gt;) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError();
+        }
+
+        clone.m = new TreeMap&lt;E,Object&gt;(m);
+        return clone;
+    }
+
+    // java.io.Serializable的写入函数
+    // 将TreeSet的“比较器、容量，所有的元素值”都写入到输出流中
+    private void writeObject(java.io.ObjectOutputStream s)
+        throws java.io.IOException {
+        s.defaultWriteObject();
+
+        // 写入比较器
+        s.writeObject(m.comparator());
+
+        // 写入容量
+        s.writeInt(m.size());
+
+        // 写入“TreeSet中的每一个元素”
+        for (Iterator i=m.keySet().iterator(); i.hasNext(); )
+            s.writeObject(i.next());
+    }
+
+    // java.io.Serializable的读取函数：根据写入方式读出
+    // 先将TreeSet的“比较器、容量、所有的元素值”依次读出
+    private void readObject(java.io.ObjectInputStream s)
+        throws java.io.IOException, ClassNotFoundException {
+        // Read in any hidden stuff
+        s.defaultReadObject();
+
+        // 从输入流中读取TreeSet的“比较器”
+        Comparator&lt;? super E&gt; c = (Comparator&lt;? super E&gt;) s.readObject();
+
+        TreeMap&lt;E,Object&gt; tm;
+        if (c==null)
+            tm = new TreeMap&lt;E,Object&gt;();
+        else
+            tm = new TreeMap&lt;E,Object&gt;(c);
+        m = tm;
+
+        // 从输入流中读取TreeSet的“容量”
+        int size = s.readInt();
+
+        // 从输入流中读取TreeSet的“全部元素”
+        tm.readTreeSet(size, s, PRESENT);
+    }
+
+    // TreeSet的序列版本号
+    private static final long serialVersionUID = -2479143000061671589L;
+}</code></pre><p>总结：</p>
+<p>(01) TreeSet实际上是TreeMap实现的。当我们构造TreeSet时；若使用不带参数的构造函数，则TreeSet的使用自然比较器；若用户需要使用自定义的比较器，则需要使用带比较器的参数。<br>(02) TreeSet是非线程安全的。<br>(03) TreeSet实现java.io.Serializable的方式。当写入到输出流时，依次写入“比较器、容量、全部元素”；当读出输入流时，再依次读取。</p>
+<p><a name="anchor4"></a></p>
+<h1 id="第4部分-TreeSet遍历方式"><a href="#第4部分-TreeSet遍历方式" class="headerlink" title="第4部分 TreeSet遍历方式"></a>第4部分 TreeSet遍历方式</h1><h2 id="4-1-Iterator顺序遍历"><a href="#4-1-Iterator顺序遍历" class="headerlink" title="4.1 Iterator顺序遍历"></a>4.1 Iterator顺序遍历</h2><pre><code>for(Iterator iter = set.iterator(); iter.hasNext(); ) { 
+    iter.next();
+}   </code></pre><h2 id="4-2-Iterator顺序遍历"><a href="#4-2-Iterator顺序遍历" class="headerlink" title="4.2 Iterator顺序遍历"></a>4.2 Iterator顺序遍历</h2><pre><code>// 假设set是TreeSet对象
+for(Iterator iter = set.descendingIterator(); iter.hasNext(); ) { 
+    iter.next();
+}</code></pre><h2 id="4-3-for-each遍历HashSet"><a href="#4-3-for-each遍历HashSet" class="headerlink" title="4.3 for-each遍历HashSet"></a>4.3 for-each遍历HashSet</h2><pre><code>// 假设set是TreeSet对象，并且set中元素是String类型
+String[] arr = (String[])set.toArray(new String[0]);
+for (String str:arr)
+    System.out.printf(&quot;for each : %s\n&quot;, str);</code></pre><p>TreeSet不支持快速随机遍历，只能通过迭代器进行遍历！</p>
+<p>TreeSet遍历测试程序如下：</p>
+<pre><code>import java.util.*;
+
+/**
+ * @desc TreeSet的遍历程序
+ *
+ * @author skywang
+ * @email kuiwu-wang@163.com
+ */
+public class TreeSetIteratorTest {
+
+    public static void main(String[] args) {
+        TreeSet set = new TreeSet();
+        set.add(&quot;aaa&quot;);
+        set.add(&quot;aaa&quot;);
+        set.add(&quot;bbb&quot;);
+        set.add(&quot;eee&quot;);
+        set.add(&quot;ddd&quot;);
+        set.add(&quot;ccc&quot;);
+
+        // 顺序遍历TreeSet
+        ascIteratorThroughIterator(set) ;
+        // 逆序遍历TreeSet
+        descIteratorThroughIterator(set);
+        // 通过for-each遍历TreeSet。不推荐！此方法需要先将Set转换为数组
+        foreachTreeSet(set);
+    }
+
+    // 顺序遍历TreeSet
+    public static void ascIteratorThroughIterator(TreeSet set) {
+        System.out.print(&quot;\n ---- Ascend Iterator ----\n&quot;);
+        for(Iterator iter = set.iterator(); iter.hasNext(); ) {
+            System.out.printf(&quot;asc : %s\n&quot;, iter.next());
+        }
+    }
+
+    // 逆序遍历TreeSet
+    public static void descIteratorThroughIterator(TreeSet set) {
+        System.out.printf(&quot;\n ---- Descend Iterator ----\n&quot;);
+        for(Iterator iter = set.descendingIterator(); iter.hasNext(); )
+            System.out.printf(&quot;desc : %s\n&quot;, (String)iter.next());
+    }
+
+    // 通过for-each遍历TreeSet。不推荐！此方法需要先将Set转换为数组
+    private static void foreachTreeSet(TreeSet set) {
+        System.out.printf(&quot;\n ---- For-each ----\n&quot;);
+        String[] arr = (String[])set.toArray(new String[0]);
+        for (String str:arr)
+            System.out.printf(&quot;for each : %s\n&quot;, str);
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code> ---- Ascend Iterator ----
+asc : aaa
+asc : bbb
+asc : ccc
+asc : ddd
+asc : eee
+
+ ---- Descend Iterator ----
+desc : eee
+desc : ddd
+desc : ccc
+desc : bbb
+desc : aaa
+
+ ---- For-each ----
+for each : aaa
+for each : bbb
+for each : ccc
+for each : ddd
+for each : eee</code></pre><p><a name="anchor5"></a></p>
+<h1 id="第5部分-TreeSet示例"><a href="#第5部分-TreeSet示例" class="headerlink" title="第5部分 TreeSet示例"></a>第5部分 TreeSet示例</h1><p>下面通过实例学习如何使用TreeSet</p>
+<pre><code>import java.util.*;
+
+/**
+ * @desc TreeSet的API测试
+ *
+ * @author skywang
+ * @email kuiwu-wang@163.com
+ */
+public class TreeSetTest {
+
+    public static void main(String[] args) {
+        testTreeSetAPIs();
+    }
+
+    // 测试TreeSet的api
+    public static void testTreeSetAPIs() {
+        String val;
+
+        // 新建TreeSet
+        TreeSet tSet = new TreeSet();
+        // 将元素添加到TreeSet中
+        tSet.add(&quot;aaa&quot;);
+        // Set中不允许重复元素，所以只会保存一个“aaa”
+        tSet.add(&quot;aaa&quot;);
+        tSet.add(&quot;bbb&quot;);
+        tSet.add(&quot;eee&quot;);
+        tSet.add(&quot;ddd&quot;);
+        tSet.add(&quot;ccc&quot;);
+        System.out.println(&quot;TreeSet:&quot;+tSet);
+
+        // 打印TreeSet的实际大小
+        System.out.printf(&quot;size : %d\n&quot;, tSet.size());
+
+        // 导航方法
+        // floor(小于、等于)
+        System.out.printf(&quot;floor bbb: %s\n&quot;, tSet.floor(&quot;bbb&quot;));
+        // lower(小于)
+        System.out.printf(&quot;lower bbb: %s\n&quot;, tSet.lower(&quot;bbb&quot;));
+        // ceiling(大于、等于)
+        System.out.printf(&quot;ceiling bbb: %s\n&quot;, tSet.ceiling(&quot;bbb&quot;));
+        System.out.printf(&quot;ceiling eee: %s\n&quot;, tSet.ceiling(&quot;eee&quot;));
+        // ceiling(大于)
+        System.out.printf(&quot;higher bbb: %s\n&quot;, tSet.higher(&quot;bbb&quot;));
+        // subSet()
+        System.out.printf(&quot;subSet(aaa, true, ccc, true): %s\n&quot;, tSet.subSet(&quot;aaa&quot;, true, &quot;ccc&quot;, true));
+        System.out.printf(&quot;subSet(aaa, true, ccc, false): %s\n&quot;, tSet.subSet(&quot;aaa&quot;, true, &quot;ccc&quot;, false));
+        System.out.printf(&quot;subSet(aaa, false, ccc, true): %s\n&quot;, tSet.subSet(&quot;aaa&quot;, false, &quot;ccc&quot;, true));
+        System.out.printf(&quot;subSet(aaa, false, ccc, false): %s\n&quot;, tSet.subSet(&quot;aaa&quot;, false, &quot;ccc&quot;, false));
+        // headSet()
+        System.out.printf(&quot;headSet(ccc, true): %s\n&quot;, tSet.headSet(&quot;ccc&quot;, true));
+        System.out.printf(&quot;headSet(ccc, false): %s\n&quot;, tSet.headSet(&quot;ccc&quot;, false));
+        // tailSet()
+        System.out.printf(&quot;tailSet(ccc, true): %s\n&quot;, tSet.tailSet(&quot;ccc&quot;, true));
+        System.out.printf(&quot;tailSet(ccc, false): %s\n&quot;, tSet.tailSet(&quot;ccc&quot;, false));
+
+
+        // 删除“ccc”
+        tSet.remove(&quot;ccc&quot;);
+        // 将Set转换为数组
+        String[] arr = (String[])tSet.toArray(new String[0]);
+        for (String str:arr)
+            System.out.printf(&quot;for each : %s\n&quot;, str);
+
+        // 打印TreeSet
+        System.out.printf(&quot;TreeSet:%s\n&quot;, tSet);
+
+        // 遍历TreeSet
+        for(Iterator iter = tSet.iterator(); iter.hasNext(); ) {
+            System.out.printf(&quot;iter : %s\n&quot;, iter.next());
+        }
+
+        // 删除并返回第一个元素
+        val = (String)tSet.pollFirst();
+        System.out.printf(&quot;pollFirst=%s, set=%s\n&quot;, val, tSet);
+
+        // 删除并返回最后一个元素
+        val = (String)tSet.pollLast();
+        System.out.printf(&quot;pollLast=%s, set=%s\n&quot;, val, tSet);
+
+        // 清空HashSet
+        tSet.clear();
+
+        // 输出HashSet是否为空
+        System.out.printf(&quot;%s\n&quot;, tSet.isEmpty()?&quot;set is empty&quot;:&quot;set is not empty&quot;);
+    }
+}</code></pre><p>运行结果： </p>
+<pre><code>TreeSet:[aaa, bbb, ccc, ddd, eee]
+size : 5
+floor bbb: bbb
+lower bbb: aaa
+ceiling bbb: bbb
+ceiling eee: eee
+higher bbb: ccc
+subSet(aaa, true, ccc, true): [aaa, bbb, ccc]
+subSet(aaa, true, ccc, false): [aaa, bbb]
+subSet(aaa, false, ccc, true): [bbb, ccc]
+subSet(aaa, false, ccc, false): [bbb]
+headSet(ccc, true): [aaa, bbb, ccc]
+headSet(ccc, false): [aaa, bbb]
+tailSet(ccc, true): [ccc, ddd, eee]
+tailSet(ccc, false): [ddd, eee]
+for each : aaa
+for each : bbb
+for each : ddd
+for each : eee
+TreeSet:[aaa, bbb, ddd, eee]
+iter : aaa
+iter : bbb
+iter : ddd
+iter : eee
+pollFirst=aaa, set=[bbb, ddd, eee]
+pollLast=eee, set=[bbb, ddd]
+set is empty</code></pre><h1 id="更多内容"><a href="#更多内容" class="headerlink" title="更多内容"></a>更多内容</h1><p><a href="/2012/02/01/collection-00-index">00. Java 集合系列目录(Category)</a><br><a href="/2012/02/01/collection-01-summary">01. Java 集合系列01之 总体框架</a><br><a href="/2012/02/02/collection-02-framework">02. Java 集合系列02之 Collection架构</a><br><a href="/2012/02/03/collection-03-arraylist">03. Java 集合系列03之 ArrayList详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/04/collection-04-fail-fast">04. Java 集合系列04之 fail-fast总结(通过ArrayList来说明fail-fast的原理、解决办法)</a><br><a href="/2012/02/05/collection-05-linkedlist">05. Java 集合系列05之 LinkedList详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/06/collection-06-vector">06. Java 集合系列06之 Vector详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/07/collection-07-stack">07. Java 集合系列07之 Stack详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/08/collection-08-List">08. Java 集合系列08之 List总结(LinkedList, ArrayList等使用场景和性能分析)</a><br><a href="/2012/02/09/collection-09-map">09. Java 集合系列09之 Map架构</a><br><a href="/2012/02/10/collection-10-hashmap">10. Java 集合系列10之 HashMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/11/collection-11-hashtable">11. Java 集合系列11之 Hashtable详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/12/collection-12-treemap">12. Java 集合系列12之 TreeMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/13/collection-13-weakhashmap">13. Java 集合系列13之 WeakHashMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/14/collection-14-mapsummary">14. Java 集合系列14之 Map总结(HashMap, Hashtable, TreeMap, WeakHashMap等使用场景)</a><br><a href="/2012/02/15/collection-15-set">15. Java 集合系列15之 Set架构</a><br><a href="/2012/02/16/collection-16-hashset">16. Java 集合系列16之 HashSet详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/17/collection-17-treeset">17. Java 集合系列17之 TreeSet详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/18/collection-18-iterator_enumeration">18. Java 集合系列18之 Iterator和Enumeration比较</a></p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/java/">#java</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2012/02/18/java/collection/2012-02-18-collection-18-iterator_enumeration/">Java 集合系列18之 Iterator和Enumeration比较</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2012/02/16/java/collection/2012-02-16-collection-16-hashset/">Java 集合系列16之 HashSet详细介绍(源码解析)和使用示例</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Android 触摸事件机制(五) 触摸事件示例2--View接受触摸事件 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="android">
+
+
+
+
+
+    <meta name="description" content="android">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 触摸事件机制(五) 触摸事件示例2--View接受触摸事件">
+<meta property="og:url" content="https://apppills.com/2015/01/05/android/os/event/2015-01-05-TouchEvent-Sample-02-View/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="android">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/event/event02.jpg">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 触摸事件机制(五) 触摸事件示例2--View接受触摸事件">
+<meta name="twitter:description" content="android">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/event/event02.jpg">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-示例概述">1&nbsp;&nbsp;<b>1. 示例概述</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-1-示例简介">1.1&nbsp;&nbsp;1.1 示例简介</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-2-示例结论">1.2&nbsp;&nbsp;1.2 示例结论</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#2-示例源码">2&nbsp;&nbsp;<b>2. 示例源码</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#3-运行结果">3&nbsp;&nbsp;<b>3. 运行结果</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-1-ACTION-DOWN事件">3.1&nbsp;&nbsp;3.1 ACTION_DOWN事件</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-2-ACTION-MOVE事件">3.2&nbsp;&nbsp;3.2 ACTION_MOVE事件</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-3-ACTION-UP事件">3.3&nbsp;&nbsp;3.3 ACTION_UP事件</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Android 触摸事件机制(五) 触摸事件示例2--View接受触摸事件
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2015-01-05T02:01:00.000Z" itemprop="datePublished">1月 5 2015</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            8 分钟 read (About 1226 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文将通过示例演示触摸事件的传递流程。</p>
+</blockquote>
+<blockquote>
+<p>注意：本文是基于Android 4.4.2版本进行介绍的！</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">示例概述</a><br><strong>1.1</strong>. <a href="#anchor1_1">示例简介</a><br><strong>1.2</strong>. <a href="#anchor1_2">示例结论</a><br><strong>2</strong>. <a href="#anchor2">示例源码</a><br><strong>3</strong>. <a href="#anchor3">运行结果</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-示例概述"><a href="#1-示例概述" class="headerlink" title="1. 示例概述"></a>1. 示例概述</h1><p><a name="anchor1_1"></a></p>
+<h2 id="1-1-示例简介"><a href="#1-1-示例简介" class="headerlink" title="1.1 示例简介"></a>1.1 示例简介</h2><p>本文的示例是在<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/events/01_event_default/EventTest" target="_blank" rel="noopener">触摸事件示例(一)</a>的基础上修改的。即本文的示例仍然是：自定义一个Activity，该Activity中的显示内容是包含一个自定义的ViewGroup，该ViewGroup中包含一个自定义的View。</p>
+<p>相比<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/events/01_event_default/EventTest" target="_blank" rel="noopener">触摸事件示例(一)</a>，本示例对MyView中的onTouchEvent()进行了修改。修改后的onTouchEvent()代码如下：</p>
+<pre><code>@Override
+public boolean onTouchEvent(MotionEvent event) {
+    String actionName = Utils.getActionName(event);
+    Log.d(TAG, &quot;onTouchEvent(start) :&quot;+actionName);
+    // boolean ret = super.onTouchEvent(event);
+    boolean ret = true;
+    Log.d(TAG, &quot;onTouchEvent( end ) :&quot;+actionName+&quot;, ret=&quot;+ret);
+    return ret;
+}   </code></pre><p>这里的onTouchEvent()直接返回true，表示MyView消费了触摸事件。</p>
+<p><a name="anchor1_2"></a></p>
+<h2 id="1-2-示例结论"><a href="#1-2-示例结论" class="headerlink" title="1.2 示例结论"></a>1.2 示例结论</h2><p>(01) <strong>如果MyView接受了ACTION_DOWN，那么就不会再再执行其他对象的onTouchEvent()函数的。即，不会执行MyViewGroup的onTouchEvent()和MyActivity的onTouchEvent()。因为MyView接受了ACTION_DOWN，意味着这个事件已经被消费了；就无须其他对象再来消费ACTION_DOWN了。</strong><br>(02) <strong>如果MyView接受了ACTION_DOWN，那么MyView能继续收到ACTION_MOVE和ACTION_UP这两种触摸触事件。并且ACTION_MOVE和ACTION_UP的处理流程和ACTION_DOWN的流程基本一样。</strong></p>
+<p>Activity中ACTION_DOWN的流程图如下：</p>
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/event/event02.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/event/event02.jpg" alt></a></p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-示例源码"><a href="#2-示例源码" class="headerlink" title="2. 示例源码"></a>2. 示例源码</h1><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/events/02_event_view/EventTest" target="_blank" rel="noopener">触摸事件示例2的源码</a></p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-运行结果"><a href="#3-运行结果" class="headerlink" title="3. 运行结果"></a>3. 运行结果</h1><h2 id="3-1-ACTION-DOWN事件"><a href="#3-1-ACTION-DOWN事件" class="headerlink" title="3.1 ACTION_DOWN事件"></a>3.1 ACTION_DOWN事件</h2><p>点击MyView所在的区域，ACTION_DOWN相关的log如下：</p>
+<p>D/##skywang-MyActivity( 2273): dispatchTouchEvent(start) :DOWN<br>D/##skywang-MyViewGroup( 2273): dispatchTouchEvent(start) :DOWN<br>D/##skywang-MyViewGroup( 2273): onInterceptTouchEvent(start) :DOWN<br>D/##skywang-MyViewGroup( 2273): onInterceptTouchEvent( end ) :DOWN, ret=false<br>D/##skywang-MyView( 2273): dispatchTouchEvent(start) :DOWN<br>D/##skywang-MyView( 2273): onTouchEvent(start) :DOWN<br>D/##skywang-MyView( 2273): onTouchEvent( end ) :DOWN, ret=true<br>D/##skywang-MyView( 2273): dispatchTouchEvent( end ) :DOWN, ret=true<br>D/##skywang-MyViewGroup( 2273): dispatchTouchEvent( end ) :DOWN, ret=true<br>D/##skywang-MyActivity( 2273): dispatchTouchEvent( end ) :DOWN, ret=true</p>
+<p>说明：很显然，ACTION_DOWN的流程如下：<br>(01) MyActivity收到ACTION_DOWN，<strong>进入MyActivity.dispatchTouchEvent()</strong>。<br>(02) MyActivity.dispatchTouchEvent()对ACTION_DOWN触摸事件进行分发，将消息传递给MyViewGroup。即，<strong>进入MyViewGroup.dispatchTouchEvent()</strong>。<br>(03) MyViewGroup.dispatchTouchEvent()会调用MyViewGroup.onInterceptTouchEvent()检查自己有没有对触摸事件进行拦截。即先<strong>进入MyViewGroup.onInterceptTouchEvent()</strong>。<br>(04) 紧接着，MyViewGroup会<strong>退出MyViewGroup.onInterceptTouchEvent()</strong>。因为MyViewGroup没有对触摸事件进行拦截，MyViewGroup会继续分发事件。<br>(05) MyViewGroup将触摸事件分发给MyView，即<strong>进入MyView.dispatchTouchEvent()</strong>。<br>(06) MyView会调用onTouchEvent()对触摸事件进行处理，即<strong>进入MyView.onTouchEvent()</strong>  。<br>(07) 紧接着，MyView会<strong>退出MyView.onTouchEvent()</strong>。此时的，MyView.onTouchEvent()返回的是true；表示MyView消费了此次触摸事件。<br>(08) MyView.dispatchTouchEvent()得知MyView.onTouchEvent()消费此次触摸事件之后；也就返回true，表示MyView接受该此次触摸事件。<br>(09) MyViewGroup则得知MyView接受了该触摸事件之后，就<strong>退出MyViewGroup.dispatchTouchEvent()</strong>，并返回true。<br>(10) MyActivity得知MyViewGroup接受了该触摸事件之后，就会调用<strong>退出MyActivity.dispatchTouchEvent()</strong>，并返回true。</p>
+<p>对比，<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/events/01_event_default/EventTest" target="_blank" rel="noopener">触摸事件示例(一)</a>中的ACTION_DOWN路径。在本示例中，MyView消费了ACTION_DOWN事件之后；触摸事件就没有再发送给MyViewGroup.onTouchEvent()以及MyActivity.onTouchEvent()。</p>
+<h2 id="3-2-ACTION-MOVE事件"><a href="#3-2-ACTION-MOVE事件" class="headerlink" title="3.2 ACTION_MOVE事件"></a>3.2 ACTION_MOVE事件</h2><p>点击MyView所在的区域，ACTION_MOVE相关的log如下：</p>
+<p>D/##skywang-MyActivity( 2273): dispatchTouchEvent(start) :MOVE<br>D/##skywang-MyViewGroup( 2273): dispatchTouchEvent(start) :MOVE<br>D/##skywang-MyViewGroup( 2273): onInterceptTouchEvent(start) :MOVE<br>D/##skywang-MyViewGroup( 2273): onInterceptTouchEvent( end ) :MOVE, ret=false<br>D/##skywang-MyView( 2273): dispatchTouchEvent(start) :MOVE<br>D/##skywang-MyView( 2273): onTouchEvent(start) :MOVE<br>D/##skywang-MyView( 2273): onTouchEvent( end ) :MOVE, ret=true<br>D/##skywang-MyView( 2273): dispatchTouchEvent( end ) :MOVE, ret=true<br>D/##skywang-MyViewGroup( 2273): dispatchTouchEvent( end ) :MOVE, ret=true<br>D/##skywang-MyActivity( 2273): dispatchTouchEvent( end ) :MOVE, ret=true</p>
+<p>说明：由于MyView接受了ACTION_DOWN；因此，ACTION_MOVE事件会继续分发给MyView。ACTION_MOVE的分发路径和ACTION_DOWN的路径基本上一样！</p>
+<h2 id="3-3-ACTION-UP事件"><a href="#3-3-ACTION-UP事件" class="headerlink" title="3.3 ACTION_UP事件"></a>3.3 ACTION_UP事件</h2><p>点击MyView所在的区域，ACTION_UP相关的log如下：</p>
+<p>D/##skywang-MyActivity( 2273): dispatchTouchEvent(start) :UP<br>D/##skywang-MyViewGroup( 2273): dispatchTouchEvent(start) :UP<br>D/##skywang-MyViewGroup( 2273): onInterceptTouchEvent(start) :UP<br>D/##skywang-MyViewGroup( 2273): onInterceptTouchEvent( end ) :UP, ret=false<br>D/##skywang-MyView( 2273): dispatchTouchEvent(start) :UP<br>D/##skywang-MyView( 2273): onTouchEvent(start) :UP<br>D/##skywang-MyView( 2273): onTouchEvent( end ) :UP, ret=true<br>D/##skywang-MyView( 2273): dispatchTouchEvent( end ) :UP, ret=true<br>D/##skywang-MyViewGroup( 2273): dispatchTouchEvent( end ) :UP, ret=true<br>D/##skywang-MyActivity( 2273): dispatchTouchEvent( end ) :UP, ret=true</p>
+<p>说明：由于MyView接受了ACTION_DOWN；因此，ACTION_UP事件会继续分发给MyView。ACTION_UP的分发路径和ACTION_DOWN的路径基本上一样！</p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/android/">#android</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2015/01/05/android/os/event/2015-01-05-TouchEvent-Sample-03-ViewGroup/">Android 触摸事件机制(五) 触摸事件示例3--ViewGroup拦截但不消费触摸事件</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2015/01/05/android/os/event/2015-01-05-TouchEvent-Sample-01-default/">Android 触摸事件机制(五) 触摸事件示例1--默认处理方式</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

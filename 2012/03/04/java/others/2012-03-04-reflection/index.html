@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Java 反射机制(包括组成、结构、示例说明等内容) - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="java">
+
+
+
+
+
+    <meta name="description" content="java">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 反射机制(包括组成、结构、示例说明等内容)">
+<meta property="og:url" content="https://apppills.com/2012/03/04/java/others/2012-03-04-reflection/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="java">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 反射机制(包括组成、结构、示例说明等内容)">
+<meta name="twitter:description" content="java">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#第1部分-Java-反射机制介绍">1&nbsp;&nbsp;<b>第1部分 Java 反射机制介绍</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第2部分-Class-详细说明">2&nbsp;&nbsp;<b>第2部分 Class 详细说明</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-获取Class对象的方法">2.1&nbsp;&nbsp;1. 获取Class对象的方法</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-Class的API说明">2.2&nbsp;&nbsp;2 Class的API说明</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-1-构造函数">2.2.1&nbsp;&nbsp;2.1 构造函数</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-2-成员方法">2.2.2&nbsp;&nbsp;2.2 成员方法</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-3-成员变量">2.2.3&nbsp;&nbsp;2.3 成员变量</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-4-类的其它信息">2.2.4&nbsp;&nbsp;2.4 类的其它信息</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Java 反射机制(包括组成、结构、示例说明等内容)
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-03-04T01:02:00.000Z" itemprop="datePublished">3月 4 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            38 分钟 read (About 5660 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1部分 Java 反射机制介绍</a><br><a href="#anchor2">第2部分 Class 详细说明</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第1部分-Java-反射机制介绍"><a href="#第1部分-Java-反射机制介绍" class="headerlink" title="第1部分 Java 反射机制介绍"></a>第1部分 Java 反射机制介绍</h1><p>Java 反射机制。<br>通俗来讲呢，就是在运行状态中，我们可以根据“类的部分已经的信息”来还原“类的全部的信息”。这里“类的部分已经的信息”，可以是“类名”或“类的对象”等信息。“类的全部信息”就是指“类的属性，方法，继承关系和Annotation注解”等内容。</p>
+<p>举个简单的例子：假设对于类ReflectionTest.java，我们知道的唯一信息是它的类名是“com.skywang.Reflection”。这时，我们想要知道ReflectionTest.java的其它信息(比如它的构造函数，它的成员变量等等)，要怎么办呢？</p>
+<p>这就需要用到“反射”。通过反射，我们可以解析出ReflectionTest.java的完整信息，包括它的构造函数，成员变量，继承关系等等。</p>
+<p>在了解了“java 反射机制”的概念之后，接下来思考一个问题：如何根据类的类名，来获取类的完整信息呢？</p>
+<p>这个过程主要分为两步：<br>第1步：根据“类名”来获取对应类的Class对象。<br>第2步：通过Class对象的函数接口，来读取“类的构造函数，成员变量”等信息。</p>
+<p>下面，我们根据示例来加深对这个概念的理解。示例如下(Demo1.java):</p>
+<pre><code>package com.skywang.test;
+
+import java.lang.Class;
+
+public class Demo1 {
+
+    public static void main(String[] args) {
+
+        try {
+            // 根据“类名”获取 对应的Class对象
+            Class&lt;?&gt; cls = Class.forName(&quot;com.skywang.test.Person&quot;);
+
+            // 新建对象。newInstance()会调用类不带参数的构造函数
+            Object obj = cls.newInstance();
+
+            System.out.println(&quot;cls=&quot;+cls);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class Person {
+    public Person() {
+        System.out.println(&quot;create Person&quot;);
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code>create Person
+cls=class com.skywang.test.Person</code></pre><p>说明：<br>(01) Person类的完整包名是”com.skywang.test.Person”。而 Class.forName(“com.skywang.test.Person”); 这一句的作用是，就是根据Person的包名来获取Person的Class对象。<br>(02) 接着，我们调用Class对象的newInstance()方法，创建Person对象。</p>
+<p>现在，我们知道了“java反射机制”的概念以及它的原理。有了这个总体思想之后，接下来，我们可以开始对反射进行深入研究了。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="第2部分-Class-详细说明"><a href="#第2部分-Class-详细说明" class="headerlink" title="第2部分 Class 详细说明"></a>第2部分 Class 详细说明</h1><h2 id="1-获取Class对象的方法"><a href="#1-获取Class对象的方法" class="headerlink" title="1. 获取Class对象的方法"></a>1. 获取Class对象的方法</h2><p>我这里总结了4种常用的“获取Class对象”的方法：<br><strong>方法1</strong>：Class.forName(“类名字符串”) （注意：类名字符串必须是全称，包名+类名）<br><strong>方法2</strong>：类名.class<br><strong>方法3</strong>：实例对象.getClass()<br><strong>方法4</strong>：”类名字符串”.getClass()</p>
+<p>下面，我们通过示例演示这4种方法。示例如下(Demo2.java):</p>
+<pre><code>package com.skywang.test;
+
+import java.lang.Class;
+
+public class Demo2 {
+
+    public static void main(String[] args) {
+
+        try {
+            // 方法1：Class.forName(&quot;类名字符串&quot;)  （注意：类名字符串必须是全称，包名+类名）
+            //Class cls1 = Class.forName(&quot;com.skywang.test.Person&quot;);
+            Class&lt;?&gt; cls1 = Class.forName(&quot;com.skywang.test.Person&quot;);
+            //Class&lt;Person&gt; cls1 = Class.forName(&quot;com.skywang.test.Person&quot;);
+
+            // 方法2：类名.class
+            Class cls2 = Person.class; 
+
+            // 方法3：实例对象.getClass()
+            Person person = new Person();
+            Class cls3 = person.getClass();
+
+            // 方法4：&quot;类名字符串&quot;.getClass()
+            String str = &quot;com.skywang.test.Person&quot;; 
+            Class cls4 = str.getClass();
+
+            System.out.printf(&quot;cls1=%s, cls2=%s, cls3=%s, cls4=%s\n&quot;, cls1, cls2, cls3, cls4);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class Person {
+    public Person() {
+        System.out.println(&quot;create Person&quot;);
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code>create Person
+cls1=class com.skywang.test.Person, cls2=class com.skywang.test.Person, cls3=class com.skywang.test.Person, cls4=class java.lang.String</code></pre><h2 id="2-Class的API说明"><a href="#2-Class的API说明" class="headerlink" title="2 Class的API说明"></a>2 Class的API说明</h2><p>Class的全部API如下表:</p>
+<pre><code>public static Class    forName(String className)
+public static Class    forName(String name, boolean initialize, ClassLoader loader)
+public Constructor    getConstructor(Class[] parameterTypes)
+public Constructor[]    getConstructors()
+public Constructor    getDeclaredConstructor(Class[] parameterTypes)
+public Constructor[]    getDeclaredConstructors()
+public Constructor    getEnclosingConstructor()
+public Method    getMethod(String name, Class[] parameterTypes)
+public Method[]    getMethods()
+public Method    getDeclaredMethod(String name, Class[] parameterTypes)
+public Method[]    getDeclaredMethods()
+public Method    getEnclosingMethod()
+public Field    getField(String name)
+public Field[]    getFields()
+public Field    getDeclaredField(String name)
+public Field[]    getDeclaredFields()
+public Type[]    getGenericInterfaces()
+public Type    getGenericSuperclass()
+public Annotation&lt;A&gt;    getAnnotation(Class annotationClass)
+public Annotation[]    getAnnotations()
+public Annotation[]    getDeclaredAnnotations()
+public boolean    isAnnotation()
+public boolean    isAnnotationPresent(Class annotationClass)
+public boolean    isAnonymousClass()
+public boolean    isArray()
+public boolean    isAssignableFrom(Class cls)
+public boolean    desiredAssertionStatus()
+public Class&lt;U&gt;    asSubclass(Class clazz)
+public Class    getSuperclass()
+public Class    getComponentType()
+public Class    getDeclaringClass()
+public Class    getEnclosingClass()
+public Class[]    getClasses()
+public Class[]    getDeclaredClasses()
+public Class[]    getInterfaces()
+public boolean    isEnum()
+public boolean    isInstance(Object obj)
+public boolean    isInterface()
+public boolean    isLocalClass()
+public boolean    isMemberClass()
+public boolean    isPrimitive()
+public boolean    isSynthetic()
+public String    getSimpleName()
+public String    getName()
+public String    getCanonicalName()
+public String    toString()
+public ClassLoader    getClassLoader()
+public Package    getPackage()
+public int    getModifiers()
+public ProtectionDomain    getProtectionDomain()
+public URL    getResource(String name)
+public InputStream    getResourceAsStream(String name)
+public Object    cast(Object obj)
+public Object    newInstance()
+public Object[]    getSigners()
+public Object[]    getEnumConstants()
+public TypeVariable[]    getTypeParameters()</code></pre><p>我们根据类的特性，将Class中的类分为4部分进行说明：构造函数，成员方法，成员变量，类的其它信息(如注解、包名、类名、继承关系等等)。Class中涉及到Annotation(注解)的相关API，可以点击查看前一章节关于Annotation的详细介绍。</p>
+<h3 id="2-1-构造函数"><a href="#2-1-构造函数" class="headerlink" title="2.1 构造函数"></a>2.1 构造函数</h3><p>“构造函数”相关API</p>
+<pre><code>// 获取“参数是parameterTypes”的public的构造函数
+public Constructor    getConstructor(Class[] parameterTypes)
+// 获取全部的public的构造函数
+public Constructor[]    getConstructors()
+// 获取“参数是parameterTypes”的，并且是类自身声明的构造函数，包含public、protected和private方法。
+public Constructor    getDeclaredConstructor(Class[] parameterTypes)
+// 获取类自身声明的全部的构造函数，包含public、protected和private方法。
+public Constructor[]    getDeclaredConstructors()
+// 如果这个类是“其它类的构造函数中的内部类”，调用getEnclosingConstructor()就是这个类所在的构造函数；若不存在，返回null。
+public Constructor    getEnclosingConstructor()</code></pre><p>接下来，我们通过示例对这些API进行说明。示例代码(DemoClassContructor.java)如下：</p>
+<pre><code>package com.skywang.test;
+
+import java.lang.Class;
+import java.lang.reflect.Constructor;
+
+/**
+ * java Class类的Constructor相关API的测试函数
+ *
+ * @author skywang
+ */
+public class DemoClassContructor {
+
+    public static void main(String[] args) {
+
+        // getDeclaredConstructor() 的测试函数
+        testGetDeclaredConstructor() ;
+
+        // getConstructor() 的测试函数
+        testGetConstructor() ;
+
+        // getEnclosingConstructor() 的测试函数
+        testGetEnclosingConstructor() ;
+    }
+
+    /**
+     * getDeclaredConstructor() 的测试函数
+     */
+    public static void testGetDeclaredConstructor() {
+        try {
+            // 获取Person类的Class
+            Class&lt;?&gt; cls = Class.forName(&quot;com.skywang.test.Person&quot;);
+
+            // 根据class，获取构造函数
+            Constructor cst1 = cls.getDeclaredConstructor();
+            Constructor cst2 = cls.getDeclaredConstructor(new Class[]{String.class});
+            Constructor cst3 = cls.getDeclaredConstructor(new Class[]{String.class, int.class, Gender.class});
+
+            // 根据构造函数，创建相应的对象
+            cst1.setAccessible(true); // 因为Person中Person()是private的，所以这里要设置为可访问
+            Object p1 = cst1.newInstance();
+            Object p2 = cst2.newInstance(&quot;Juce&quot;);
+            Object p3 = cst3.newInstance(&quot;Jody&quot;, 34, Gender.MALE);
+
+            System.out.printf(&quot;%-30s: p1=%s, p2=%s, p3=%s\n&quot;, 
+                    &quot;getConstructor()&quot;, p1, p2, p3);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * getConstructor() 的测试函数
+     */
+    public static void testGetConstructor() {
+        try {
+            // 获取Person类的Class
+            Class&lt;?&gt; cls = Class.forName(&quot;com.skywang.test.Person&quot;);
+
+            // 根据class，获取构造函数
+            //Constructor cst1 = cls.getConstructor(); // 抛出异常，因为默认构造函数是private权限。
+            //Constructor cst2 = cls.getConstructor(new Class[]{String.class});// 抛出异常，因为该构造函数是protected权限。
+            Constructor cst3 = cls.getConstructor(new Class[]{String.class, int.class, Gender.class});
+
+            // 根据构造函数，创建相应的对象
+            //Object p1 = cst1.newInstance();
+            //cst1.setAccessible(true); // 因为Person中Person()是private的，所以这里要设置为可访问
+            //Object p1 = cst1.newInstance();
+            //Object p2 = cst2.newInstance(&quot;Kim&quot;);
+            Object p3 = cst3.newInstance(&quot;Katter&quot;, 36, Gender.MALE);
+
+            System.out.printf(&quot;%-30s: p3=%s\n&quot;, 
+                    &quot;getConstructor()&quot;, p3);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * getEnclosingConstructor() 的测试函数
+     */
+    public static void testGetEnclosingConstructor() {
+        try {
+            // 获取Person类的Class
+            Class&lt;?&gt; cls = Class.forName(&quot;com.skywang.test.Person&quot;);
+
+            // 根据class，调用Person类中有内部类InnerA的构造函数
+            Constructor cst = cls.getDeclaredConstructor(new Class[]{String.class, int.class});
+
+            // 根据构造函数，创建相应的对象
+            Object obj = cst.newInstance(&quot;Ammy&quot;, 18);
+
+            System.out.printf(&quot;%-30s: obj=%s\n&quot;, 
+                    &quot;getEnclosingConstructor()&quot;, obj);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+// 枚举类型。表示“性别”
+enum Gender{  
+    MALE, FEMALE
+} 
+// 人
+class Person {
+    private Gender gender;  // 性别
+    private int age;        // 年龄
+    private String name;    // 姓名
+
+    private Person() {
+        this.name = &quot;unknown&quot;;
+        this.age = 0;
+        this.gender = Gender.FEMALE;
+        System.out.println(&quot;call--\&quot;private Person()\&quot;&quot;);
+    }
+    protected Person(String name) {
+        this.name = name;
+        this.age = 0;
+        this.gender = Gender.FEMALE;
+        System.out.println(&quot;call--\&quot;protected Person(String name)\&quot;&quot;);
+    }
+    public Person(String name, int age, Gender gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        System.out.println(&quot;call--\&quot;public Person(String name, int age, Gender gender)\&quot;&quot;);
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+        this.gender = Gender.FEMALE;
+        //内部类在构造方法中
+        class InnerA{
+        }
+        // 获取InnerA的Class对象
+        Class cls = InnerA.class;
+
+        // 获取“封闭该内部类(InnerA)”的构造方法
+        Constructor cst = cls.getEnclosingConstructor();
+
+        System.out.println(&quot;call--\&quot;public Person(String name, int age)\&quot; cst=&quot;+cst);
+    }
+    @Override
+    public String toString() {
+        return &quot;(&quot;+name+&quot;, &quot;+age+&quot;, &quot;+gender+&quot;)&quot;;
+    }
+}</code></pre><p>注意：若程序无法运行，请检查“forName()”中的包名是否正确！forName()的参数必须是，Person类的完整包名。</p>
+<p>运行结果：</p>
+<pre><code>call--&quot;private Person()&quot;
+call--&quot;protected Person(String name)&quot;
+call--&quot;public Person(String name, int age, Gender gender)&quot;
+getConstructor() : p1=(unknown, 0, FEMALE), p2=(Juce, 0, FEMALE), p3=(Jody, 34, MALE)
+call--&quot;public Person(String name, int age, Gender gender)&quot;
+getConstructor() : p3=(Katter, 36, MALE)
+call--&quot;public Person(String name, int age)&quot; cst=public com.skywang.test.Person(java.lang.String,int)
+getEnclosingConstructor() : obj=(Ammy, 18, FEMALE)</code></pre><p>说明：<br>(01) 首先，要搞清楚Person类，它是我们自定义的类。专门用来测试这些API的。Person中有一个成员变量gender；它是Gender对象，Gender是一个枚举类。取值可以是MALE或者FEMALE。</p>
+<p>(02) testGetDeclaredConstructor() 是“getDeclaredConstructor() 的测试函数”。getDeclaredConstructor()可以“获取类中任意的构造函数，包含public、protected和private方法”。</p>
+<p>(03) testGetConstructor() 是“getConstructor() 的测试函数”。getConstructor()只能“获取类中public的构造函数”。</p>
+<p>(04) testGetEnclosingConstructor() 是“getEnclosingConstructor() 的测试函数”。<br>关于getEnclosingConstructor()的介绍，官方说法是“如果该 Class 对象表示构造方法中的一个本地或匿名类，则返回 Constructor 对象，它表示底层类的立即封闭构造方法。否则返回 null。” 通俗点来说，就是<strong><em>“如果一个类A的构造函数中定义了一个内部类InnerA，则通过InnerA的Class对象调用getEnclosingConstructor()方法，可以获取类A的这个构造函数”。</em></strong></p>
+<h3 id="2-2-成员方法"><a href="#2-2-成员方法" class="headerlink" title="2.2 成员方法"></a>2.2 成员方法</h3><p> “成员方法”相关API</p>
+<pre><code>// 获取“名称是name，参数是parameterTypes”的public的函数(包括从基类继承的、从接口实现的所有public函数)
+public Method    getMethod(String name, Class[] parameterTypes)
+// 获取全部的public的函数(包括从基类继承的、从接口实现的所有public函数)
+public Method[]    getMethods()
+// 获取“名称是name，参数是parameterTypes”，并且是类自身声明的函数，包含public、protected和private方法。
+public Method    getDeclaredMethod(String name, Class[] parameterTypes)
+// 获取全部的类自身声明的函数，包含public、protected和private方法。
+public Method[]    getDeclaredMethods()
+// 如果这个类是“其它类中某个方法的内部类”，调用getEnclosingMethod()就是这个类所在的方法；若不存在，返回null。
+public Method    getEnclosingMethod()</code></pre><p>接下来，我们通过示例对这些API进行说明。示例代码(DemoClassMethod.java)如下：</p>
+<pre><code>package com.skywang.test;
+
+import java.lang.Class;
+import java.lang.reflect.Method;
+
+/**
+ * java Class类的Method相关API的测试函数
+ *
+ * @author skywang
+ */
+public class DemoClassMethod {
+
+    public static void main(String[] args) {
+
+            // getDeclaredMethod() 的测试函数
+            testGetDeclaredMethod() ;
+
+            // getMethod() 的测试函数
+            testGetMethod() ;
+
+            // getEnclosingMethod() 的测试函数
+            testGetEnclosingMethod() ;
+    }
+
+    /**
+     * getDeclaredMethod() 的测试函数
+     */
+    public static void testGetDeclaredMethod() {
+        try {
+            // 获取Person类的Class
+            Class&lt;?&gt; cls = Class.forName(&quot;com.skywang.test.Person&quot;);
+            // 根据class，调用类的默认构造函数(不带参数)
+            Object person = cls.newInstance();
+
+            // 获取Person中的方法
+            Method mSetName = cls.getDeclaredMethod(&quot;setName&quot;, new Class[]{String.class});
+            Method mGetName = cls.getDeclaredMethod(&quot;getName&quot;, new Class[]{});
+            Method mSetAge  = cls.getDeclaredMethod(&quot;setAge&quot;, new Class[]{int.class});
+            Method mGetAge  = cls.getDeclaredMethod(&quot;getAge&quot;, new Class[]{});
+            Method mSetGender = cls.getDeclaredMethod(&quot;setGender&quot;, new Class[]{Gender.class});
+            Method mGetGender = cls.getDeclaredMethod(&quot;getGender&quot;, new Class[]{});
+
+            // 调用获取的方法
+            mSetName.invoke(person, new Object[]{&quot;Jimmy&quot;});
+            mSetAge.invoke(person, new Object[]{30});
+            mSetGender.setAccessible(true);    // 因为Person中setGender()是private的，所以这里要设置为可访问
+            mSetGender.invoke(person, new Object[]{Gender.MALE});
+            String name = (String)mGetName.invoke(person, new Object[]{});
+            Integer age = (Integer)mGetAge.invoke(person, new Object[]{});
+            mGetGender.setAccessible(true);    // 因为Person中getGender()是private的，所以这里要设置为可访问
+            Gender gender = (Gender)mGetGender.invoke(person, new Object[]{});
+
+            // 打印输出
+            System.out.printf(&quot;%-30s: person=%s, name=%s, age=%s, gender=%s\n&quot;, 
+                    &quot;getDeclaredMethod()&quot;, person, name, age, gender);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * getMethod() 的测试函数
+     */
+    public static void testGetMethod() {
+        try {
+            // 获取Person类的Class
+            Class&lt;?&gt; cls = Class.forName(&quot;com.skywang.test.Person&quot;);
+            // 根据class，调用类的默认构造函数(不带参数)
+            Object person = cls.newInstance();
+
+            // 获取Person中的方法
+            Method mSetName = cls.getMethod(&quot;setName&quot;, new Class[]{String.class});
+            Method mGetName = cls.getMethod(&quot;getName&quot;, new Class[]{});
+            //Method mSetAge  = cls.getMethod(&quot;setAge&quot;, new Class[]{int.class});         // 抛出异常，因为setAge()是protected权限。
+            //Method mGetAge  = cls.getMethod(&quot;getAge&quot;, new Class[]{});                  // 抛出异常，因为getAge()是protected权限。
+            //Method mSetGender = cls.getMethod(&quot;setGender&quot;, new Class[]{Gender.class}); // 抛出异常，因为setGender()是private权限。
+            //Method mGetGender = cls.getMethod(&quot;getGender&quot;, new Class[]{});             // 抛出异常，因为getGender()是private权限。
+
+            // 调用获取的方法
+            mSetName.invoke(person, new Object[]{&quot;Phobe&quot;});
+            //mSetAge.invoke(person, new Object[]{38});
+            //mSetGender.invoke(person, new Object[]{Gender.FEMALE});
+            String name = (String)mGetName.invoke(person, new Object[]{});
+            //Integer age = (Integer)mGetAge.invoke(person, new Object[]{});
+            //Gender gender = (Gender)mGetGender.invoke(person, new Object[]{});
+
+            // 打印输出
+            System.out.printf(&quot;%-30s: person=%s\n&quot;, 
+                    &quot;getMethod()&quot;, person);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * getEnclosingMethod() 的测试函数
+     */
+    public static void testGetEnclosingMethod() {
+        try {
+            // 获取Person类的Class
+            Class&lt;?&gt; cls = Class.forName(&quot;com.skywang.test.Person&quot;);
+            // 根据class，调用类的默认构造函数(不带参数)
+            Object person = cls.newInstance();
+
+            // 根据class，调用Person类中有内部类InnerB的函数
+            Method mGetInner = cls.getDeclaredMethod(&quot;getInner&quot;, new Class[]{});
+
+            // 根据构造函数，创建相应的对象
+            mGetInner.invoke(person, new Object[]{});
+
+            System.out.printf(&quot;%-30s: person=%s\n&quot;,
+                       &quot;getEnclosingMethod&quot;, person);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+}
+
+enum Gender{  
+    MALE, FEMALE
+} 
+class Person {
+    private Gender gender;  // 性别
+    private int age;        // 年龄
+    private String name;    // 姓名
+
+    public Person() {
+        this(&quot;unknown&quot;, 0, Gender.FEMALE);
+    }
+    public Person(String name, int age, Gender gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    // 获取”姓名“。权限是 public
+    public String getName() {
+        return name;
+    }
+    // 设置”姓名“。权限是 public
+    public void setName(String name) {
+        this.name = name;
+    }
+    // 获取”年龄“。权限是 protected
+    protected int getAge() {
+        return age;
+    }
+    // 设置”年龄“。权限是 protected
+    protected void setAge(int age) {
+        this.age = age;
+    }
+    // 获取“性别”。权限是 private
+    private Gender getGender() {
+        return gender;
+    }
+    // 设置“性别”。权限是 private
+    private void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+
+    // getInner() 中有内部类InnerB，用来测试getEnclosingMethod()
+    public void getInner() {
+        // 内部类
+        class InnerB{
+        }
+        // 获取InnerB的Class对象
+        Class cls = InnerB.class;
+
+        // 获取“封闭该内部类(InnerB)”的构造方法
+        Method cst = cls.getEnclosingMethod();
+
+        System.out.println(&quot;call--\&quot;getInner()\&quot; cst=&quot;+cst);
+    }
+
+
+    @Override
+    public String toString() {
+        return &quot;(&quot;+name+&quot;, &quot;+age+&quot;, &quot;+gender+&quot;)&quot;;
+    }
+}</code></pre><p>注意：若程序无法运行，请检查“forName()”中的包名是否正确！forName()的参数必须是，Person类的完整包名。</p>
+<p>运行结果：</p>
+<pre><code>getDeclaredMethod() : person=(Jimmy, 30, MALE), name=Jimmy, age=30, gender=MALE
+getMethod() : person=(Phobe, 0, FEMALE)
+call--&quot;getInner()&quot; cst=public void com.skywang.test.Person.getInner()
+getEnclosingMethod : person=(unknown, 0, FEMALE)</code></pre><h3 id="2-3-成员变量"><a href="#2-3-成员变量" class="headerlink" title="2.3 成员变量"></a>2.3 成员变量</h3><p>“成员变量”的相关API</p>
+<pre><code>// 获取“名称是name”的public的成员变量(包括从基类继承的、从接口实现的所有public成员变量)
+public Field    getField(String name)
+// 获取全部的public成员变量(包括从基类继承的、从接口实现的所有public成员变量)
+public Field[]    getFields()
+// 获取“名称是name”，并且是类自身声明的成员变量，包含public、protected和private成员变量。
+public Field    getDeclaredField(String name)
+// 获取全部的类自身声明的成员变量，包含public、protected和private成员变量。
+public Field[]    getDeclaredFields()</code></pre><p>接下来，我们通过示例对这些API进行说明。示例代码(DemoClassField.java)如下：</p>
+<pre><code>package com.skywang.test;
+
+import java.lang.Class;
+import java.lang.reflect.Field;
+
+/**
+ * java Class类的&quot;成员变量&quot;相关API的测试函数
+ *
+ * @author skywang
+ */
+public class DemoClassField {
+
+    public static void main(String[] args) {
+        // getDeclaredField() 的测试函数
+        testGetDeclaredField() ;
+
+        // getField() 的测试函数
+        testGetField() ;
+    }
+
+    /**
+     * getDeclaredField() 的测试函数
+     * getDeclaredField() 用于获取的是类自身声明的所有成员遍历，包含public、protected和private方法。
+     */
+    public static void testGetDeclaredField() {
+        try {
+            // 获取Person类的Class
+            Class&lt;?&gt; cls = Class.forName(&quot;com.skywang.test.Person&quot;);
+            // 根据class，调用类的默认构造函数(不带参数)
+            Object person = cls.newInstance();
+
+            // 根据class，获取Filed
+            Field fName = cls.getDeclaredField(&quot;name&quot;);
+            Field fAge = cls.getDeclaredField(&quot;age&quot;);
+            Field fGender = cls.getDeclaredField(&quot;gender&quot;);
+
+            // 根据构造函数，创建相应的对象
+            fName.set(person, &quot;Hamier&quot;);
+            fAge.set(person, 31);
+            fGender.setAccessible(true);  // 因为&quot;flag&quot;是private权限，所以要设置访问权限为true；否则，会抛出异常。
+            fGender.set(person, Gender.FEMALE);
+
+            System.out.printf(&quot;%-30s: person=%s\n&quot;, 
+                    &quot;getDeclaredField()&quot;, person);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * getField() 的测试函数
+     * getField() 用于获取的是public的“成员”
+     */
+    public static void testGetField() {
+        try {
+            // 获取Person类的Class
+            Class&lt;?&gt; cls = Class.forName(&quot;com.skywang.test.Person&quot;);
+            // 根据class，调用类的默认构造函数(不带参数)
+            Object person = cls.newInstance();
+
+            // 根据class，获取Filed
+            Field fName = cls.getField(&quot;name&quot;);
+            Field fAge = cls.getDeclaredField(&quot;age&quot;);       // 抛出异常，因为Person中age是protected权限。 
+            Field fGender = cls.getDeclaredField(&quot;gender&quot;); // 抛出异常，因为Person中gender是private权限。 
+
+            // 根据构造函数，创建相应的对象
+            fName.set(person, &quot;Grace&quot;);
+            //fAge.set(person, 26);
+            //fGender.set(person, Gender.FEMALE);
+
+            System.out.printf(&quot;%-30s: person=%s\n&quot;, 
+                    &quot;getField()&quot;, person);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+// 枚举类型。表示“性别”
+enum Gender{  
+    MALE, FEMALE
+} 
+// 人
+class Person {
+    // private。性别
+    private Gender gender;
+    // protected。 年龄
+    protected int age;
+    // public。 姓名
+    public String name;
+
+    public Person() {
+        this(&quot;unknown&quot;, 0, Gender.FEMALE);
+    }
+
+    public Person(String name, int age, Gender gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;(&quot;+name+&quot;, &quot;+age+&quot;, &quot;+gender+&quot;)&quot;;
+    }
+}</code></pre><p>注意：若程序无法运行，请检查“forName()”中的包名是否正确！forName()的参数必须是，Person类的完整包名。</p>
+<p>运行结果：</p>
+<pre><code>getDeclaredField() : person=(Hamier, 31, FEMALE)
+getField() : person=(Grace, 0, FEMALE)</code></pre><h3 id="2-4-类的其它信息"><a href="#2-4-类的其它信息" class="headerlink" title="2.4 类的其它信息"></a>2.4 类的其它信息</h3><p><strong>2.4.1 “注解”相关的API</strong></p>
+<pre><code>// 获取类的&quot;annotationClass&quot;类型的注解 (包括从基类继承的、从接口实现的所有public成员变量)
+public Annotation&lt;A&gt;    getAnnotation(Class annotationClass)
+// 获取类的全部注解 (包括从基类继承的、从接口实现的所有public成员变量)
+public Annotation[]    getAnnotations()
+// 获取类自身声明的全部注解 (包含public、protected和private成员变量)
+public Annotation[]    getDeclaredAnnotations()</code></pre><p>接下来，我们通过示例对这些API进行说明。示例代码(DemoClassAnnotation.java)如下：</p>
+<pre><code>package com.skywang.test;
+
+import java.lang.Class;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+/**
+ * java Class类getAnnotation()的测试程序
+ */
+public class DemoClassAnnotation {
+
+    public static void main(String[] args) {
+        try {
+            // 根据“类名”获取 对应的Class对象
+            Class&lt;?&gt; cls = Class.forName(&quot;com.skywang.test.Person&quot;);
+
+            // 获取“Person类”的注解
+            MyAnnotation myann = cls.getAnnotation(MyAnnotation.class);
+
+            System.out.println(&quot;myann=&quot;+myann);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+/**
+ * MyAnnotation是自定义个一个Annotation
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@interface MyAnnotation {
+}
+
+/**
+ * MyAnnotation 是Person的注解。
+ */
+@MyAnnotation 
+class Person {
+}</code></pre><p>注意：若程序无法运行，请检查“forName()”中的包名是否正确！forName()的参数必须是，Person类的完整包名。</p>
+<p>运行结果：</p>
+<pre><code>myann=@com.skywang.test.MyAnnotation()</code></pre><p>说明：<br>(01) MyAnnotation 是我们自定义个一个Annotation注解。若读者不明白“注解”，可以参考博文“<a href="/2012/03/03/annotation">Java Annotation认知(包括框架图、详细介绍、示例说明)</a>”<br>(02) getAnnotation()就是获取这个类的注解。</p>
+<p><strong>2.4.2 “父类”和“接口”相关的API</strong></p>
+<pre><code>// 获取实现的全部接口
+public Type[]    getGenericInterfaces()
+// 获取父类
+public Type    getGenericSuperclass()</code></pre><p>示例代码(DemoClassInterface.java)如下：</p>
+<pre><code>package com.skywang.test;
+
+import java.io.Serializable;
+import java.lang.Runnable;
+import java.lang.Thread;
+import java.lang.Class;
+import java.lang.reflect.Type;
+
+/**
+ * java Class类的有关父类和接口的测试
+ */
+public class DemoClassInterface {
+
+    public static void main(String[] args) {
+
+        try {
+            // 根据“类名”获取 对应的Class对象
+            Class&lt;?&gt; cls = Class.forName(&quot;com.skywang.test.Person&quot;);
+
+            // 获取“Person”的父类
+            Type father = cls.getGenericSuperclass();
+            // 获取“Person”实现的全部接口
+            Type[] intfs = cls.getGenericInterfaces();
+
+            System.out.println(&quot;father=&quot;+father);
+            for (Type t:intfs)
+                System.out.println(&quot;t=&quot;+t);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+/**
+ * Person 继承于 Object，并且实现了Serializable和Runnable接口
+ */
+class Person extends Object implements Serializable, Runnable{
+
+    @Override
+    public void run() {
+    }
+
+}</code></pre><p>注意：若程序无法运行，请检查“forName()”中的包名是否正确！forName()的参数必须是，Person类的完整包名。</p>
+<p>运行结果：</p>
+<pre><code>father=class java.lang.Object
+t=interface java.io.Serializable
+t=interface java.lang.Runnable</code></pre><p><strong>2.4.3 剩余的API</strong></p>
+<pre><code>// 获取“类名”
+public String    getSimpleName()
+// 获取“完整类名”
+public String    getName()
+// 类是不是“枚举类”
+public boolean    isEnum()
+// obj是不是类的对象
+public boolean    isInstance(Object obj)
+// 类是不是“接口”
+public boolean    isInterface()
+// 类是不是“本地类”。本地类,就是定义在方法内部的类。
+public boolean    isLocalClass()
+// 类是不是“成员类”。成员类,是内部类的一种，但是它不是“内部类”或“匿名类”。
+public boolean    isMemberClass()
+// 类是不是“基本类型”。 基本类型，包括void和boolean、byte、char、short、int、long、float 和 double这几种类型。
+public boolean    isPrimitive()
+// 类是不是“复合类”。 JVM中才会产生复合类，在java应用程序中不存在“复合类”！
+public boolean    isSynthetic()</code></pre><p>示例代码(DemoClassOtherAPIs.java)如下：</p>
+<pre><code>package com.skywang.test;
+
+import java.lang.Class;
+import java.lang.Runnable;
+import java.lang.annotation.ElementType;
+import java.util.TreeMap;
+
+/**
+ * java Class类的getName(), isInterface()等测试程序
+ *
+ * @author skywang
+ */
+public class DemoClassOtherAPIs {
+    public static void main(String[] args) {
+
+        Class cls = DemoClassOtherAPIs.class;
+        // 获取“类名”
+        System.out.printf(&quot;%-50s:getSimpleName()=%s\n&quot;, cls, cls.getSimpleName());
+        // 获取“完整类名”
+        System.out.printf(&quot;%-50s:getName()=%s\n&quot;, cls, cls.getName());
+
+        // 测试其它的API
+        testOtherAPIs() ;
+    }
+
+    public static void testOtherAPIs() {
+        // 本地类
+        class LocalA {
+        }
+
+        // 测试枚举类型。ElementType是一个枚举类
+        Class elementtypeCls = ElementType.class;
+        System.out.printf(&quot;%-50s:isEnum()=%s\n&quot;, 
+                elementtypeCls, elementtypeCls.isEnum());
+
+        // 判断是不是类的对象
+        Class demoCls = DemoClassOtherAPIs.class;
+        DemoClassOtherAPIs demoObj = new DemoClassOtherAPIs();
+        System.out.printf(&quot;%-50s:isInstance(obj)=%s\n&quot;, 
+                demoCls, demoCls.isInstance(demoObj));
+
+        // 类是不是“接口”
+        Class runCls = Runnable.class;
+        System.out.printf(&quot;%-50s:isInterface()=%s\n&quot;, 
+                runCls, runCls.isInterface());
+
+        // 类是不是“本地类”。本地类,就是定义在方法内部的类。
+        Class localCls = LocalA.class;
+        System.out.printf(&quot;%-50s:isLocalClass()=%s\n&quot;, 
+                localCls, localCls.isLocalClass());
+
+        // 类是不是“成员类”。成员类,是内部类的一种，但是它不是“内部类”或“匿名类”。
+        Class memCls = MemberB.class;
+        System.out.printf(&quot;%-50s:isMemberClass()=%s\n&quot;, 
+                memCls, memCls.isMemberClass());
+
+        // 类是不是“基本类型”。 基本类型，包括void和boolean、byte、char、short、int、long、float 和 double这几种类型。
+        Class primCls = int.class;
+        System.out.printf(&quot;%-50s:isPrimitive()=%s\n&quot;, 
+                primCls, primCls.isPrimitive());
+
+        // 类是不是“复合类”。 JVM中才会产生复合类，在java应用程序中不存在“复合类”！
+        Class synCls = DemoClassOtherAPIs.class;
+        System.out.printf(&quot;%-50s:isSynthetic()=%s\n&quot;, 
+                synCls, synCls.isSynthetic());
+    }
+
+    // 内部成员类
+    class MemberB {
+    }
+}</code></pre><p>注意：若程序无法运行，请检查“forName()”中的包名是否正确！forName()的参数必须是，Person类的完整包名。</p>
+<p>运行结果：</p>
+<pre><code>class com.skywang.test.DemoClassOtherAPIs :getSimpleName()=DemoClassOtherAPIs
+class com.skywang.test.DemoClassOtherAPIs :getName()=com.skywang.test.DemoClassOtherAPIs
+class java.lang.annotation.ElementType :isEnum()=true
+class com.skywang.test.DemoClassOtherAPIs :isInstance(obj)=true
+interface java.lang.Runnable :isInterface()=true
+class com.skywang.test.DemoClassOtherAPIs$1LocalA :isLocalClass()=true
+class com.skywang.test.DemoClassOtherAPIs$MemberB :isMemberClass()=true
+int :isPrimitive()=true
+class com.skywang.test.DemoClassOtherAPIs :isSynthetic()=false</code></pre><p>说明：isSynthetic()是用来判断Class是不是“复合类”。这在java应用程序中只会返回false，不会返回true。因为，JVM中才会产生复合类，在java应用程序中不存在“复合类”！</p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/java/">#java</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2012/04/14/java/exception/2012-04-14-exception/">Java异常(一) Java异常简介及其架构</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2012/03/03/java/others/2012-03-03-annotation/">Java Annotation认知(包括框架图、详细介绍、示例说明)</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

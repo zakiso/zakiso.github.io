@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Android 之ContentProvider(二)之 ContentProvider基本用法 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="android training">
+
+
+
+
+
+    <meta name="description" content="android training">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 之ContentProvider(二)之 ContentProvider基本用法">
+<meta property="og:url" content="https://apppills.com/2014/07/06/android/api_guide/app_component/content_provider/2014-07-06-ContentProvider-Usage/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="android training">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 之ContentProvider(二)之 ContentProvider基本用法">
+<meta name="twitter:description" content="android training">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#ContentProvider简介">1&nbsp;&nbsp;<b>ContentProvider简介</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#ContentProvider示例">2&nbsp;&nbsp;<b>ContentProvider示例</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-ContentProvider提供者APK">2.1&nbsp;&nbsp;1. ContentProvider提供者APK</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-1-ContentProvider的存储表格">2.1.1&nbsp;&nbsp;1.1 ContentProvider的存储表格</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-2-ContentProvider对应的manifest">2.1.2&nbsp;&nbsp;1.2 ContentProvider对应的manifest</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-3-自定义的ContentProvider类">2.1.3&nbsp;&nbsp;1.3 自定义的ContentProvider类</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-3-1-数据库">2.1.4&nbsp;&nbsp;1.3.1 数据库</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-3-2-注册Uri">2.1.5&nbsp;&nbsp;1.3.2 注册Uri</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-3-2-实现ContentProvider的抽象函数">2.1.6&nbsp;&nbsp;1.3.2 实现ContentProvider的抽象函数</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-ContentProvider测试APK">2.2&nbsp;&nbsp;2. ContentProvider测试APK</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Android 之ContentProvider(二)之 ContentProvider基本用法
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-07-06T02:11:00.000Z" itemprop="datePublished">7月 6 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            12 分钟 read (About 1796 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本章给出ContentProvider的完整示例，并对之进行介绍。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">ContentProvider简介</a><br><strong>2</strong>. <a href="#anchor2">ContentProvider示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="ContentProvider简介"><a href="#ContentProvider简介" class="headerlink" title="ContentProvider简介"></a>ContentProvider简介</h1><p>ContentProvider通常用于共享数据。</p>
+<p>当其他程序需要访问本程序的数据，并且数据的结构比较复杂时，就可以使用ContentProvider来共享数据。如果数据不需要跨程序访问，使用数据库即可；如果数据结构比较简单，可以考虑前面提到的通过Intent共享文本等简单数据，或者通过FileProvider共享文件。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="ContentProvider示例"><a href="#ContentProvider示例" class="headerlink" title="ContentProvider示例"></a>ContentProvider示例</h1><p>接下来，实现一个ContentProvider。该ContentProvider包括两部分：ContentProvider提供者APK 和 ContentProvider测试APK。<br>(01) ContentProvider提供者：自定义一个ContentProvider，并监听相应的URI。客户可以通过URI插入/删除/更新/查询数据。ContentProvider中的数据记录的是人的信息，包括”姓名，出生年月，email，性别”等信息。<br>(02) ContentProvider测试APK：通过URI向ContentProvider发起插入/删除/更新/查询等操作。  </p>
+<p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/contentprovider/01_basic/MyProvider" target="_blank" rel="noopener">ContentProvider示例的完整源码</a></p>
+<p>下面介绍ContentProvider的实现步骤。</p>
+<h2 id="1-ContentProvider提供者APK"><a href="#1-ContentProvider提供者APK" class="headerlink" title="1. ContentProvider提供者APK"></a>1. ContentProvider提供者APK</h2><h3 id="1-1-ContentProvider的存储表格"><a href="#1-1-ContentProvider的存储表格" class="headerlink" title="1.1 ContentProvider的存储表格"></a>1.1 ContentProvider的存储表格</h3><p>根据ContentProvider的数据特性，我们建立一张表，表格包括”id/姓名/出生年月/email/性别”这些信息。表对应的类如下：</p>
+<pre><code>public final class MyContract {
+    public MyContract() {}
+
+    /** 
+     * BaseColumns类中有两个属性：_ID 和 _COUNT
+     */
+    public static abstract class Entry implements BaseColumns {
+        public static final String TABLE_NAME = &quot;mytable01&quot;;
+        public static final String NAME       = &quot;name&quot;;
+        public static final String BIRTH_DAY  = &quot;birthday&quot;;
+        public static final String EMAIL      = &quot;email&quot;;
+        public static final String GENDER     = &quot;gender&quot;;
+    }   
+}</code></pre><p>说明：BaseColumns是Android自带的类，它集成了”_ID”和”_COUNT”两个属性。 </p>
+<h3 id="1-2-ContentProvider对应的manifest"><a href="#1-2-ContentProvider对应的manifest" class="headerlink" title="1.2 ContentProvider对应的manifest"></a>1.2 ContentProvider对应的manifest</h3><p>在manifest中声明我们自定义的ContentProvider。</p>
+<pre><code>&lt;application android:label=&quot;@string/app_name&quot; android:icon=&quot;@drawable/ic_launcher&quot;&gt;
+    &lt;provider android:name=&quot;MyProvider&quot; android:authorities=&quot;com.skw.myprovider&quot; /&gt;
+&lt;/application&gt;</code></pre><h3 id="1-3-自定义的ContentProvider类"><a href="#1-3-自定义的ContentProvider类" class="headerlink" title="1.3 自定义的ContentProvider类"></a>1.3 自定义的ContentProvider类</h3><p>完成ContentProvider类，主要需要注意以下几点：<br>(01) ContentProvider的数据一般是以”数据库”或”网络数据”的方式存储的。如果是数据库，则需要实现SQLiteOpenHelper类。通过SQLiteOpenHelper类新建/管理数据库。<br>(02) ContentProvider主要是以Uri的形式方式访问的(也可以通过Intent)。要通过UriMatcher注册ContentProvider监听的Uri。<br>(03) ContentProvider是一个抽象类。当我们需要以继承ContentProvider的方式自定义ContentProvider时，需要实现query(), insert(), update(), delete(), getType(), onCreate()这六个函数。  </p>
+<h3 id="1-3-1-数据库"><a href="#1-3-1-数据库" class="headerlink" title="1.3.1 数据库"></a>1.3.1 数据库</h3><p>下面，先介绍ContentProvider的数据库的实现。</p>
+<pre><code>// 创建表格的SQL语句
+private static final String SQL_CREATE_ENTRIES =
+    &quot;CREATE TABLE &quot; + Entry.TABLE_NAME + &quot; (&quot; +
+    Entry._ID + &quot; INTEGER PRIMARY KEY,&quot; +
+    Entry.NAME + &quot; TEXT NOT NULL, &quot; +
+    Entry.BIRTH_DAY + &quot; TEXT, &quot; +
+    Entry.EMAIL + &quot; TEXT, &quot; +
+    Entry.GENDER + &quot; INTEGER &quot; +
+    &quot; )&quot;;
+
+...
+
+private class DBLiteHelper extends SQLiteOpenHelper {
+    public static final int DATABASE_VERSION = 1;
+    public static final String DATABASE_NAME = &quot;MyProvider.db&quot;;
+
+    public DBLiteHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(SQL_CREATE_ENTRIES);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    }
+}</code></pre><p>说明：关于SQLiteOpenHelper的内容在”<a href="/2014/05/30/SavingData/">数据存储章节</a>“中已经详细介绍过了。</p>
+<h3 id="1-3-2-注册Uri"><a href="#1-3-2-注册Uri" class="headerlink" title="1.3.2 注册Uri"></a>1.3.2 注册Uri</h3><pre><code>// Uri的authority
+public static final String AUTHORITY = &quot;com.skw.myprovider&quot;;
+// Uri的path
+public static final String PATH = &quot;table01&quot;;
+// UriMatcher中URI对应的序号
+public static final int ITEM_ALL = 1;
+public static final int ITEM_ID  = 2;
+
+private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
+static {
+    URI_MATCHER.addURI(AUTHORITY, PATH, ITEM_ALL);
+    URI_MATCHER.addURI(AUTHORITY, PATH+&quot;/#&quot;, ITEM_ID);
+}</code></pre><p>说明：通过addURI()就可以将URI注册到UriMatcher中，从而实现ContentProvider对URI的监听。这里的AUTHORITY与manifest中的android:authorities一致！<br>例如， URI_MATCHER.addURI(AUTHORITY, PATH, ITEM_ALL); 意味着ContentProvider对”content://con.skw.myprovider/table01”进行监听。<br>例如， URI_MATCHER.addURI(AUTHORITY, PATH+”/#”, ITEM_ALL); 意味着ContentProvider对”content://con.skw.myprovider/table01/5”进行监听。   </p>
+<h3 id="1-3-2-实现ContentProvider的抽象函数"><a href="#1-3-2-实现ContentProvider的抽象函数" class="headerlink" title="1.3.2 实现ContentProvider的抽象函数"></a>1.3.2 实现ContentProvider的抽象函数</h3><h4 id="onCreate"><a href="#onCreate" class="headerlink" title="onCreate()"></a>onCreate()</h4><pre><code>@Override
+public boolean onCreate() {
+    mDbHelper = new DBLiteHelper(this.getContext());
+    Log.d(TAG, &quot;open/create table&quot;);
+    return true;
+}</code></pre><p>说明：onCreate()中新建SQLiteOpenHelper对象。</p>
+<h4 id="delete"><a href="#delete" class="headerlink" title="delete()"></a>delete()</h4><pre><code>@Override
+public int delete(Uri uri, String selection, String[] selectionArgs) {
+    SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+    int count = 0;
+    switch (URI_MATCHER.match(uri)) {
+    case ITEM_ALL:
+        count = db.delete(Entry.TABLE_NAME, selection, selectionArgs);
+        Log.d(TAG, &quot;delete ITEM uri=&quot;+uri+&quot;, count=&quot;+count);
+        break;
+    case ITEM_ID:
+        // 获取id列的值
+        String id = uri.getPathSegments().get(1);
+        count = db.delete(Entry.TABLE_NAME, Entry._ID+&quot;=?&quot;, new String[]{id});
+        Log.d(TAG, &quot;delete ITEM_ID id=&quot;+id+&quot;, uri=&quot;+uri+&quot;, count=&quot;+count);
+        break;
+    default:
+        throw new IllegalArgumentException(&quot;Unknown URI&quot;+uri);
+    }
+    getContext().getContentResolver().notifyChange(uri, null);
+    return count;
+}</code></pre><p>说明：delete()中会通过match()获取uri对应的编码。这里的编码就是和addURI()注册uri的编码是相对应的。此外，notifyChange()的作用是通常数据库变化，若有ContentObserver监听该Uri，则notifyChange()最终会将消息传递给监听者。</p>
+<p>insert(), update(), query()的实现与delete()类似，就不再说明。</p>
+<h4 id="getType"><a href="#getType" class="headerlink" title="getType()"></a>getType()</h4><pre><code>@Override
+public String getType(Uri uri) {
+    switch (URI_MATCHER.match(uri)) {
+    case ITEM_ALL:
+        return &quot;skw.myprovider.dir/table01&quot;;
+    case ITEM_ID:
+        return &quot;skw.myprovider.item/table01&quot;;
+    default:
+        throw new IllegalArgumentException(&quot;Unknown URI&quot;+uri);
+    }
+}</code></pre><p>说明：getType()是返回Uri对应的数据类型。</p>
+<h2 id="2-ContentProvider测试APK"><a href="#2-ContentProvider测试APK" class="headerlink" title="2. ContentProvider测试APK"></a>2. ContentProvider测试APK</h2><pre><code>public class ProviderTest extends Activity 
+    implements View.OnClickListener {
+
+    private static final String TAG = &quot;##ProviderTest##&quot;;
+
+    // 数据库的属性，与MyProvider的表格属性一致
+    public static final String NAME      = &quot;name&quot;;
+    public static final String BIRTH_DAY = &quot;birthday&quot;;
+    public static final String EMAIL     = &quot;email&quot;;
+    public static final String GENDER    = &quot;gender&quot;;
+    // 数据库的URI
+    public static final Uri CONTENT_URI = Uri.parse(&quot;content://com.skw.myprovider/table01&quot;);
+
+    private ContentResolver mContentResolver = null;
+    /** Called when the activity is first created. */
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        ((Button)findViewById(R.id.insert)).setOnClickListener(this);
+        ((Button)findViewById(R.id.deleteFirst)).setOnClickListener(this);
+        ((Button)findViewById(R.id.deleteKate)).setOnClickListener(this);
+        ((Button)findViewById(R.id.deleteAll)).setOnClickListener(this);
+        ((Button)findViewById(R.id.update)).setOnClickListener(this);
+        ((Button)findViewById(R.id.show)).setOnClickListener(this);
+
+        // 删除第一行，然后全部打印出来
+        mContentResolver = getContentResolver();
+
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()) {
+            case R.id.insert:
+                // 添加
+                insert(&quot;Jimmy&quot;, &quot;20020201&quot;, &quot;Jimmy20020201@126.com&quot;, 1);
+                insert(&quot;Kate&quot;,  &quot;20030104&quot;, &quot;kate20030104@126.com&quot;, 0);
+                insert(&quot;Li Lei&quot;, &quot;20021124&quot;, &quot;lilei20101124@126.com&quot;, 1);
+                insert(&quot;Lucy&quot;, &quot;20010624&quot;, &quot;lucy20101124@126.com&quot;, 0);
+                break;
+            case R.id.deleteFirst:
+                ContentUris cus = new ContentUris();
+                Uri uri = cus.withAppendedId(CONTENT_URI, 1);
+                Log.d(TAG, &quot;delete uri=&quot;+uri);
+                mContentResolver.delete(uri, null, null);
+                break;
+            case R.id.deleteKate:
+                // 删除“username=Kate”的行，然后全部打印出来
+                mContentResolver.delete(CONTENT_URI, NAME+&quot;=?&quot;, new String[]{&quot;Kate&quot;});
+                break;
+            case R.id.deleteAll:
+                // 删除全部的行，然后全部打印出来
+                deleteAll() ;
+                break;
+            case R.id.update:
+                // 更新第1个值，然后全部打印出来
+                updateItem() ;
+                break;
+            case R.id.show:
+                // 打印全部的值
+                printAll() ;
+                break;
+            default:
+                // 查找第2个值
+                //querySecondItem() ;
+                break;
+        }
+    }
+
+    /*
+     * 通过ContentResolver,将值插入到MyProvider中
+     */
+    private void insert(String name, String date, String email, int gender) {
+
+        ContentResolver cr = getContentResolver();
+
+        ContentValues cv = new ContentValues();
+        cv.put(NAME, name);
+        cv.put(BIRTH_DAY, date);
+        cv.put(EMAIL, email);
+        cv.put(GENDER, gender);
+        Uri uri = cr.insert(CONTENT_URI, cv);
+        Log.d(TAG, &quot;insert uri=&quot;+uri);
+    }
+
+    private void updateItem() {
+        ContentResolver cr = getContentResolver();
+
+        ContentUris cus = new ContentUris();
+        Uri uri = cus.withAppendedId(CONTENT_URI, 1);
+
+        ContentValues cv = new ContentValues();
+        cv.put(NAME, &quot;update_name&quot;);
+        cv.put(BIRTH_DAY, &quot;update_date&quot;);
+        cv.put(EMAIL, &quot;update_email&quot;);
+        cv.put(GENDER, 1);
+        cr.update(uri, cv, null, null);
+    }
+
+    /*
+     * 通过ContentResolver,将MyProvider中的值全部删除
+     */
+    private void deleteAll() {
+
+        Log.d(TAG, &quot;delete all value!&quot;);
+        ContentResolver cr = getContentResolver();
+        cr.delete(CONTENT_URI, null, null);
+    }
+
+    private void querySecondItem() {
+        ContentResolver cr = getContentResolver();
+        ContentUris cus = new ContentUris();
+        Uri uri = cus.withAppendedId(CONTENT_URI, 2);
+        String[] proj = new String[] { NAME, BIRTH_DAY, EMAIL, GENDER};
+        Cursor cursor = cr.query(uri, proj, null, null, null);
+        int index = 0;
+        while (cursor.moveToNext()) {
+            Log.d(TAG, &quot;querySecondItem--&quot;+index+&quot;--&quot;
+                    +&quot;, email=&quot; + cursor.getString(cursor.getColumnIndex(EMAIL))
+                    +&quot;, username=&quot; + cursor.getString(cursor.getColumnIndex(NAME))
+                    +&quot;, date=&quot; + cursor.getString(cursor.getColumnIndex(BIRTH_DAY))
+                    +&quot;, gender=&quot; + cursor.getInt(cursor.getColumnIndex(GENDER)));
+            index++;
+        }
+    }
+
+    private void printAll() {
+        //通过contentResolver进行查找
+        ContentResolver cr = getContentResolver();
+
+        Log.d(TAG, &quot;print all value!&quot;);
+        // query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder)
+        // 返回的列
+        String[] proj = new String[] { NAME, BIRTH_DAY, EMAIL, GENDER};
+        Cursor cursor = cr.query(
+            CONTENT_URI, proj, null, null, null);
+        int index = 0;
+        while (cursor.moveToNext()) {
+            Log.d(TAG, &quot;printAll--&quot;+index+&quot;--&quot;
+                    +&quot;, email=&quot; + cursor.getString(cursor.getColumnIndex(EMAIL))
+                    +&quot;, username=&quot; + cursor.getString(cursor.getColumnIndex(NAME))
+                    +&quot;, date=&quot; + cursor.getString(cursor.getColumnIndex(BIRTH_DAY))
+                    +&quot;, gender=&quot; + cursor.getString(cursor.getColumnIndex(GENDER)));
+            index++;
+        }
+        startManagingCursor(cursor);  //查找后关闭游标
+    }
+}</code></pre>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/android/">#android</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2014/07/06/android/api_guide/app_component/content_provider/2014-07-06-ContentProvider-Permission/">Android 之ContentProvider(三)之 Permission权限设置</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2014/07/06/android/api_guide/app_component/content_provider/2014-07-06-ContentProvider-Uri/">Android 之ContentProvider(一)之 Uri介绍</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

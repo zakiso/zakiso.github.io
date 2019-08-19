@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Java多线程系列--“基础篇”09之 interrupt()和线程终止方式 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="java threads">
+
+
+
+
+
+    <meta name="description" content="java threads">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“基础篇”09之 interrupt()和线程终止方式">
+<meta property="og:url" content="https://apppills.com/2012/08/09/java/threads/2012-08-09-threads-basic/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="java threads">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“基础篇”09之 interrupt()和线程终止方式">
+<meta name="twitter:description" content="java threads">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-interrupt-说明">1&nbsp;&nbsp;<b>1. interrupt()说明</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#2-终止线程的方式">2&nbsp;&nbsp;<b>2. 终止线程的方式</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-1-终止处于“阻塞状态”的线程">2.1&nbsp;&nbsp;2.1 终止处于“阻塞状态”的线程</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-2-终止处于“运行状态”的线程">2.2&nbsp;&nbsp;2.2 终止处于“运行状态”的线程</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#3-终止线程的示例">3&nbsp;&nbsp;<b>3. 终止线程的示例</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#4-interrupted-和-isInterrupted-的区别">4&nbsp;&nbsp;<b>4. interrupted() 和 isInterrupted()的区别</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Java多线程系列--“基础篇”09之 interrupt()和线程终止方式
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-08-09T01:01:00.000Z" itemprop="datePublished">8月 9 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            19 分钟 read (About 2800 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本章，会对线程的interrupt()中断和终止方式进行介绍。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. interrupt()说明</a><br><a href="#anchor2">2. 终止线程的方式</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor2_1">2.1 终止处于“阻塞状态”的线程</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor2_2">2.2 终止处于“运行状态”的线程</a><br><a href="#anchor3">3. 终止线程的示例</a><br><a href="#anchor4">4. interrupted() 和 isInterrupted()的区别</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-interrupt-说明"><a href="#1-interrupt-说明" class="headerlink" title="1. interrupt()说明"></a>1. interrupt()说明</h1><p>在介绍终止线程的方式之前，有必要先对interrupt()进行了解。<br>关于interrupt()，java的djk文档描述如下：<a href="http://docs.oracle.com/javase/7/docs/api/" target="_blank" rel="noopener">http://docs.oracle.com/javase/7/docs/api/</a></p>
+<blockquote>
+<p>Interrupts this thread.<br>Unless the current thread is interrupting itself, which is always permitted, the checkAccess method of this thread is invoked, which may cause a SecurityException to be thrown.</p>
+</blockquote>
+<blockquote>
+<p>If this thread is blocked in an invocation of the wait(), wait(long), or wait(long, int) methods of the Object class, or of the join(), join(long), join(long, int), sleep(long), or sleep(long, int), methods of this class, then its interrupt status will be cleared and it will receive an InterruptedException.</p>
+</blockquote>
+<blockquote>
+<p>If this thread is blocked in an I/O operation upon an interruptible channel then the channel will be closed, the thread’s interrupt status will be set, and the thread will receive a ClosedByInterruptException.</p>
+</blockquote>
+<blockquote>
+<p>If this thread is blocked in a Selector then the thread’s interrupt status will be set and it will return immediately from the selection operation, possibly with a non-zero value, just as if the selector’s wakeup method were invoked.</p>
+</blockquote>
+<blockquote>
+<p>If none of the previous conditions hold then this thread’s interrupt status will be set.</p>
+</blockquote>
+<blockquote>
+<p>Interrupting a thread that is not alive need not have any effect.</p>
+</blockquote>
+<p>大致意思是：</p>
+<blockquote>
+<p>interrupt()的作用是中断本线程。<br>本线程中断自己是被允许的；其它线程调用本线程的interrupt()方法时，会通过checkAccess()检查权限。这有可能抛出SecurityException异常。</p>
+</blockquote>
+<blockquote>
+<p>如果本线程是处于阻塞状态：调用线程的wait(), wait(long)或wait(long, int)会让它进入等待(阻塞)状态，或者调用线程的join(), join(long), join(long, int), sleep(long), sleep(long, int)也会让它进入阻塞状态。若线程在阻塞状态时，调用了它的interrupt()方法，那么它的“中断状态”会被清除并且会收到一个InterruptedException异常。例如，线程通过wait()进入阻塞状态，此时通过interrupt()中断该线程；调用interrupt()会立即将线程的中断标记设为“true”，但是由于线程处于阻塞状态，所以该“中断标记”会立即被清除为“false”，同时，会产生一个InterruptedException的异常。<br>如果线程被阻塞在一个Selector选择器中，那么通过interrupt()中断它时；线程的中断标记会被设置为true，并且它会立即从选择操作中返回。<br>如果不属于前面所说的情况，那么通过interrupt()中断线程时，它的中断标记会被设置为“true”。<br>中断一个“已终止的线程”不会产生任何操作。</p>
+</blockquote>
+<p><a name="anchor2"></a></p>
+<h1 id="2-终止线程的方式"><a href="#2-终止线程的方式" class="headerlink" title="2. 终止线程的方式"></a>2. 终止线程的方式</h1><p>Thread中的stop()和suspend()方法，由于固有的不安全性，已经建议不再使用！<br>下面，我先分别讨论线程在“阻塞状态”和“运行状态”的终止方式，然后再总结出一个通用的方式。</p>
+<p><a name="anchor2_1"></a></p>
+<h2 id="2-1-终止处于“阻塞状态”的线程"><a href="#2-1-终止处于“阻塞状态”的线程" class="headerlink" title="2.1 终止处于“阻塞状态”的线程"></a>2.1 终止处于“阻塞状态”的线程</h2><p>通常，我们通过“中断”方式终止处于“阻塞状态”的线程。<br>当线程由于被调用了sleep(), wait(), join()等方法而进入阻塞状态；若此时调用线程的interrupt()将线程的中断标记设为true。由于处于阻塞状态，中断标记会被清除，同时产生一个InterruptedException异常。将InterruptedException放在适当的为止就能终止线程，形式如下：</p>
+<pre><code>@Override
+public void run() {
+    try {
+        while (true) {
+            // 执行任务...
+        }
+    } catch (InterruptedException ie) {  
+        // 由于产生InterruptedException异常，退出while(true)循环，线程终止！
+    }
+}</code></pre><p>说明：在while(true)中不断的执行任务，当线程处于阻塞状态时，调用线程的interrupt()产生InterruptedException中断。中断的捕获在while(true)之外，这样就退出了while(true)循环！<br>注意：对InterruptedException的捕获务一般放在while(true)循环体的外面，这样，在产生异常时就退出了while(true)循环。否则，InterruptedException在while(true)循环体之内，就需要额外的添加退出处理。形式如下：</p>
+<pre><code>@Override
+public void run() {
+    while (true) {
+        try {
+            // 执行任务...
+        } catch (InterruptedException ie) {  
+            // InterruptedException在while(true)循环体内。
+            // 当线程产生了InterruptedException异常时，while(true)仍能继续运行！需要手动退出
+            break;
+        }
+    }
+}</code></pre><p>说明：上面的InterruptedException异常的捕获在whle(true)之内。当产生InterruptedException异常时，被catch处理之外，仍然在while(true)循环体内；要退出while(true)循环体，需要额外的执行退出while(true)的操作。</p>
+<p><a name="anchor2_2"></a></p>
+<h2 id="2-2-终止处于“运行状态”的线程"><a href="#2-2-终止处于“运行状态”的线程" class="headerlink" title="2.2 终止处于“运行状态”的线程"></a>2.2 终止处于“运行状态”的线程</h2><p>通常，我们通过“标记”方式终止处于“运行状态”的线程。其中，包括“中断标记”和“额外添加标记”。</p>
+<p><strong>(01) 通过“中断标记”终止线程。</strong><br>形式如下：</p>
+<pre><code>@Override
+public void run() {
+    while (!isInterrupted()) {
+        // 执行任务...
+    }
+}</code></pre><p>说明：isInterrupted()是判断线程的中断标记是不是为true。当线程处于运行状态，并且我们需要终止它时；可以调用线程的interrupt()方法，使用线程的中断标记为true，即isInterrupted()会返回true。此时，就会退出while循环。<br>注意：interrupt()并不会终止处于“运行状态”的线程！它会将线程的中断标记设为true。</p>
+<p><strong>(02) 通过“额外添加标记”。</strong><br>形式如下：</p>
+<pre><code>private volatile boolean flag= true;
+protected void stopTask() {
+    flag = false;
+}
+
+@Override
+public void run() {
+    while (flag) {
+        // 执行任务...
+    }
+}</code></pre><p>说明：线程中有一个flag标记，它的默认值是true；并且我们提供stopTask()来设置flag标记。当我们需要终止该线程时，调用该线程的stopTask()方法就可以让线程退出while循环。<br>注意：将flag定义为volatile类型，是为了保证flag的可见性。即其它线程通过stopTask()修改了flag之后，本线程能看到修改后的flag的值。</p>
+<p>综合线程处于“阻塞状态”和“运行状态”的终止方式，比较通用的终止线程的形式如下：</p>
+<pre><code>@Override
+public void run() {
+    try {
+        // 1. isInterrupted()保证，只要中断标记为true就终止线程。
+        while (!isInterrupted()) {
+            // 执行任务...
+        }
+    } catch (InterruptedException ie) {  
+        // 2. InterruptedException异常保证，当InterruptedException异常产生时，线程被终止。
+    }
+}</code></pre><p><a name="anchor3"></a></p>
+<h1 id="3-终止线程的示例"><a href="#3-终止线程的示例" class="headerlink" title="3. 终止线程的示例"></a>3. 终止线程的示例</h1><p>interrupt()常常被用来终止“阻塞状态”线程。参考下面示例：</p>
+<pre><code>// Demo1.java的源码
+class MyThread extends Thread {
+
+    public MyThread(String name) {
+        super(name);
+    }
+
+    @Override
+    public void run() {
+        try {  
+            int i=0;
+            while (!isInterrupted()) {
+                Thread.sleep(100); // 休眠100ms
+                i++;
+                System.out.println(Thread.currentThread().getName()+&quot; (&quot;+this.getState()+&quot;) loop &quot; + i);  
+            }
+        } catch (InterruptedException e) {  
+            System.out.println(Thread.currentThread().getName() +&quot; (&quot;+this.getState()+&quot;) catch InterruptedException.&quot;);  
+        }
+    }
+}
+
+public class Demo1 {
+
+    public static void main(String[] args) {  
+        try {  
+            Thread t1 = new MyThread(&quot;t1&quot;);  // 新建“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is new.&quot;);  
+
+            t1.start();                      // 启动“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is started.&quot;);  
+
+            // 主线程休眠300ms，然后主线程给t1发“中断”指令。
+            Thread.sleep(300);
+            t1.interrupt();
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted.&quot;);
+
+            // 主线程休眠300ms，然后查看t1的状态。
+            Thread.sleep(300);
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted now.&quot;);
+        } catch (InterruptedException e) {  
+            e.printStackTrace();
+        }
+    } 
+}</code></pre><p>运行结果：</p>
+<pre><code>t1 (NEW) is new.
+t1 (RUNNABLE) is started.
+t1 (RUNNABLE) loop 1
+t1 (RUNNABLE) loop 2
+t1 (TIMED_WAITING) is interrupted.
+t1 (RUNNABLE) catch InterruptedException.
+t1 (TERMINATED) is interrupted now.</code></pre><p>结果说明：<br>(01) 主线程main中通过new MyThread(“t1”)创建线程t1，之后通过t1.start()启动线程t1。<br>(02) t1启动之后，会不断的检查它的中断标记，如果中断标记为“false”；则休眠100ms。<br>(03) t1休眠之后，会切换到主线程main；主线程再次运行时，会执行t1.interrupt()中断线程t1。t1收到中断指令之后，会将t1的中断标记设置“false”，而且会抛出InterruptedException异常。在t1的run()方法中，是在循环体while之外捕获的异常；因此循环被终止。</p>
+<p>我们对上面的结果进行小小的修改，将run()方法中捕获InterruptedException异常的代码块移到while循环体内。</p>
+<pre><code>// Demo2.java的源码
+class MyThread extends Thread {
+
+    public MyThread(String name) {
+        super(name);
+    }
+
+    @Override
+    public void run() {
+        int i=0;
+        while (!isInterrupted()) {
+            try {
+                Thread.sleep(100); // 休眠100ms
+            } catch (InterruptedException ie) {  
+                System.out.println(Thread.currentThread().getName() +&quot; (&quot;+this.getState()+&quot;) catch InterruptedException.&quot;);  
+            }
+            i++;
+            System.out.println(Thread.currentThread().getName()+&quot; (&quot;+this.getState()+&quot;) loop &quot; + i);  
+        }
+    }
+}
+
+public class Demo2 {
+
+    public static void main(String[] args) {  
+        try {  
+            Thread t1 = new MyThread(&quot;t1&quot;);  // 新建“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is new.&quot;);  
+
+            t1.start();                      // 启动“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is started.&quot;);  
+
+            // 主线程休眠300ms，然后主线程给t1发“中断”指令。
+            Thread.sleep(300);
+            t1.interrupt();
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted.&quot;);
+
+            // 主线程休眠300ms，然后查看t1的状态。
+            Thread.sleep(300);
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted now.&quot;);
+        } catch (InterruptedException e) {  
+            e.printStackTrace();
+        }
+    } 
+}</code></pre><p>运行结果：</p>
+<pre><code>t1 (NEW) is new.
+t1 (RUNNABLE) is started.
+t1 (RUNNABLE) loop 1
+t1 (RUNNABLE) loop 2
+t1 (TIMED_WAITING) is interrupted.
+t1 (RUNNABLE) catch InterruptedException.
+t1 (RUNNABLE) loop 3
+t1 (RUNNABLE) loop 4
+t1 (RUNNABLE) loop 5
+t1 (TIMED_WAITING) is interrupted now.
+t1 (RUNNABLE) loop 6
+t1 (RUNNABLE) loop 7
+t1 (RUNNABLE) loop 8
+t1 (RUNNABLE) loop 9
+...</code></pre><p>结果说明：<br>程序进入了死循环！<br>为什么会这样呢？这是因为，t1在“等待(阻塞)状态”时，被interrupt()中断；此时，会清除中断标记[即isInterrupted()会返回false]，而且会抛出InterruptedException异常[该异常在while循环体内被捕获]。因此，t1理所当然的会进入死循环了。<br>解决该问题，需要我们在捕获异常时，额外的进行退出while循环的处理。例如，在MyThread的catch(InterruptedException)中添加break 或 return就能解决该问题。</p>
+<p>下面是通过“额外添加标记”的方式终止“状态状态”的线程的示例：</p>
+<pre><code>// Demo3.java的源码
+class MyThread extends Thread {
+
+    private volatile boolean flag= true;
+    public void stopTask() {
+        flag = false;
+    }
+
+    public MyThread(String name) {
+        super(name);
+    }
+
+    @Override
+    public void run() {
+        synchronized(this) {
+            try {
+                int i=0;
+                while (flag) {
+                    Thread.sleep(100); // 休眠100ms
+                    i++;
+                    System.out.println(Thread.currentThread().getName()+&quot; (&quot;+this.getState()+&quot;) loop &quot; + i);  
+                }
+            } catch (InterruptedException ie) {  
+                System.out.println(Thread.currentThread().getName() +&quot; (&quot;+this.getState()+&quot;) catch InterruptedException.&quot;);  
+            }
+        }  
+    }
+}
+
+public class Demo3 {
+
+    public static void main(String[] args) {  
+        try {  
+            MyThread t1 = new MyThread(&quot;t1&quot;);  // 新建“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is new.&quot;);  
+
+            t1.start();                      // 启动“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is started.&quot;);  
+
+            // 主线程休眠300ms，然后主线程给t1发“中断”指令。
+            Thread.sleep(300);
+            t1.stopTask();
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted.&quot;);
+
+            // 主线程休眠300ms，然后查看t1的状态。
+            Thread.sleep(300);
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted now.&quot;);
+        } catch (InterruptedException e) {  
+            e.printStackTrace();
+        }
+    } 
+}</code></pre><p>运行结果：</p>
+<pre><code>t1 (NEW) is new.
+t1 (RUNNABLE) is started.
+t1 (RUNNABLE) loop 1
+t1 (RUNNABLE) loop 2
+t1 (TIMED_WAITING) is interrupted.
+t1 (RUNNABLE) loop 3
+t1 (TERMINATED) is interrupted now.</code></pre><p><a name="anchor4"></a></p>
+<h1 id="4-interrupted-和-isInterrupted-的区别"><a href="#4-interrupted-和-isInterrupted-的区别" class="headerlink" title="4. interrupted() 和 isInterrupted()的区别"></a>4. interrupted() 和 isInterrupted()的区别</h1><p>最后谈谈 interrupted() 和 isInterrupted()。<br>interrupted() 和 isInterrupted()都能够用于检测对象的“中断标记”。<br>区别是，interrupted()除了返回中断标记之外，它还会清除中断标记(即将中断标记设为false)；而isInterrupted()仅仅返回中断标记。</p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/java/">#java</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2012/08/10/java/threads/2012-08-10-threads-basic/">Java多线程系列--“基础篇”10之 线程优先级和守护线程</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2012/08/08/java/threads/2012-08-08-threads-basic/">Java多线程系列--“基础篇”08之 join()</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/17/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/09/07/android/os/binder/2014-09-07-BinderCommunication-GetService02/" itemprop="url">Android Binder机制(十) getService详解02之 请求的处理</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-09-07T01:02:00.000Z" itemprop="datePublished">9月 7 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            28 分钟 read (About 4128 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>前面介绍了getService请求的发送部分，本文接着介绍请求的处理部分。下面看看ServiceManager被唤醒之后，是如何处理getService请求的</p>
+</blockquote>
+<blockquote>
+<p>注意：本文是基于Android 4.4.2版本进行介绍的！</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-Binder驱动中binder-thread-read-的源码"><a href="#1-Binder驱动中binder-thread-read-的源码" class="headerlink" title="1. Binder驱动中binder_thread_read()的源码"></a>1. Binder驱动中binder_thread_read()的源码</h1><p>前面说到，MediaPlayer线程在执行binder_transaction()时，会将一个待处理事务添加到”ServiceManager的待处理事务队列”中；然后，再将ServiceManager进程唤醒。<br>下面，我们就接着看看ServiceManager被唤醒之后做了些什么。</p>
+<pre><code>static int binder_thread_read(struct binder_proc *proc,
+                struct binder_thread *thread,
+                void  __user *buffer, int size,
+                signed long *consumed, int non_block)
+{
+    ...
+    if (wait_for_proc_work) {
+      ...
+      if (non_block) {
+          ...
+      } else
+          ret = wait_event_interruptible_exclusive(proc-&gt;wait, binder_has_proc_work(proc, thread));
+    } else {
+      ...
+    }
+    ...
+
+    while (1) {
+        struct binder_transaction_data tr;
+        struct binder_work *w;
+        struct binder_transaction *t = NULL;
+
+        // 如果当前线程的&quot;待完成工作&quot;不为空，则取出待完成工作。
+        if (!list_empty(&amp;thread-&gt;todo))
+            w = list_first_entry(&amp;thread-&gt;todo, struct binder_work, entry);
+        else if (!list_empty(&amp;proc-&gt;todo) &amp;&amp; wait_for_proc_work)
+            ...
+        else {
+            ...
+        }
+
+        ...
+
+        switch (w-&gt;type) {
+            case BINDER_WORK_TRANSACTION: {
+                t = container_of(w, struct binder_transaction, work);
+            } break;
+            ...
+        }
+
+        if (!t)
+            continue;
+
+        // t-&gt;buffer-&gt;target_node是目标节点。
+        // 这里，MediaPlayer的getService请求的目标是ServiceManager，因此target_node是Service Manager对应的节点；
+        if (t-&gt;buffer-&gt;target_node) {
+            // 事务目标对应的Binder实体(即，ServiceManager对应的Binder实体)
+            struct binder_node *target_node = t-&gt;buffer-&gt;target_node;
+            // Binder实体在用户空间的地址(ServiceManager的ptr为NULL)
+            tr.target.ptr = target_node-&gt;ptr;
+            // Binder实体在用户空间的其它数据(ServiceManager的cookie为NULL)
+            tr.cookie =  target_node-&gt;cookie;
+            t-&gt;saved_priority = task_nice(current);
+            if (t-&gt;priority &lt; target_node-&gt;min_priority &amp;&amp;
+                !(t-&gt;flags &amp; TF_ONE_WAY))
+                binder_set_nice(t-&gt;priority);
+            else if (!(t-&gt;flags &amp; TF_ONE_WAY) ||
+                 t-&gt;saved_priority &gt; target_node-&gt;min_priority)
+                binder_set_nice(target_node-&gt;min_priority);
+            cmd = BR_TRANSACTION;
+        } else {
+            ...
+        }
+        // 交易码
+        tr.code = t-&gt;code;
+        tr.flags = t-&gt;flags;
+        tr.sender_euid = t-&gt;sender_euid;
+
+        if (t-&gt;from) {
+            struct task_struct *sender = t-&gt;from-&gt;proc-&gt;tsk;
+            tr.sender_pid = task_tgid_nr_ns(sender,
+                            current-&gt;nsproxy-&gt;pid_ns);
+        } else {
+            ...
+        }
+
+        // 数据大小
+        tr.data_size = t-&gt;buffer-&gt;data_size;
+        // 数据中对象的偏移数组的大小(即对象的个数)
+        tr.offsets_size = t-&gt;buffer-&gt;offsets_size;
+        // 数据
+        tr.data.ptr.buffer = (void *)t-&gt;buffer-&gt;data +
+                    proc-&gt;user_buffer_offset;
+        // 数据中对象的偏移数组
+        tr.data.ptr.offsets = tr.data.ptr.buffer +
+                    ALIGN(t-&gt;buffer-&gt;data_size,
+                        sizeof(void *));
+
+        // 将cmd指令写入到ptr，即传递到用户空间
+        if (put_user(cmd, (uint32_t __user *)ptr))
+            return -EFAULT;
+        // 将tr数据拷贝到用户空间
+        ptr += sizeof(uint32_t);
+        if (copy_to_user(ptr, &amp;tr, sizeof(tr)))
+            return -EFAULT;
+        ptr += sizeof(tr);
+
+        ...
+        // 删除已处理的事务
+        list_del(&amp;t-&gt;work.entry);
+        t-&gt;buffer-&gt;allow_user_free = 1;
+        if (cmd == BR_TRANSACTION &amp;&amp; !(t-&gt;flags &amp; TF_ONE_WAY)) {
+            // 将事务t添加到当前线程的事务栈transaction_stack中。
+            // 这是因为，Binder驱动需要等待Service Manager的反馈。
+            t-&gt;to_parent = thread-&gt;transaction_stack;
+            t-&gt;to_thread = thread;
+            thread-&gt;transaction_stack = t;
+        } else {
+            ...
+        }
+        break;
+    }
+
+done:
+
+    // 更新bwr.read_consumed的值
+    *consumed = ptr - buffer;
+
+    ...
+    return 0;
+}</code></pre><p>说明：ServiceManager进程被唤醒之后，binder_has_thread_work()为true，因为ServiceManager中有个待处理事务(即，MediaPlayer的getService求)。<br>(01) 进入while循环后，首先取出待处理事务。<br>(02) 事务的类型是BINDER_WORK_TRANSACTION，得到对应的binder_transaction<em>类型指针t之后，跳出switch语句。很显然，此时t不为NULL，因此继续往下执行。下面的工作的目的，是将t中的数据转移到tr中(tr是事务交互数据包结构体binder_transaction_data对应的指针)，然后将指令和tr数据都拷贝到用户空间，让ServiceManager读取后进行处理。此时的指令为BR_TRANSACTION！<br>(03) 最后，更新</em>consumed的值，即更新bwr.read_consumed的值。</p>
+<p>然后，binder_thread_read()会返回到binder_ioctl()中。binder_ioctl()在将数据bwr拷贝到用户空间之后会返回。这样，就又回到了ServiceManager守护进程中。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-binder-loop"><a href="#2-binder-loop" class="headerlink" title="2. binder_loop"></a>2. binder_loop</h1><pre><code>void binder_loop(struct binder_state *bs, binder_handler func)
+{
+    ..
+
+    for (;;) {
+        ...
+        res = ioctl(bs-&gt;fd, BINDER_WRITE_READ, &amp;bwr);
+
+        ...
+        res = binder_parse(bs, 0, readbuf, bwr.read_consumed, func);
+        ...
+    }
+}   </code></pre><p>说明：该代码在frameworks/native/cmds/servicemanager/binder.c中。Binder驱动共反馈了BR_NOOP和BR_TRANSACTION两个指令给Service Manager守护进程。BR_NOOP什么实质性的工作也不会做，我们直接分析BR_TRANSACTION的处理情况。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-binder-parse"><a href="#3-binder-parse" class="headerlink" title="3. binder_parse"></a>3. binder_parse</h1><pre><code>int binder_parse(struct binder_state *bs, struct binder_io *bio,
+                 uint32_t *ptr, uint32_t size, binder_handler func)
+{
+    int r = 1;
+    uint32_t *end = ptr + (size / 4);
+
+    while (ptr &lt; end) {
+        uint32_t cmd = *ptr++;
+
+        switch(cmd) {
+        case BR_NOOP:
+            break;
+        ...
+        case BR_TRANSACTION: {
+            struct binder_txn *txn = (void *) ptr;
+            ...
+            if (func) {
+                unsigned rdata[256/4];
+                struct binder_io msg;   // 用于保存&quot;Binder驱动反馈的信息&quot;
+                struct binder_io reply; // 用来保存&quot;回复给Binder驱动的信息&quot;
+                int res;
+
+                // 初始化reply
+                bio_init(&amp;reply, rdata, sizeof(rdata), 4);
+                // 根据txt(Binder驱动反馈的信息)初始化msg
+                bio_init_from_txn(&amp;msg, txn);
+                // 消息处理
+                res = func(bs, txn, &amp;msg, &amp;reply);
+                // 反馈消息给Binder驱动。
+                binder_send_reply(bs, &amp;reply, txn-&gt;data, res);
+            }
+            ptr += sizeof(*txn) / sizeof(uint32_t);
+            break;
+        }
+        ...
+        }
+    }
+
+    return r;
+}</code></pre><p>说明：这里只关注BR_TRANSACTION分支。 首先，用bio_init()初始化reply。然后通过bio_init_from_txn()初始化msg。接着，是通过func函数指针对数据进行处理，func指向svcmgr_handler。处理完毕，再通过binder_send_reply()填写反馈信息给Binder驱动。<br>这里的大部分内容在<a href="/2014/09/05/BinderCommunication-AddService02/">Android Binder机制(六) addService详解02之 请求的处理</a>中都介绍过，这里重点关注svcmgr_handler()处理getService请求的流程。</p>
+<p><a name="anchor4"></a></p>
+<h1 id="4-svcmgr-handler"><a href="#4-svcmgr-handler" class="headerlink" title="4. svcmgr_handler"></a>4. svcmgr_handler</h1><pre><code>int svcmgr_handler(struct binder_state *bs,
+                   struct binder_txn *txn,
+                   struct binder_io *msg,
+                   struct binder_io *reply)
+{
+    ...
+    // 数据有效性检测(数据头)
+    strict_policy = bio_get_uint32(msg);
+    s = bio_get_string16(msg, &amp;len);
+    if ((len != (sizeof(svcmgr_id) / 2)) ||
+        memcmp(svcmgr_id, s, sizeof(svcmgr_id))) {
+        ...
+    }
+
+    switch(txn-&gt;code) {
+        case SVC_MGR_GET_SERVICE:
+        case SVC_MGR_CHECK_SERVICE:
+            s = bio_get_string16(msg, &amp;len);
+            ptr = do_find_service(bs, s, len, txn-&gt;sender_euid);
+            if (!ptr)
+                break;
+            bio_put_ref(reply, ptr);
+            return 0;
+        ...
+    }
+
+    bio_put_uint32(reply, 0);
+    return 0;
+}</code></pre><p>说明：该代码在frameworks/native/cmds/servicemanager/service_manager.c中。svcmgr_handler()首先读取出getService请求的消息头，进行有效性检测。然后，取出请求的编码；这里请求编码对应是SVC_MGR_CHECK_SERVICE。接着，便进入对应的switch分支。<br>(01) 通过bio_get_string16()获取请求的IBinder对象的名称，即s=”media.player”。<br>(02) 然后，通过do_find_service()查找名称为s的IBinder对象。  </p>
+<p><a name="anchor5"></a></p>
+<h1 id="5-do-find-service"><a href="#5-do-find-service" class="headerlink" title="5. do_find_service"></a>5. do_find_service</h1><pre><code>void *do_find_service(struct binder_state *bs, uint16_t *s, unsigned len, unsigned uid)
+{
+    struct svcinfo *si;
+    si = find_svc(s, len);
+
+    if (si &amp;&amp; si-&gt;ptr) {
+        ...
+        return si-&gt;ptr;
+    } else {
+        return 0;
+    }
+}
+
+struct svcinfo *find_svc(uint16_t *s16, unsigned len)
+{
+    struct svcinfo *si;
+
+    for (si = svclist; si; si = si-&gt;next) {
+        if ((len == si-&gt;len) &amp;&amp;
+            !memcmp(s16, si-&gt;name, len * sizeof(uint16_t))) {
+            return si;
+        }
+    }
+    return 0;
+}</code></pre><p>说明：<br>(01) do_find_service()会调用find_svc()进行查找。在find_svc()中，会在svclist链表中查找是否有名称等于”media.player”的svcinfo对象。很显然，在<a href="/2014/09/05/BinderCommunication-AddService02/">Android Binder机制(六) addService详解02之 请求的处理</a>中，已经将MediaPlayerService注册到svclist中，而MediaPlayerService的名称就是”media.player”。<br>(02) find_svc()找到svcinfo对象后返回到do_find_service()中。此时，if (si &amp;&amp; si-&gt;ptr)为true，返回si-&gt;ptr。这里的si-&gt;ptr就是MediaPlayerService在Binder驱动中的Binder引用的描述。根据该引用描述，就能找到对应的MediaPlayerService对象。</p>
+<p>随后，在成功获取Binder引用的描述之后，svcmgr_handler()会调用bio_put_ref()将该引用信息写入到binder_object中。</p>
+<p><a name="anchor6"></a></p>
+<h1 id="6-bio-put-ref"><a href="#6-bio-put-ref" class="headerlink" title="6. bio_put_ref()"></a>6. bio_put_ref()</h1><pre><code>void bio_put_ref(struct binder_io *bio, void *ptr)
+{
+    struct binder_object *obj;
+
+    if (ptr) 
+        obj = bio_alloc_obj(bio);
+    else
+        obj = bio_alloc(bio, sizeof(*obj));
+
+    if (!obj)
+        return;
+
+    obj-&gt;flags = 0x7f | FLAT_BINDER_FLAG_ACCEPTS_FDS;
+    // 类型
+    obj-&gt;type = BINDER_TYPE_HANDLE;
+    // 句柄地址
+    obj-&gt;pointer = ptr;
+    obj-&gt;cookie = 0;
+}</code></pre><p>说明：bio_put_ref()会将获取到的Binder引用描述打包到结构体binder_object中。而binder_object是与flat_binder_object对应的结构体，Binder驱动在收到个数据之后，就能对flat_binder_object进行解析处理。</p>
+<p>在bio_put_ref()将数据打包到reply中之后，svcmgr_handle会调用binder_send_reply()将数据和指令整合到一起。</p>
+<p><a name="anchor7"></a></p>
+<h1 id="7-binder-send-reply"><a href="#7-binder-send-reply" class="headerlink" title="7. binder_send_reply()"></a>7. binder_send_reply()</h1><pre><code>void binder_send_reply(struct binder_state *bs,
+                       struct binder_io *reply,
+                       void *buffer_to_free,
+                       int status)
+{
+    struct {
+        uint32_t cmd_free;
+        void *buffer;
+        uint32_t cmd_reply;
+        struct binder_txn txn;
+    } __attribute__((packed)) data;
+
+    data.cmd_free = BC_FREE_BUFFER;
+    data.buffer = buffer_to_free;
+    data.cmd_reply = BC_REPLY;
+    data.txn.target = 0;
+    data.txn.cookie = 0;
+    data.txn.code = 0;
+    if (status) {
+        ...
+    } else {
+        data.txn.flags = 0;
+        data.txn.data_size = reply-&gt;data - reply-&gt;data0;
+        data.txn.offs_size = ((char*) reply-&gt;offs) - ((char*) reply-&gt;offs0);
+        data.txn.data = reply-&gt;data0;
+        data.txn.offs = reply-&gt;offs0;
+    }
+    binder_write(bs, &amp;data, sizeof(data));
+}</code></pre><p>说明：binder_send_reply()在<a href="/2014/09/05/BinderCommunication-AddService02/">Android Binder机制(六) addService详解02之 请求的处理</a>中已经介绍过。它共打包了两个指令：BC_FREE_BUFFER和BC_REPLY。在函数最后，它调用binder_write()和Binder驱动交互。</p>
+<p><a name="anchor8"></a></p>
+<h1 id="8-binder-write"><a href="#8-binder-write" class="headerlink" title="8. binder_write()"></a>8. binder_write()</h1><pre><code>int binder_write(struct binder_state *bs, void *data, unsigned len)
+{
+    struct binder_write_read bwr;
+    int res;
+    bwr.write_size = len;
+    bwr.write_consumed = 0;
+    bwr.write_buffer = (unsigned) data;
+    bwr.read_size = 0;
+    bwr.read_consumed = 0;
+    bwr.read_buffer = 0;
+    res = ioctl(bs-&gt;fd, BINDER_WRITE_READ, &amp;bwr);
+    if (res &lt; 0) {
+        fprintf(stderr,&quot;binder_write: ioctl failed (%s)\n&quot;,
+                strerror(errno));
+    }
+    return res;
+}</code></pre><p>说明：binder_write()会将数据封装到binder_write_read的变量bwr中；其中，bwr.read_size=0，而bwr.write_size&gt;0。接着，便通过ioctl(,BINDER_WRITE_READ,)和Binder驱动交互，将数据反馈给Binder驱动。</p>
+<p>再次回到Binder驱动的binder_ioctl()对应的BINDER_WRITE_READ分支中。此时，由于bwr.read_size=0，而bwr.write_size&gt;0；因此，Binder驱动只调用binder_thread_write进行写操作，而不会进行读。</p>
+<p><a name="anchor9"></a></p>
+<h1 id="9-Binder驱动中binder-thread-write-的源码"><a href="#9-Binder驱动中binder-thread-write-的源码" class="headerlink" title="9. Binder驱动中binder_thread_write()的源码"></a>9. Binder驱动中binder_thread_write()的源码</h1><pre><code>int binder_thread_write(struct binder_proc *proc, struct binder_thread *thread,
+          void __user *buffer, int size, signed long *consumed)
+{
+  uint32_t cmd;
+  void __user *ptr = buffer + *consumed;
+  void __user *end = buffer + size;
+
+  // 读取binder_write_read.write_buffer中的内容。
+  // 每次读取32bit(即4个字节)
+  while (ptr &lt; end &amp;&amp; thread-&gt;return_error == BR_OK) {
+      // 从用户空间读取32bit到内核中，并赋值给cmd。
+      if (get_user(cmd, (uint32_t __user *)ptr))
+          return -EFAULT;
+
+      ptr += sizeof(uint32_t);
+      ...
+      switch (cmd) {
+        case BC_FREE_BUFFER: 
+        ...
+        case BC_TRANSACTION:
+        case BC_REPLY: {
+            struct binder_transaction_data tr;
+
+            if (copy_from_user(&amp;tr, ptr, sizeof(tr)))
+                return -EFAULT;
+            ptr += sizeof(tr);
+            binder_transaction(proc, thread, &amp;tr, cmd == BC_REPLY);
+            break;
+        }
+      ...
+      }
+      // 更新bwr.write_consumed的值
+      *consumed = ptr - buffer;
+  }
+  return 0;
+}</code></pre><p>说明：binder_thread_write()会逐个读出”Service Manager反馈的指令”。<br>(01) 第一个指令是BC_FREE_BUFFER。binder_thread_write()进入BC_FREE_BUFFER对应的分支后后，执行的动作主要是释放”保存MediaPlayer请求数据的缓冲”。<br>(02) 第二个指令是BC_REPLY。binder_thread_write()进入BC_REPLY之后，会将数据拷贝到内核空间，然后调用binder_transaction()进行处理</p>
+<p><a name="anchor10"></a></p>
+<h1 id="10-Binder驱动中binder-transaction-的源码"><a href="#10-Binder驱动中binder-transaction-的源码" class="headerlink" title="10. Binder驱动中binder_transaction()的源码"></a>10. Binder驱动中binder_transaction()的源码</h1><pre><code>static void binder_transaction(struct binder_proc *proc,
+                   struct binder_thread *thread,
+                   struct binder_transaction_data *tr, int reply)
+{
+    struct binder_transaction *t;
+    struct binder_work *tcomplete;
+    size_t *offp, *off_end;
+    struct binder_proc *target_proc;
+    struct binder_thread *target_thread = NULL;
+    struct binder_node *target_node = NULL;
+    struct list_head *target_list;
+    wait_queue_head_t *target_wait;
+    struct binder_transaction *in_reply_to = NULL;
+    struct binder_transaction_log_entry *e;
+    uint32_t return_error;
+
+    ...
+
+    if (reply) {
+        // 事务栈
+        in_reply_to = thread-&gt;transaction_stack;
+        ...
+        // 设置优先级
+        binder_set_nice(in_reply_to-&gt;saved_priority);
+        ...
+        thread-&gt;transaction_stack = in_reply_to-&gt;to_parent;
+        // 发起请求的线程，即MediaPlayer所在线程。
+        // from的值，是MediaPlayer发起请求时在binder_transaction()中赋值的。
+        target_thread = in_reply_to-&gt;from;
+        ...
+        // MediaPlayer对应的进程
+        target_proc = target_thread-&gt;proc;
+    } else {
+        ...
+    }
+    if (target_thread) {
+        e-&gt;to_thread = target_thread-&gt;pid;
+        target_list = &amp;target_thread-&gt;todo;
+        target_wait = &amp;target_thread-&gt;wait;
+    } else {
+        ...
+    }
+    e-&gt;to_proc = target_proc-&gt;pid;
+
+    // 分配一个待处理的事务t，t是binder事务(binder_transaction对象)
+    t = kzalloc(sizeof(*t), GFP_KERNEL);
+    if (t == NULL) {
+        return_error = BR_FAILED_REPLY;
+        goto err_alloc_t_failed;
+    }
+
+    // 分配一个待完成的工作tcomplete，tcomplete是binder_work对象。
+    tcomplete = kzalloc(sizeof(*tcomplete), GFP_KERNEL);
+    if (tcomplete == NULL) {
+        return_error = BR_FAILED_REPLY;
+        goto err_alloc_tcomplete_failed;
+    }
+    binder_stats_created(BINDER_STAT_TRANSACTION_COMPLETE);
+
+    t-&gt;debug_id = ++binder_last_id;
+    e-&gt;debug_id = t-&gt;debug_id;
+
+    if (!reply &amp;&amp; !(tr-&gt;flags &amp; TF_ONE_WAY))
+        t-&gt;from = thread;
+    else
+        t-&gt;from = NULL;
+    // 下面的一些赋值是初始化事务t
+    t-&gt;sender_euid = proc-&gt;tsk-&gt;cred-&gt;euid;
+    // 事务将交给target_proc进程进行处理
+    t-&gt;to_proc = target_proc;
+    // 事务将交给target_thread线程进行处理
+    t-&gt;to_thread = target_thread;
+    // 事务编码
+    t-&gt;code = tr-&gt;code;
+    // 事务标志
+    t-&gt;flags = tr-&gt;flags;
+    // 事务优先级
+    t-&gt;priority = task_nice(current);
+
+    // 分配空间
+    t-&gt;buffer = binder_alloc_buf(target_proc, tr-&gt;data_size,
+        tr-&gt;offsets_size, !reply &amp;&amp; (t-&gt;flags &amp; TF_ONE_WAY));
+    if (t-&gt;buffer == NULL) {
+        return_error = BR_FAILED_REPLY;
+        goto err_binder_alloc_buf_failed;
+    }
+    t-&gt;buffer-&gt;allow_user_free = 0;
+    t-&gt;buffer-&gt;debug_id = t-&gt;debug_id;
+    // 保存事务
+    t-&gt;buffer-&gt;transaction = t;
+    // target_node为NULL
+    t-&gt;buffer-&gt;target_node = target_node;
+    trace_binder_transaction_alloc_buf(t-&gt;buffer);
+    if (target_node)
+        binder_inc_node(target_node, 1, 0, NULL);
+
+    offp = (size_t *)(t-&gt;buffer-&gt;data + ALIGN(tr-&gt;data_size, sizeof(void *)));
+
+    // 将&quot;用户传入的数据&quot;保存到事务中
+    if (copy_from_user(t-&gt;buffer-&gt;data, tr-&gt;data.ptr.buffer, tr-&gt;data_size)) {
+        ...
+    }
+    // 将&quot;用户传入的数据偏移地址&quot;保存到事务中
+    if (copy_from_user(offp, tr-&gt;data.ptr.offsets, tr-&gt;offsets_size)) {
+        ...
+    }
+
+    ...
+    off_end = (void *)offp + tr-&gt;offsets_size;
+    // 将flat_binder_object对象读取出来，
+    // 这里就是Service Manager中反馈的MediaPlayerService对象。
+    for (; offp &lt; off_end; offp++) {
+        struct flat_binder_object *fp;
+        ...
+        fp = (struct flat_binder_object *)(t-&gt;buffer-&gt;data + *offp);
+
+        switch (fp-&gt;type) {
+            ...
+            case BINDER_TYPE_HANDLE:
+            case BINDER_TYPE_WEAK_HANDLE: {
+                // 根据handle获取对应的Binder引用，即得到MediaPlayerService的Binder引用
+                struct binder_ref *ref = binder_get_ref(proc, fp-&gt;handle);
+                if (ref == NULL) {
+                    ...
+                }
+                // ref-&gt;node-&gt;proc是MediaPlayerService的进程上下文环境，
+                // 而target_proc是MediaPlayer的进程上下文环境
+                if (ref-&gt;node-&gt;proc == target_proc) {
+                    ...
+                } else {
+                    struct binder_ref *new_ref;
+                    // 在MediaPlayer进程中引用&quot;MediaPlayerService&quot;。
+                    // 表现为，执行binder_get_ref_for_node()会，会先在MediaPlayer进程中查找是否存在MediaPlayerService对应的Binder引用；
+                    // 很显然是不存在的。于是，并新建MediaPlayerService对应的Binder引用，并将其添加到MediaPlayer的Binder引用红黑树中。
+                    new_ref = binder_get_ref_for_node(target_proc, ref-&gt;node);
+                    if (new_ref == NULL) {
+                        ...
+                    }
+                    // 将new_ref的引用描述复制给fp-&gt;handle。
+                    fp-&gt;handle = new_ref-&gt;desc;
+                    binder_inc_ref(new_ref, fp-&gt;type == BINDER_TYPE_HANDLE, NULL);
+                    ...
+                }
+            } break;
+
+        }
+    }
+
+    if (reply) {
+        binder_pop_transaction(target_thread, in_reply_to);
+    } else if (!(t-&gt;flags &amp; TF_ONE_WAY)) {
+        ...
+    } else {
+        ...
+    }
+    // 设置事务的类型为BINDER_WORK_TRANSACTION
+    t-&gt;work.type = BINDER_WORK_TRANSACTION;
+    // 将事务添加到target_list队列中，即target_list的待处理事务中
+    list_add_tail(&amp;t-&gt;work.entry, target_list);
+    // 设置待完成工作的类型为BINDER_WORK_TRANSACTION_COMPLETE
+    tcomplete-&gt;type = BINDER_WORK_TRANSACTION_COMPLETE;
+    // 将待完成工作添加到thread-&gt;todo队列中，即当前线程的待完成工作中。
+    list_add_tail(&amp;tcomplete-&gt;entry, &amp;thread-&gt;todo);
+    // 唤醒目标进程
+    if (target_wait)
+        wake_up_interruptible(target_wait);
+    return;
+    ...
+}</code></pre><p>说明：reply=1，这里只关注reply部分。<br>(01) 此反馈最终是要回复给MediaPlayer的。因此，target_thread被赋值为MediaPlayer所在的线程，target_proc则是MediaPlayer对应的进程，target_node为null。<br>(02) 这里，先看看for循环里面的内容，取出BR_REPLY指令所发送的数据，然后获取数据中的flat_binder_object变量fp。因为fp-&gt;type为BINDER_TYPE_HANDLE，因此进入BINDER_TYPE_HANDLE对应的分支。接着，通过binder_get_ref()获取MediaPlayerService对应的Binder引用；很明显，能够正常获取到MediaPlayerService的Binder引用。因为在MediaPlayerService调用addService请求时，已经创建了它的Binder引用。 binder_get_ref_for_node()的作用是在MediaPlayer进程上下文中添加”MediaPlayerService对应的Binder引用”。这样，后面就可以根据该Binder引用一步步的获取MediaPlayerService对象。 最后，将Binder引用的描述赋值给fp-&gt;handle。<br>(03) 此时，Service Manager已经处理了getService请求。便调用binder_pop_transaction(target_thread, in_reply_to)将事务从”target_thread的事务栈”中删除，即从MediaPlayer线程的事务栈中删除该事务。<br>(04) 新建的”待处理事务t”的type为设为BINDER_WORK_TRANSACTION后，会被添加到MediaPlayer的待处理事务队列中。<br>(05) 此时，Service Manager已经处理了getService请求，而Binder驱动在等待它的回复。于是，将一个BINDER_WORK_TRANSACTION_COMPLETE类型的”待完成工作tcomplete”(作为回复)添加到当前线程(即，Service Manager线程)的待处理事务队列中。<br>(06) 最后，调用wake_up_interruptible()唤醒MediaPlayer。MediaPlayer被唤醒后，会对事务BINDER_WORK_TRANSACTION进行处理。</p>
+<p>OK，到现在为止，还有两个待处理事务：(01) ServiceManager待处理事务列表中有个BINDER_WORK_TRANSACTION_COMPLETE类型的事务 (02) MediaPlayer待处理事务列表中有个BINDER_WORK_TRANSACTION事务。</p>
+<p>关于BINDER_WORK_TRANSACTION_COMPLETE事务，它是用来告诉ServiceManager，ServiceManager的反馈信息已经处理完毕。下一篇文章，就说说MediaPlayer被唤醒后，执行BINDER_WORK_TRANSACTION的流程。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/16/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/18/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/16/">16</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/17/">17</a></li>
+        
+        <li><a class="pagination-link" href="/page/18/">18</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

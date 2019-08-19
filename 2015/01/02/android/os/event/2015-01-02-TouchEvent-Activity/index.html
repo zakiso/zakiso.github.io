@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Android 触摸事件机制(二) Activity中触摸事件详解 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="android">
+
+
+
+
+
+    <meta name="description" content="android">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 触摸事件机制(二) Activity中触摸事件详解">
+<meta property="og:url" content="https://apppills.com/2015/01/02/android/os/event/2015-01-02-TouchEvent-Activity/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="android">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 触摸事件机制(二) Activity中触摸事件详解">
+<meta name="twitter:description" content="android">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-Activity中触摸事件的概述">1&nbsp;&nbsp;<b>1. Activity中触摸事件的概述</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#2-Activity中触摸事件的源码解析">2&nbsp;&nbsp;<b>2. Activity中触摸事件的源码解析</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-1-Activity中的dispatchTouchEvent">2.1&nbsp;&nbsp;2.1 Activity中的dispatchTouchEvent</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-1-1-Activity中的getWindow">2.1.1&nbsp;&nbsp;2.1.1 Activity中的getWindow()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-1-2-PolicyManager中的makeNewWindow">2.1.2&nbsp;&nbsp;2.1.2 PolicyManager中的makeNewWindow()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-1-3-Policy中的makeNewWindow">2.1.3&nbsp;&nbsp;2.1.3 Policy中的makeNewWindow</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-1-4-PhoneWindow中的superDispatchTouchEvent">2.1.4&nbsp;&nbsp;2.1.4 PhoneWindow中的superDispatchTouchEvent</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-1-5-DecorView中的superDispatchTouchEvent">2.1.5&nbsp;&nbsp;2.1.5 DecorView中的superDispatchTouchEvent</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-2-Activity中的onTouchEvent">2.2&nbsp;&nbsp;2.2 Activity中的onTouchEvent</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-2-1-Window的shouldCloseOnTouch">2.2.1&nbsp;&nbsp;2.2.1 Window的shouldCloseOnTouch()</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Android 触摸事件机制(二) Activity中触摸事件详解
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2015-01-02T01:01:00.000Z" itemprop="datePublished">1月 2 2015</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            13 分钟 read (About 1997 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文将对Activity中触摸事件相关的内容进行介绍，重点介绍的是Activity中与触摸事件相关的两个API：dispatchTouchEvent()和onTouchEvent()。</p>
+</blockquote>
+<blockquote>
+<p>注意：本文是基于Android 4.4.2版本进行介绍的！</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">Activity中触摸事件的概述</a><br><strong>2</strong>. <a href="#anchor2">Activity中触摸事件的源码解析</a><br><strong>2.1</strong>. <a href="#anchor2_1">Activity中的dispatchTouchEvent</a><br><strong>2.2</strong>. <a href="#anchor2_2">Activity中的onTouchEvent</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-Activity中触摸事件的概述"><a href="#1-Activity中触摸事件的概述" class="headerlink" title="1. Activity中触摸事件的概述"></a>1. Activity中触摸事件的概述</h1><p>  Activity中与触摸事件相关API主要是dispatchTouchEvent()和onTouchEvent()。dispatchTouchEvent()是传递触摸事件的API，而onTouchEvent()则是Activity处理触摸事件的API。</p>
+<p>  Activity就是dispatchTouchEvent()将触摸事件传递给它所包含的根视图，从而实现将触摸事件传递给View或ViewGroup进行处理。<br>  而在onTouchEvent()在是Activity自己对触摸事件的处理。例如，如果Activity是一个Dialog主题，即Activity相当于一个对话框；那么当onTouchEvent()收到点击事件，并且该点击事件的坐标在Activity之外的时候，onTouchEvent()就会结束Activity。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-Activity中触摸事件的源码解析"><a href="#2-Activity中触摸事件的源码解析" class="headerlink" title="2. Activity中触摸事件的源码解析"></a>2. Activity中触摸事件的源码解析</h1><p><a name="anchor2_1"></a></p>
+<h2 id="2-1-Activity中的dispatchTouchEvent"><a href="#2-1-Activity中的dispatchTouchEvent" class="headerlink" title="2.1 Activity中的dispatchTouchEvent"></a>2.1 Activity中的dispatchTouchEvent</h2><pre><code>public boolean dispatchTouchEvent(MotionEvent ev) {
+    // onUserInteraction默认不执行任何动作。
+    // 它是提供给客户的接口。
+    if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+        onUserInteraction();
+    }
+    // 这里会调用到ViewGroup的dispatchTouchEvent()，
+    // 即会调用Activity包含的根视图的dispatchTouchEvent()。
+    if (getWindow().superDispatchTouchEvent(ev)) {
+        return true;
+    }
+    // 如果superDispatchTouchEvent()返回false，
+    // 即Activity的根视图以及根视图的子视图都没有拦截该事件的话，则调用Activity的onTouchEvent()
+    return onTouchEvent(ev);
+}</code></pre><p>说明：该代码定义在frameworks/base/core/java/android/app/Activity.java中。<br>Activity通过调用dispatchTouchEvent()将触摸事件分发给Activity所包含的视图；如果Activity中的视图都没有对触摸事件进行拦截的话，则调用Activity的onTouchEvent()对触摸事件进行处理。<br>下面，先看看Activity是如何通过superDispatchTouchEvent()将事件分发给它所包含的View的。</p>
+<h3 id="2-1-1-Activity中的getWindow"><a href="#2-1-1-Activity中的getWindow" class="headerlink" title="2.1.1 Activity中的getWindow()"></a>2.1.1 Activity中的getWindow()</h3><pre><code>private Window mWindow;
+
+public Window getWindow() {
+    return mWindow;
+}
+
+final void attach(Context context, ActivityThread aThread,
+        Instrumentation instr, IBinder token, int ident,
+        Application application, Intent intent, ActivityInfo info,
+        CharSequence title, Activity parent, String id,
+        NonConfigurationInstances lastNonConfigurationInstances,
+        Configuration config) {
+
+    ...
+
+    mWindow = PolicyManager.makeNewWindow(this);
+
+    ...
+}</code></pre><p>说明：getWindow()返回的是mWindow对象，而mWindow是在attach()中初始化的。attach()是Activity被加载时调用的，具体是如何attact()的，不是我们关心的重点；这里只需要了解，Activity被加载时，attach()会被执行即可。<br>接着，我们就看看PolicyManager.makeNewWindow()是如何实现的。</p>
+<h3 id="2-1-2-PolicyManager中的makeNewWindow"><a href="#2-1-2-PolicyManager中的makeNewWindow" class="headerlink" title="2.1.2 PolicyManager中的makeNewWindow()"></a>2.1.2 PolicyManager中的makeNewWindow()</h3><pre><code>public static Window makeNewWindow(Context context) {
+    return sPolicy.makeNewWindow(context);
+}   
+
+private static final String POLICY_IMPL_CLASS_NAME =
+    &quot;com.android.internal.policy.impl.Policy&quot;;
+
+private static final IPolicy sPolicy;
+
+static {
+    // Pull in the actual implementation of the policy at run-time
+    try {
+        Class policyClass = Class.forName(POLICY_IMPL_CLASS_NAME);
+        sPolicy = (IPolicy)policyClass.newInstance();
+    } catch (ClassNotFoundException ex) {
+        throw new RuntimeException(
+                POLICY_IMPL_CLASS_NAME + &quot; could not be loaded&quot;, ex);
+    } catch (InstantiationException ex) {
+        throw new RuntimeException(
+                POLICY_IMPL_CLASS_NAME + &quot; could not be instantiated&quot;, ex);
+    } catch (IllegalAccessException ex) {
+        throw new RuntimeException(
+                POLICY_IMPL_CLASS_NAME + &quot; could not be instantiated&quot;, ex);
+    }
+}   </code></pre><p>说明：该代码定义在frameworks/base/core/java/com/android/internal/policy/PolicyManager.java中。<br>makeNewWindow()是调用的sPolicy.makeNewWindow()，而sPolicy是个静态变量，它的实现也是在静态代码块中。因此，在PolicyManager.java加载的时候，sPolicy就会被初始化为policyClass.newInstance()。而policyClass是通过Class得到的Policy对象。<br>也就是说，PolicyManager中的makeNewWindow()会调用Policy中的makeNewWindow()。</p>
+<h3 id="2-1-3-Policy中的makeNewWindow"><a href="#2-1-3-Policy中的makeNewWindow" class="headerlink" title="2.1.3 Policy中的makeNewWindow"></a>2.1.3 Policy中的makeNewWindow</h3><pre><code>public Window makeNewWindow(Context context) {
+    return new PhoneWindow(context);
+}   </code></pre><p>说明：该代码定义在frameworks/base/policy/src/com/android/internal/policy/impl/Policy.java中。makeNewWindow()会返回PhoneWindow对象。<br>回到Activity的dispatchTouchEvent()中，也就是说getWindow()返回的是PhoneWindow对象。接着，就看看superDispatchTouchEvent()的实现。</p>
+<h3 id="2-1-4-PhoneWindow中的superDispatchTouchEvent"><a href="#2-1-4-PhoneWindow中的superDispatchTouchEvent" class="headerlink" title="2.1.4 PhoneWindow中的superDispatchTouchEvent"></a>2.1.4 PhoneWindow中的superDispatchTouchEvent</h3><pre><code>@Override
+public boolean superDispatchTouchEvent(MotionEvent event) {
+    return mDecor.superDispatchTouchEvent(event);
+}    
+
+private DecorView mDecor;
+
+private void installDecor() {
+    if (mDecor == null) {
+        mDecor = generateDecor();
+        ...
+    }
+
+    ...
+}
+
+protected DecorView generateDecor() {
+    return new DecorView(getContext(), -1); 
+}    </code></pre><p>说明：该代码定义在frameworks/base/policy/src/com/android/internal/policy/impl/PhoneWindow.java中。<br>superDispatchTouchEvent()会调用mDecor.superDispatchTouchEvent()；而mDecor是DecorView对象。mDecor是在installDecor()中被创建的。总之，PhoneWindow中的superDispatchTouchEvent()会调用DecorView中的superDispatchTouchEvent()。DecorView是PhoneWindow中的内部类，下面看看它的实现。</p>
+<h3 id="2-1-5-DecorView中的superDispatchTouchEvent"><a href="#2-1-5-DecorView中的superDispatchTouchEvent" class="headerlink" title="2.1.5 DecorView中的superDispatchTouchEvent"></a>2.1.5 DecorView中的superDispatchTouchEvent</h3><pre><code>private final class DecorView extends FrameLayout implements RootViewSurfaceTaker {
+    ...
+
+    public boolean superDispatchTouchEvent(MotionEvent event) {
+        return super.dispatchTouchEvent(event);
+    }
+
+    ...
+}</code></pre><p>说明：DecorView中的superDispatchTouchEvent()会调用父类的dispatchTouchEvent()。而DecorView的父类是FrameLayout，FrameLayout的父类又是GroupView；因此superDispatchTouchEvent()最终会调用到GroupView的dispatchTouchEvent()。</p>
+<p>关于GroupView中的dispatchTouchEvent()的流程，在后面的文章中再来详细介绍！这里重点需要了解：<strong>Activity在通过dispatchTouchEvent()传递触摸事件的时候，会调用到ViewGroup的dispatchTouchEvent()。从而实现，将Activity中的触摸事件传递给它所包含的View或ViewGroup。</strong></p>
+<p><a name="anchor2_2"></a></p>
+<h2 id="2-2-Activity中的onTouchEvent"><a href="#2-2-Activity中的onTouchEvent" class="headerlink" title="2.2 Activity中的onTouchEvent"></a>2.2 Activity中的onTouchEvent</h2><p>回顾一下Activity中dispatchTouchEvent()的内容。</p>
+<pre><code>public boolean dispatchTouchEvent(MotionEvent ev) {
+    // onUserInteraction默认不执行任何动作。
+    // 它是提供给客户的接口。
+    if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+        onUserInteraction();
+    }
+    // 这里会调用到ViewGroup的dispatchTouchEvent()，
+    // 即会调用Activity包含的根视图的dispatchTouchEvent()。
+    if (getWindow().superDispatchTouchEvent(ev)) {
+        return true;
+    }
+    // 如果superDispatchTouchEvent()返回false，
+    // 即Activity的根视图以及根视图的子视图都没有拦截该事件的话，则调用Activity的onTouchEvent()
+    return onTouchEvent(ev);
+}</code></pre><p>(01) 如果superDispatchTouchEvent()返回true的话，dispatchTouchEvent()就直接返回true了，不会执行onTouchEvent()。也就是说，如果Activity将触摸事件分发给它所包含的视图的时候，如果有视图拦截或消费了该事件，就不会轮到Activity来处理该事件了；即，不会执行Activity的onTouchEvent()了。<br>(02) 如果superDispatchTouchEvent()返回false的话，意味着，Activity所包含的视图都没有拦截或消费该触摸事件；那么，就会调用Activity的onTouchEvent()来处理触摸事件。</p>
+<p>下面就看看onTouchEvent()的代码。</p>
+<pre><code>public boolean onTouchEvent(MotionEvent event) {
+    if (mWindow.shouldCloseOnTouch(this, event)) {
+        finish();
+        return true;
+    }    
+
+    return false;
+}    </code></pre><p>说明：代码很简单。它会先调用mWindow.shouldCloseOnTouch()，如果shouldCloseOnTouch()返回true，则意味着该触摸事件会触发”结束Activity”的动作。那么接下来，就调用finish()来结束Activity，并返回true，表示Activity消费了这个触摸事件。否则的话，就返回false。</p>
+<h3 id="2-2-1-Window的shouldCloseOnTouch"><a href="#2-2-1-Window的shouldCloseOnTouch" class="headerlink" title="2.2.1 Window的shouldCloseOnTouch()"></a>2.2.1 Window的shouldCloseOnTouch()</h3><p>前面分析过，mWindow是PhoneWindow对象，而PhoneWindow继承于Window。则mWindow.shouldCloseOnTouch()实际上会调用Window中的shouldCloseOnTouch()。</p>
+<pre><code>public boolean shouldCloseOnTouch(Context context, MotionEvent event) {
+    if (mCloseOnTouchOutside &amp;&amp; event.getAction() == MotionEvent.ACTION_DOWN
+            &amp;&amp; isOutOfBounds(context, event) &amp;&amp; peekDecorView() != null) {
+        return true;
+    }    
+    return false;
+}    </code></pre><p>说明：该代码定义在frameworks/base/core/java/android/view/Window.java中。<br>(01) mCloseOnTouchOutside是一个boolean变量，它是由Window的android:windowCloseOnTouchOutside属性值决定。<br>(02) isOutOfBounds(context, event)是判断该event的坐标是否在context(对于本文来说就是当前的Activity)之外。是的话，返回true；否则，返回false。<br>(03) peekDecorView()则是返回PhoneWindow的mDecor。<br>也就是说，如果设置了android:windowCloseOnTouchOutside属性为true，并且当前事件是ACTION_DOWN，而且点击发生在Activity之外，同时Activity还包含视图的话，则返回true；表示该点击事件会导致Activity的结束。</p>
+<p>至此，Activity中关于触摸事件的代码就分析完毕了。总结来说：<br>(01) <strong>Activity中的dispatchTouchEvent会将触摸事件传递给Activity所包含的视图。具体的实现方式在通过调用到Activity所属Window的superDispatchTouchEvent，进而调用到Window的DecorView的superDispatchTouchEvent，进一步的又调用到ViewGroup的dispatchTouchEvent()。</strong><br> 如果Activity所包含的视图拦截或者消费了该触摸事件的话，就不会再执行Activity的onTouchEvent()；<br> 如果Activity所包含的视图没有拦截或者消费该触摸事件的话，则会执行Activity的onTouchEvent()。<br>(02) <strong>Activity中的onTouchEvent是Activity自身对触摸事件的处理。如果该Activity的android:windowCloseOnTouchOutside属性为true，并且当前触摸事件是ACTION_DOWN，而且该触摸事件的坐标在Activity之外，同时Activity还包含了视图的话；就会导致Activity被结束。</strong></p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/android/">#android</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2015/01/03/android/os/event/2015-01-03-TouchEvent-View/">Android 触摸事件机制(三) View中触摸事件详解</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2015/01/01/android/os/event/2015-01-01-TouchEvent-Introduce/">Android 触摸事件机制(一) 简介</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/42/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/25/android/api_guide/tasks/2014-06-25-Loader/" itemprop="url">Android之Loader介绍</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-25T01:11:00.000Z" itemprop="datePublished">6月 25 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            25 分钟 read (About 3681 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文介绍Loader, CursorLoader, AsyncTaskLoader 和 LoaderManager。先给出它们的使用示例，然后再对它们的架构和原理进行分析。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">Loader简介</a><br><strong>2</strong>. <a href="#anchor2">Loader使用示例</a><br><strong>3</strong>. <a href="#anchor3">Loader架构和原理</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="Loader简介"><a href="#Loader简介" class="headerlink" title="Loader简介"></a>Loader简介</h1><p><strong>Loader</strong>：是一个执行异步数据加载的抽象类。它是AsyncTaskLoader的父类，CursorLoader的祖父类。</p>
+<p><strong>AsyncTaskLoader</strong>：它是继承于Loader的抽象类。在AsyncTaskLoader中有AsyncTask用来执行异步工作。</p>
+<p><strong>CursorLoader</strong>：它是AsyncTaskLoader的子类。它可以查询ContentResolver然后返回一个Cursor，同时CursorLoader内包含ContentObserver对象来监听Cursor数据的变化。</p>
+<p><strong>LoaderManager</strong>：它是一个抽像类，作用是用来管理Loader。LoaderManager关联到一个Activity或Fragment；例如，在Activity中通过getLoaderManager()可以获取到一个LoaderManager对象。</p>
+<p><strong>LoaderManager.LoaderCallbacks</strong>：它提供了与”Activity或Fragment”交互的接口。LoaderCallbacks中共包行三个接口：</p>
+<blockquote>
+<ol>
+<li>onCreateLoader()：根据所给出的ID，初始化并返回一个新的加载器。</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li>onLoadFinished()：当一个先前被创建的加载器完成了它的加载过程时被调用。</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="3">
+<li>onLoaderReset()：当一个先前被创建的加载器被重置时被调用，然后使加载器的数据无效。</li>
+</ol>
+</blockquote>
+<p>总结：Loader, AsyncTaskLoader和CursorLoader都是用来提供异步加载的类；而LoaderManager则提供了管理这些异步加载类的接口。此外，Activity或Fragment保护了获取LoaderManager的接口，通过这样的接口，就可以在Activity或Fragment中实现异步加载任务！</p>
+<p><a name="anchor2"></a></p>
+<h1 id="Loader使用示例"><a href="#Loader使用示例" class="headerlink" title="Loader使用示例"></a>Loader使用示例</h1><p>下面通过一则示例演示Fragment中执行异步加载的完整流程！该示例中，会在FragmentActivity中采用异步加载的方式查找并显示数据库中所有的图片的相关信息。</p>
+<p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/loader/loader_picture/LoaderTest" target="_blank" rel="noopener">Loader示例的完整源码</a></p>
+<h2 id="1-获取LoaderManager，并执行initLoader"><a href="#1-获取LoaderManager，并执行initLoader" class="headerlink" title="1. 获取LoaderManager，并执行initLoader()"></a>1. 获取LoaderManager，并执行initLoader()</h2><pre><code>public class LoaderTest extends FragmentActivity
+    implements LoaderCallbacks&lt;Cursor&gt;, OnItemClickListener {
+
+    ...
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        listView = (ListView)findViewById(android.R.id.list);
+        simpleCursorAdapter = new SimpleCursorAdapter(
+                this, 
+                R.layout.list_item, 
+                null, 
+                STORE_IMAGES, 
+                new int[] { R.id.item_title, R.id.item_value}
+                );  
+
+        simpleCursorAdapter.setViewBinder(new ImageLocationBinder());
+        listView.setAdapter(simpleCursorAdapter);
+        // 注意此处是getSupportLoaderManager()，而不是getLoaderManager()方法。
+        getSupportLoaderManager().initLoader(0, null, this);
+
+        listView.setOnItemClickListener(this);
+    }   
+}</code></pre><p>说明：需要重点关注的是getSupportLoaderManager()，它的作用是获取LoaderManager。然后，通过initLoader()初始化Loader。</p>
+<p>initLoader()的完整声明如下：</p>
+<pre><code>public &lt;D&gt; Loader&lt;D&gt; initLoader(int id, Bundle args, LoaderManager.LoaderCallbacks&lt;D&gt; callback);</code></pre><p>说明：<br>(01) id是Loader的唯一标识。<br>(02) args是Bundle，这里赋值位null。<br>(03) callback是回调函数。后面会给出回调的实现。  </p>
+<h2 id="2-实现LoaderManager-LoaderCallbacks接口"><a href="#2-实现LoaderManager-LoaderCallbacks接口" class="headerlink" title="2. 实现LoaderManager.LoaderCallbacks接口"></a>2. 实现LoaderManager.LoaderCallbacks接口</h2><p>LoaderCallbacks中包行onCreateLoader(), onLoaderReset(), onLoadFinished()三个接口。下面是它们的实现：</p>
+<pre><code>@Override
+public Loader&lt;Cursor&gt; onCreateLoader(int arg0, Bundle arg1) {
+    CursorLoader cursorLoader = new CursorLoader(
+            this, 
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, 
+            STORE_IMAGES, 
+            null, 
+            null, 
+            null);
+    return cursorLoader;
+}
+
+@Override
+public void onLoaderReset(Loader&lt;Cursor&gt; arg0) {
+    simpleCursorAdapter.swapCursor(null);
+}
+
+@Override
+public void onLoadFinished(Loader&lt;Cursor&gt; arg0, Cursor cursor) {
+    simpleCursorAdapter.swapCursor(cursor);
+}</code></pre><p>说明：<br>(01) onCreateLoader()会在初始化Loader之后执行，它的作用是返回一个Loader对象。<br>(02) 而onLoadFinished()是当异步加载完成之后会被执行，当Loader加载完数据时，我们会通过 simpleCursorAdapter.swapCursor(cursor)将simpleCursorAdapter切换到新的Cursor对象(即，加载完后保存数据的对象)。不同于changeCursor()，changeCursor()在切换到新的Cursor之后，会将旧的Cursor关闭掉；而swapCursor()切换到新的Cursor之后，不会关闭旧的Cursor，如果旧的Cursor存在的话，它会返回旧的Cursor。<br>(03) onLoaderReset()则是当异步加载起被重置时会被调用。当Loader被重置会，我们通过simpleCursorAdapter.swapCursor(null)将Cursor设为null。</p>
+<h2 id="3-其他操作"><a href="#3-其他操作" class="headerlink" title="3. 其他操作"></a>3. 其他操作</h2><p>经过上面两步之后，已经能成功的使用异步加载数据了。得到的数据保存在SimpleCursorAdapter对象中，接下来需要做的就是在SimpleCursorAdapter中显示数据。</p>
+<p>在onCreate()中，我们通过simpleCursorAdapter.setViewBinder(new ImageLocationBinder())设置了SimpleCursorAdapter的ViewBinder对象。下面看看ViewBinder中是如何显示的：</p>
+<pre><code>// 将图片的位置绑定到视图
+private class ImageLocationBinder implements ViewBinder {
+    @Override
+    public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+        if (columnIndex == 1) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            String path = cursor.getString(column_index);
+            ((TextView)view).setText(&quot;Location: &quot;+path);
+            return true;
+        }
+
+        return false;
+    }
+}</code></pre><p>至此，数据的异步加载示例差不多介绍完了。总的来说很简单，先获取LoaderManager对象，然后通过initLoader()初始化Loader。接着，需要作的是实现LoaderCallbacks接口！LoaderCallbacks接口中，需要重点关注的是onCreateLoader()和onLoadFinished()接口！</p>
+<p><a name="anchor3"></a></p>
+<h1 id="Loader架构和原理"><a href="#Loader架构和原理" class="headerlink" title="Loader架构和原理"></a>Loader架构和原理</h1><p>在Loader简介中，我们大致介绍了Loader, LoaderManager各个类的作用。这里，我们分析一下它们的源码来查看它们是如何工作的。主要解决的有以下几个问题：<br>(01) <strong>Loader的异步加载原理。也就是说Loader异步是通过什么实现的？是一个Thread，还是AsyncTask，还是其他的什么方式</strong>？<br>(02) <strong>onCreateLoader()和onLoadFinished()是如何回调的。尤其是onLoadFinished()，当数据加载完时，是如何回调的</strong>？<br>(03) <strong>当发生Activity或Fragment被重新加载(例如，发生旋屏动作)时，Loader不会重新加载，它里面的数据仍然存在。这是如何做到的</strong>？<br>(04) <strong>Loader异步加载器，能够自动更新数据。它又是如何做到的</strong>？  </p>
+<h2 id="1-异步加载原理"><a href="#1-异步加载原理" class="headerlink" title="1. 异步加载原理"></a>1. 异步加载原理</h2><p>涉及到的文件：<br>frameworks/base/core/java/android/app/LoaderManager.java<br>frameworks/base/core/java/android/content/Loader.java<br>frameworks/base/core/java/android/content/AsyncTaskLoader.java<br>frameworks/base/core/java/android/content/CursorLoader.java</p>
+<h3 id="1-1-initLoader"><a href="#1-1-initLoader" class="headerlink" title="1.1 initLoader()"></a>1.1 initLoader()</h3><p>LoaderManager.java中initLoader()源码如下：</p>
+<pre><code>public &lt;D&gt; Loader&lt;D&gt; initLoader(int id, Bundle args, LoaderManager.LoaderCallbacks&lt;D&gt; callback) {
+    if (mCreatingLoader) {
+        throw new IllegalStateException(&quot;Called while creating a loader&quot;);
+    }   
+
+    LoaderInfo info = mLoaders.get(id);
+
+    if (DEBUG) Log.v(TAG, &quot;initLoader in &quot; + this + &quot;: args=&quot; + args);
+
+    if (info == null) {
+        // Loader doesn&apos;t already exist; create.
+        info = createAndInstallLoader(id, args,  (LoaderManager.LoaderCallbacks&lt;Object&gt;)callback);
+        if (DEBUG) Log.v(TAG, &quot;  Created new loader &quot; + info);
+    } else {
+        if (DEBUG) Log.v(TAG, &quot;  Re-using existing loader &quot; + info);
+        info.mCallbacks = (LoaderManager.LoaderCallbacks&lt;Object&gt;)callback;
+    }   
+
+    if (info.mHaveData &amp;&amp; mStarted) {
+        // If the loader has already generated its data, report it now.
+        info.callOnLoadFinished(info.mLoader, info.mData);
+    }   
+
+    return (Loader&lt;D&gt;)info.mLoader;
+}   </code></pre><p>说明：<br>(01) initLoader()会现通过mLoaders.get(id)来根据id获取LoaderInfo对象。如果Activity或Fragment第一次调用initLoader()，则获取到的LoaderInfo对象为null。<br>(02) 如果info为null，则执行createAndInstallLoader()来创建LoaderInfo对象。  </p>
+<h3 id="1-2-createAndInstallLoader"><a href="#1-2-createAndInstallLoader" class="headerlink" title="1.2 createAndInstallLoader()"></a>1.2 createAndInstallLoader()</h3><p>LoaderManager.java中createAndInstallLoader()源码如下：</p>
+<pre><code>private LoaderInfo createLoader(int id, Bundle args,
+        LoaderManager.LoaderCallbacks&lt;Object&gt; callback) {
+    LoaderInfo info = new LoaderInfo(id, args,  (LoaderManager.LoaderCallbacks&lt;Object&gt;)callback);
+    Loader&lt;Object&gt; loader = callback.onCreateLoader(id, args);
+    info.mLoader = (Loader&lt;Object&gt;)loader;
+    return info;
+}
+
+private LoaderInfo createAndInstallLoader(int id, Bundle args,
+        LoaderManager.LoaderCallbacks&lt;Object&gt; callback) {
+    try {
+        mCreatingLoader = true;
+        LoaderInfo info = createLoader(id, args, callback);
+        installLoader(info);
+        return info;
+    } finally {
+        mCreatingLoader = false;
+    }
+}
+
+void installLoader(LoaderInfo info) {
+    mLoaders.put(info.mId, info);
+    if (mStarted) {
+        // The activity will start all existing loaders in it&apos;s onStart(),
+        // so only start them here if we&apos;re past that point of the activitiy&apos;s
+        // life cycle
+        info.start();
+    }
+}</code></pre><p>说明：<br>(01) createAndInstallLoader()会分别调用createLoader()和installLoader()接口。<br>(02) createLoader()会新建LoaderInfo对象，然后调用callback.onCreateLoader()接口。<strong>这里的onCreateLoader()就是我们实现的LoaderCallbacks接口中的onCreateLoader()接口</strong>。<br>(03) initLoader()中会调用info.start()接口。  </p>
+<h3 id="1-3-LoaderInfo中的start"><a href="#1-3-LoaderInfo中的start" class="headerlink" title="1.3 LoaderInfo中的start()"></a>1.3 LoaderInfo中的start()</h3><p>LoaderManager.java中的内部类LoaderInfo的源码如下：</p>
+<pre><code>final class LoaderInfo implements Loader.OnLoadCompleteListener&lt;Object&gt;,
+        Loader.OnLoadCanceledListener&lt;Object&gt; {
+
+    final int mId;
+    final Bundle mArgs;
+    LoaderManager.LoaderCallbacks&lt;Object&gt; mCallbacks;
+    Loader&lt;Object&gt; mLoader;
+
+    ...
+
+    public LoaderInfo(int id, Bundle args, LoaderManager.LoaderCallbacks&lt;Object&gt; callbacks) {
+        mId = id;
+        mArgs = args;
+        mCallbacks = callbacks;
+    }
+
+    void start() {
+        if (mRetaining &amp;&amp; mRetainingStarted) {
+            mStarted = true;
+            return;
+        }
+
+        if (mStarted) {
+            return;
+        }
+
+        mStarted = true;
+
+        if (DEBUG) Log.v(TAG, &quot;  Starting: &quot; + this);
+        if (mLoader == null &amp;&amp; mCallbacks != null) {
+           mLoader = mCallbacks.onCreateLoader(mId, mArgs);
+        }
+        if (mLoader != null) {
+            if (mLoader.getClass().isMemberClass()
+                    &amp;&amp; !Modifier.isStatic(mLoader.getClass().getModifiers())) {
+                throw new IllegalArgumentException(
+                        &quot;Object returned from onCreateLoader must not be a non-static inner member class: &quot;
+                        + mLoader);
+            }
+            if (!mListenerRegistered) {
+                mLoader.registerListener(mId, this);
+                mLoader.registerOnLoadCanceledListener(this);
+                mListenerRegistered = true;
+            }
+            mLoader.startLoading();
+        }
+    }
+
+    ...
+}</code></pre><p>说明：start()中一个非常重要的成员是mLoader。<strong>它就是onCreateLoader()返回的Loader对象</strong>。start()会调用mLoaders.startLoading()。</p>
+<h3 id="1-4-startLoading"><a href="#1-4-startLoading" class="headerlink" title="1.4 startLoading()"></a>1.4 startLoading()</h3><p>下面查看startLoading的相关代码。查看代码时，请记得：Loader.java, AsyncTaskLoader和CursorLoader这三者之间存在继承关系！</p>
+<pre><code>// 在Loader.java中
+public final void startLoading() {
+    mStarted = true;
+    mReset = false;
+    mAbandoned = false;
+    onStartLoading();
+}
+
+// 在CursorLoader.java中
+@Override
+protected void onStartLoading() {
+    if (mCursor != null) {
+        deliverResult(mCursor);
+    }   
+    if (takeContentChanged() || mCursor == null) {
+        forceLoad();
+    }   
+}   </code></pre><p>说明：startLoading()是在Loader.java中定义的，它调用了onStartLoading()。而CursorLoader.java覆盖了onStartLoading()函数。在onStartLoading()中，此时的mCursor是为null；所以，它会执行forceLoad()。</p>
+<h3 id="1-5-forceLoad"><a href="#1-5-forceLoad" class="headerlink" title="1.5 forceLoad()"></a>1.5 forceLoad()</h3><p>下面查看forceLoad的相关代码。</p>
+<pre><code>// 在Loader.java中
+public void forceLoad() {
+    onForceLoad();
+}
+
+// 在AsyncTaskLoader.java中
+@Override
+protected void onForceLoad() {
+    super.onForceLoad();
+    cancelLoad();
+    mTask = new LoadTask();
+    if (DEBUG) Slog.v(TAG, &quot;Preparing load: mTask=&quot; + mTask);
+    executePendingTask();
+}  
+
+// 在AsyncTaskLoader.java中
+void executePendingTask() {
+    if (mCancellingTask == null &amp;&amp; mTask != null) {
+        if (mTask.waiting) {
+            mTask.waiting = false;
+            mHandler.removeCallbacks(mTask);
+        }
+        if (mUpdateThrottle &gt; 0) {
+            long now = SystemClock.uptimeMillis();
+            if (now &lt; (mLastLoadCompleteTime+mUpdateThrottle)) {
+                // Not yet time to do another load.
+                if (DEBUG) Slog.v(TAG, &quot;Waiting until &quot;
+                        + (mLastLoadCompleteTime+mUpdateThrottle)
+                        + &quot; to execute: &quot; + mTask);
+                mTask.waiting = true;
+                mHandler.postAtTime(mTask, mLastLoadCompleteTime+mUpdateThrottle);
+                return;
+            }
+        }
+        if (DEBUG) Slog.v(TAG, &quot;Executing: &quot; + mTask);
+        mTask.executeOnExecutor(mExecutor, (Void[]) null);
+    }
+}</code></pre><p>说明：forceLoad()会调用onForceLoad()。而onForceLoad()中会新建LoadTask对象，然后执行executePendingTask()。在executePendingTask()中会调用LoadTask对象的executeOnExecutor()。</p>
+<h3 id="1-6-LoadTask"><a href="#1-6-LoadTask" class="headerlink" title="1.6 LoadTask"></a>1.6 LoadTask</h3><p>LoadTask是AsyncTaskLoader的内部类。实际上，它是AsyncTask的子类。在<a href="/2014/06/25/AsyncTask">介绍AsyncTask的文章中</a>，我们知道executeOnExecutor()会将任务提交到线程池中去执行，而这个被提交到线程池的任务会执行AsyncTask的doInBackground()。</p>
+<pre><code>// AsyncTaskLoader.java中
+final class LoadTask extends AsyncTask&lt;Void, Void, D&gt; implements Runnable {
+    private final CountDownLatch mDone = new CountDownLatch(1);
+
+    boolean waiting;
+
+    @Override
+    protected D doInBackground(Void... params) {
+        if (DEBUG) Slog.v(TAG, this + &quot; &gt;&gt;&gt; doInBackground&quot;);
+        try {
+            D data = AsyncTaskLoader.this.onLoadInBackground();
+            if (DEBUG) Slog.v(TAG, this + &quot;  &lt;&lt;&lt; doInBackground&quot;);
+            return data;
+        } catch (OperationCanceledException ex) {
+            if (!isCancelled()) {
+                throw ex;
+            }
+            if (DEBUG) Slog.v(TAG, this + &quot;  &lt;&lt;&lt; doInBackground (was canceled)&quot;, ex);
+            return null;
+        }
+    }
+
+    /* Runs on the UI thread */
+    @Override
+    protected void onPostExecute(D data) {
+        if (DEBUG) Slog.v(TAG, this + &quot; onPostExecute&quot;);
+        try {
+            AsyncTaskLoader.this.dispatchOnLoadComplete(this, data);
+        } finally {
+            mDone.countDown();
+        }
+    }
+
+    ...
+}</code></pre><p>说明：LoadTask的doInBackground()会调用onLoadInBackground()。</p>
+<h3 id="1-7-onLoadInBackground"><a href="#1-7-onLoadInBackground" class="headerlink" title="1.7 onLoadInBackground()"></a>1.7 onLoadInBackground()</h3><p>下面查看onLoadInBackground()的相关代码。</p>
+<pre><code>// AsyncTaskLoader.java中
+protected D onLoadInBackground() {
+    return loadInBackground();
+}
+
+// CursorLoader.java中
+@Override
+public Cursor loadInBackground() {
+    synchronized (this) {
+        if (isLoadInBackgroundCanceled()) {
+            throw new OperationCanceledException();
+        }
+        mCancellationSignal = new CancellationSignal();
+    }           
+    try {
+        Cursor cursor = getContext().getContentResolver().query(mUri, mProjection, mSelection,
+                mSelectionArgs, mSortOrder, mCancellationSignal);
+        if (cursor != null) {
+            try {
+                // Ensure the cursor window is filled.
+                cursor.getCount();
+                cursor.registerContentObserver(mObserver);
+            } catch (RuntimeException ex) {
+                cursor.close();
+                throw ex;
+            } 
+        }
+        return cursor;
+    } finally {
+        synchronized (this) {
+            mCancellationSignal = null;
+        }
+    }
+}   </code></pre><p>说明：loadInBackground()会执行查询。<strong>这就是后台任务真正执行的动作所在！</strong></p>
+<p>至此，我们已经回答了第一个问题：Loader的异步加载原理。实际上，Loader的异步加载是通过AsyncTask启动一个后台任务，在后台任务中再执行query()查询操作！</p>
+<h2 id="2-onLoadFinished是如何被回调的"><a href="#2-onLoadFinished是如何被回调的" class="headerlink" title="2. onLoadFinished是如何被回调的"></a>2. onLoadFinished是如何被回调的</h2><p>我们知道，当AsyncTask中的任务执行完时，会通过onPostExecute()反馈执行结果。下面，我们看看AsyncTask反馈的结果中是如何调用onLoadFinished()的。</p>
+<h3 id="2-1-onPostExecute"><a href="#2-1-onPostExecute" class="headerlink" title="2.1 onPostExecute"></a>2.1 onPostExecute</h3><p>下面看看onPostExecute()的相关代码。</p>
+<pre><code>// AsyncTaskLoader.java中
+@Override
+protected void onPostExecute(D data) {
+    if (DEBUG) Slog.v(TAG, this + &quot; onPostExecute&quot;);
+    try {
+        AsyncTaskLoader.this.dispatchOnLoadComplete(this, data);
+    } finally {
+        mDone.countDown();
+    }
+}
+
+// AsyncTaskLoader.java中
+void dispatchOnLoadComplete(LoadTask task, D data) {
+    if (mTask != task) {
+        if (DEBUG) Slog.v(TAG, &quot;Load complete of old task, trying to cancel&quot;);
+        dispatchOnCancelled(task, data);
+    } else {
+        if (isAbandoned()) {
+            // This cursor has been abandoned; just cancel the new data.
+            onCanceled(data);
+        } else {
+            commitContentChanged();
+            mLastLoadCompleteTime = SystemClock.uptimeMillis();
+            mTask = null;
+            if (DEBUG) Slog.v(TAG, &quot;Delivering result&quot;);
+            deliverResult(data);
+        }
+    }
+}</code></pre><p>说明：onPostExecute()会执行dispatchOnLoadComplete()，而后者会调用deliverResult()来分发消息。</p>
+<h3 id="2-2-deliverResult"><a href="#2-2-deliverResult" class="headerlink" title="2.2 deliverResult()"></a>2.2 deliverResult()</h3><pre><code>// CursorLoader.java中
+@Override
+public void deliverResult(Cursor cursor) {
+    if (isReset()) {
+        // An async query came in while the loader is stopped
+        if (cursor != null) {
+            cursor.close();
+        }   
+        return;
+    }   
+    Cursor oldCursor = mCursor;
+    mCursor = cursor;
+
+    if (isStarted()) {
+        super.deliverResult(cursor);
+    }   
+
+    if (oldCursor != null &amp;&amp; oldCursor != cursor &amp;&amp; !oldCursor.isClosed()) {
+        oldCursor.close();
+    }   
+}   
+
+// Loader.java中
+public void deliverResult(D data) {
+    if (mListener != null) {
+        mListener.onLoadComplete(this, data);
+    }
+}</code></pre><p>说明：CursorLoader.java中的deliverResult()会通过super.deliverResult()调用父类的deliverResult()，也就是会执行Loader.java中的deliverResult()。最终会执行mListener.onLoadComplete()。mListener是什么呢？它是我们在执行LoaderManager.java的start()函数时，通过mLoader.registerListener(mId, this)注册到Loader上的。也就是说，mListener是LoaderManager中的LoaderInfo对象。</p>
+<h3 id="2-3-LoaderInfo中的onLoadComplete"><a href="#2-3-LoaderInfo中的onLoadComplete" class="headerlink" title="2.3 LoaderInfo中的onLoadComplete()"></a>2.3 LoaderInfo中的onLoadComplete()</h3><pre><code>@Override
+public void onLoadComplete(Loader&lt;Object&gt; loader, Object data) {
+    if (DEBUG) Log.v(TAG, &quot;onLoadComplete: &quot; + this);
+
+    if (mDestroyed) {
+        if (DEBUG) Log.v(TAG, &quot;  Ignoring load complete -- destroyed&quot;);
+        return;
+    }
+
+    if (mLoaders.get(mId) != this) {
+        if (DEBUG) Log.v(TAG, &quot;  Ignoring load complete -- not active&quot;);
+        return;
+    }
+
+    LoaderInfo pending = mPendingLoader;
+    if (pending != null) {
+        mPendingLoader = null;
+        mLoaders.put(mId, null);
+        destroy();
+        installLoader(pending);
+        return;
+    }
+
+    if (mData != data || !mHaveData) {
+        mData = data;
+        mHaveData = true;
+        if (mStarted) {
+            callOnLoadFinished(loader, data);
+        }
+    }
+
+    LoaderInfo info = mInactiveLoaders.get(mId);
+    if (info != null &amp;&amp; info != this) {
+        info.mDeliveredData = false;
+        info.destroy();
+        mInactiveLoaders.remove(mId);
+    }
+
+    if (mActivity != null &amp;&amp; !hasRunningLoaders()) {
+        mActivity.mFragments.startPendingDeferredFragments();
+    }
+}
+
+void callOnLoadFinished(Loader&lt;Object&gt; loader, Object data) {
+    if (mCallbacks != null) {
+        String lastBecause = null;
+        if (mActivity != null) {
+            lastBecause = mActivity.mFragments.mNoTransactionsBecause;
+            mActivity.mFragments.mNoTransactionsBecause = &quot;onLoadFinished&quot;;
+        }
+        try {
+            if (DEBUG) Log.v(TAG, &quot;  onLoadFinished in &quot; + loader + &quot;: &quot;
+                    + loader.dataToString(data));
+            mCallbacks.onLoadFinished(loader, data);
+        } finally {
+            if (mActivity != null) {
+                mActivity.mFragments.mNoTransactionsBecause = lastBecause;
+            }
+        }
+        mDeliveredData = true;
+    }
+}</code></pre><p>说明：onLoadComplete()会调用callOnLoadFinished()，而callOnLoadFinished()最终会调用onLoadFinished()。<strong>这就是我们实现的LoaderCallbacks接口中的onLoadFinished()</strong>。</p>
+<p>至此，我们也搞明白了第二个问题onLoadFinished()是如何被回调的。当AsyncTask任务执行完时，会调用onPostExecute()；而onPostExecute()会通过LoaderManager，LoaderManager最终会调用onLoadFinished()。</p>
+<h2 id="3-当Activity或Fragment被重新加载时，Loader不会被重新加载。"><a href="#3-当Activity或Fragment被重新加载时，Loader不会被重新加载。" class="headerlink" title="3. 当Activity或Fragment被重新加载时，Loader不会被重新加载。"></a>3. 当Activity或Fragment被重新加载时，Loader不会被重新加载。</h2><p>这个原理其实非常简单，关键就是initLoader()的实现方式。</p>
+<pre><code>public &lt;D&gt; Loader&lt;D&gt; initLoader(int id, Bundle args, LoaderManager.LoaderCallbacks&lt;D&gt; callback) {
+    if (mCreatingLoader) {
+        throw new IllegalStateException(&quot;Called while creating a loader&quot;);
+    }   
+
+    LoaderInfo info = mLoaders.get(id);
+
+    if (DEBUG) Log.v(TAG, &quot;initLoader in &quot; + this + &quot;: args=&quot; + args);
+
+    if (info == null) {
+        // Loader doesn&apos;t already exist; create.
+        info = createAndInstallLoader(id, args,  (LoaderManager.LoaderCallbacks&lt;Object&gt;)callback);
+        if (DEBUG) Log.v(TAG, &quot;  Created new loader &quot; + info);
+    } else {
+        if (DEBUG) Log.v(TAG, &quot;  Re-using existing loader &quot; + info);
+        info.mCallbacks = (LoaderManager.LoaderCallbacks&lt;Object&gt;)callback;
+    }   
+
+    if (info.mHaveData &amp;&amp; mStarted) {
+        // If the loader has already generated its data, report it now.
+        info.callOnLoadFinished(info.mLoader, info.mData);
+    }   
+
+    return (Loader&lt;D&gt;)info.mLoader;
+}   </code></pre><p>说明：initLoader()会首先调用mLoaders.get(id)来获取id对应的LoaderInfo对象。如果Activity或Fragment是由于旋屏而发生重载，那么通过id获取到的LoaderInfo就不是null。那么initLoader()就会调用info.callOnLoadFinished()。</p>
+<h2 id="4-Loader异步加载器自动更新数据"><a href="#4-Loader异步加载器自动更新数据" class="headerlink" title="4. Loader异步加载器自动更新数据"></a>4. Loader异步加载器自动更新数据</h2><p>Loader自动更新数据是通过ContentObserver来实现的。</p>
+<h3 id="4-1-注册ContentResolver"><a href="#4-1-注册ContentResolver" class="headerlink" title="4.1 注册ContentResolver"></a>4.1 注册ContentResolver</h3><pre><code>// CursorLoader.java中
+@Override
+public Cursor loadInBackground() {
+    synchronized (this) {
+        if (isLoadInBackgroundCanceled()) {
+            throw new OperationCanceledException();
+        }
+        mCancellationSignal = new CancellationSignal();
+    }           
+    try {
+        Cursor cursor = getContext().getContentResolver().query(mUri, mProjection, mSelection,
+                mSelectionArgs, mSortOrder, mCancellationSignal);
+        if (cursor != null) {
+            try {
+                // Ensure the cursor window is filled.
+                cursor.getCount();
+                cursor.registerContentObserver(mObserver);
+            } catch (RuntimeException ex) {
+                cursor.close();
+                throw ex;
+            } 
+        }
+        return cursor;
+    } finally {
+        synchronized (this) {
+            mCancellationSignal = null;
+        }
+    }
+}   </code></pre><p>说明：在执行query()查询之后，如果得到的Cursor对象不是null。则通过cursor.registerContentObserver(mObserver)来监听该cursor的内容。</p>
+<h3 id="4-2-注册mObserver"><a href="#4-2-注册mObserver" class="headerlink" title="4.2 注册mObserver"></a>4.2 注册mObserver</h3><pre><code>// CursorLoader.java中
+public CursorLoader(Context context) {
+    super(context);
+    mObserver = new ForceLoadContentObserver();
+}
+
+// CursorLoader.java中
+public CursorLoader(Context context, Uri uri, String[] projection, String selection,
+        String[] selectionArgs, String sortOrder) {
+    super(context);
+    mObserver = new ForceLoadContentObserver();
+    mUri = uri;
+    mProjection = projection;
+    mSelection = selection;
+    mSelectionArgs = selectionArgs;
+    mSortOrder = sortOrder;
+}</code></pre><p>说明：在创建CursorLoader对象时，就创建了mObserver，它是ForceLoadContentObserver对象。</p>
+<h3 id="4-3-ForceLoadContentObserver"><a href="#4-3-ForceLoadContentObserver" class="headerlink" title="4.3 ForceLoadContentObserver"></a>4.3 ForceLoadContentObserver</h3><pre><code>// Loader.java
+public final class ForceLoadContentObserver extends ContentObserver {
+    public ForceLoadContentObserver() {
+        super(new Handler());
+    }
+
+    @Override
+    public boolean deliverSelfNotifications() {
+        return true;
+    }
+
+    @Override
+    public void onChange(boolean selfChange) {
+        onContentChanged();
+    }
+}
+
+// Loader.java中
+public void onContentChanged() {
+    if (mStarted) {
+        forceLoad();
+    } else {
+        // This loader has been stopped, so we don&apos;t want to load
+        // new data right now...  but keep track of it changing to
+        // refresh later if we start again.
+        mContentChanged = true;
+    }
+}</code></pre><p>说明：ForceLoadContentObserver是Loader.java的内部类，它继承于ContentObserver。当数据发生变化时，它会回调onChange()，进而调用onContentChanged()。而onContentChanged()则会执行forceLoad()。forceLoad()在前面已经介绍过了，它会启动AsyncTask被执行query查询操作！</p>
+<p>至此，几个问题都回答完了。Loader, AsyncTaskLoader, CursorLoader和LoaderManager的相互关系也整理完了！谢谢观赏！</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/41/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/43/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/41/">41</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/42/">42</a></li>
+        
+        <li><a class="pagination-link" href="/page/43/">43</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

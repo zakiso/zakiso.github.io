@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Java Annotation认知(包括框架图、详细介绍、示例说明) - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="java">
+
+
+
+
+
+    <meta name="description" content="java">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java Annotation认知(包括框架图、详细介绍、示例说明)">
+<meta property="og:url" content="https://apppills.com/2012/03/03/java/others/2012-03-03-annotation/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="java">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://apppills.com/media/pic/java/basic/annotation01.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/java/basic/annotation02.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/java/basic/annotation03.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/java/basic/annotation04.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/java/basic/annotation05.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/java/basic/annotation06.jpg">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java Annotation认知(包括框架图、详细介绍、示例说明)">
+<meta name="twitter:description" content="java">
+<meta name="twitter:image" content="https://apppills.com/media/pic/java/basic/annotation01.jpg">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#第1部分-Annotation架构">1&nbsp;&nbsp;<b>第1部分 Annotation架构</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第2部分-Annotation组成部分">2&nbsp;&nbsp;<b>第2部分 Annotation组成部分</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-annotation组成成分">2.1&nbsp;&nbsp;1. annotation组成成分</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第3部分-java自带的Annotation">3&nbsp;&nbsp;<b>第3部分 java自带的Annotation</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-Annotation通用定义">3.1&nbsp;&nbsp;1 Annotation通用定义</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-java自带的Annotation">3.2&nbsp;&nbsp;2 java自带的Annotation</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-1-Deprecated">3.2.1&nbsp;&nbsp;2.1 @Deprecated</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-2-Inherited">3.2.2&nbsp;&nbsp;2.2 @Inherited</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-3-SuppressWarnings">3.2.3&nbsp;&nbsp;2.3 @SuppressWarnings</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第4部分-Annotation-的作用">4&nbsp;&nbsp;<b>第4部分 Annotation 的作用</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-编译检查">4.1&nbsp;&nbsp;1 编译检查</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-在反射中使用Annotation">4.2&nbsp;&nbsp;2 在反射中使用Annotation</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-根据Annotation生成帮助文档">4.3&nbsp;&nbsp;3 根据Annotation生成帮助文档</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#4-能够帮忙查看查看代码">4.4&nbsp;&nbsp;4 能够帮忙查看查看代码</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Java Annotation认知(包括框架图、详细介绍、示例说明)
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-03-03T01:01:00.000Z" itemprop="datePublished">3月 3 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            32 分钟 read (About 4802 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>Java Annotation是JDK5.0引入的一种注释机制。</p>
+</blockquote>
+<blockquote>
+<p>网上很多关于Java Annotation的文章，看得人眼花缭乱。Java Annotation本来很简单的，结果说的人没说清楚；弄的看的人更加迷糊。</p>
+</blockquote>
+<blockquote>
+<p>我按照自己的思路，对Annotation进行了整理。理解 Annotation 的关键，是理解Annotation的语法和用法，对这些内容，我都进行了详细说明；理解Annotation的语法和用法之后，再看Annotation的框架图，可能有更深刻体会。废话就说这么多，下面开始对Annotation进行说明。若您发现文章中存在错误或不足的地方，希望您能指出！</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1部分 Annotation架构</a><br><a href="#anchor2">第2部分 Annotation组成部分</a><br><a href="#anchor3">第3部分 java自带的Annotation</a><br><a href="#anchor4">第4部分 Annotation 的作用</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第1部分-Annotation架构"><a href="#第1部分-Annotation架构" class="headerlink" title="第1部分 Annotation架构"></a>第1部分 Annotation架构</h1><p>先看看Annotation的架构图：</p>
+<p><img src="/media/pic/java/basic/annotation01.jpg" alt="img"></p>
+<p>从中，我们可以看出：<br>(01) 1个Annotation 和 1个RetentionPolicy关联。<br>&nbsp;&nbsp;&nbsp;&nbsp; 可以理解为：每1个Annotation对象，都会有唯一的RetentionPolicy属性。</p>
+<p>(02) 1个Annotation 和 1~n个ElementType关联。<br>&nbsp;&nbsp;&nbsp;&nbsp; 可以理解为：对于每1个Annotation对象，可以有若干个ElementType属性。</p>
+<p>(03) Annotation 有许多实现类，包括：Deprecated, Documented, Inherited, Override等等。<br>&nbsp;&nbsp;&nbsp;&nbsp; Annotation 的每一个实现类，都“和1个RetentionPolicy关联”并且“和1~n个ElementType关联”。</p>
+<p>下面，我先介绍框架图的左半边(如下图)，即Annotation, RetentionPolicy, ElementType；然后在就Annotation的实现类进行举例说明。</p>
+<p><img src="/media/pic/java/basic/annotation02.jpg" alt="img"></p>
+<p><a name="anchor2"></a></p>
+<h1 id="第2部分-Annotation组成部分"><a href="#第2部分-Annotation组成部分" class="headerlink" title="第2部分 Annotation组成部分"></a>第2部分 Annotation组成部分</h1><h2 id="1-annotation组成成分"><a href="#1-annotation组成成分" class="headerlink" title="1. annotation组成成分"></a>1. annotation组成成分</h2><p>java annotation 的组成中，有3个非常重要的主干类。它们分别是：</p>
+<p><strong>(01) Annotation.java</strong></p>
+<pre><code>package java.lang.annotation;
+public interface Annotation {
+
+    boolean equals(Object obj);
+
+    int hashCode();
+
+    String toString();
+
+    Class&lt;? extends Annotation&gt; annotationType();
+}</code></pre><p><strong>(02) ElementType.java</strong></p>
+<pre><code>package java.lang.annotation;
+
+public enum ElementType {
+    TYPE,               /* 类、接口（包括注释类型）或枚举声明  */
+
+    FIELD,              /* 字段声明（包括枚举常量）  */
+
+    METHOD,             /* 方法声明  */
+
+    PARAMETER,          /* 参数声明  */
+
+    CONSTRUCTOR,        /* 构造方法声明  */
+
+    LOCAL_VARIABLE,     /* 局部变量声明  */
+
+    ANNOTATION_TYPE,    /* 注释类型声明  */
+
+    PACKAGE             /* 包声明  */
+}</code></pre><p><strong>(03) RetentionPolicy.java</strong></p>
+<pre><code>package java.lang.annotation;
+public enum RetentionPolicy {
+    SOURCE,            /* Annotation信息仅存在于编译器处理期间，编译器处理完之后就没有该Annotation信息了  */
+
+    CLASS,             /* 编译器将Annotation存储于类对应的.class文件中。默认行为  */
+
+    RUNTIME            /* 编译器将Annotation存储于class文件中，并且可由JVM读入 */
+}</code></pre><p>说明：<br>(01) Annotation 就是个接口。<br>&nbsp;&nbsp;&nbsp;&nbsp; “每1个Annotation” 都与 “1个RetentionPolicy”关联，并且与 “1～n个ElementType”关联。可以通俗的理解为：每1个Annotation对象，都会有唯一的RetentionPolicy属性；至于ElementType属性，则有1~n个。  </p>
+<p>(02) ElementType 是Enum枚举类型，它用来指定Annotation的类型。<br>&nbsp;&nbsp;&nbsp;&nbsp; “每1个Annotation” 都与 “1～n个ElementType”关联。当Annotation与某个ElementType关联时，就意味着：Annotation有了某种用途。<br>&nbsp;&nbsp;&nbsp;&nbsp; 例如，若一个Annotation对象是METHOD类型，则该Annotation只能用来修饰方法。  </p>
+<p>(03) RetentionPolicy 是Enum枚举类型，它用来指定Annotation的策略。通俗点说，就是不同RetentionPolicy类型的Annotation的作用域不同。<br>&nbsp;&nbsp;&nbsp;&nbsp; “每1个Annotation” 都与 “1个RetentionPolicy”关联。<br>&nbsp;&nbsp;&nbsp;&nbsp; a) 若Annotation的类型为 SOURCE，则意味着：Annotation仅存在于编译器处理期间，编译器处理完之后，该Annotation就没用了。<br>&nbsp;&nbsp;&nbsp;&nbsp; 例如，“ @Override ”标志就是一个Annotation。当它修饰一个方法的时候，就意味着该方法覆盖父类的方法；并且在编译期间会进行语法检查！编译器处理完后，“@Override”就没有任何作用了。<br>&nbsp;&nbsp;&nbsp;&nbsp; b) 若Annotation的类型为 CLASS，则意味着：编译器将Annotation存储于类对应的.class文件中，它是Annotation的默认行为。<br>&nbsp;&nbsp;&nbsp;&nbsp; c) 若Annotation的类型为 RUNTIME，则意味着：编译器将Annotation存储于class文件中，并且可由JVM读入。  </p>
+<p>这时，只需要记住“每1个Annotation” 都与 “1个RetentionPolicy”关联，并且与 “1～n个ElementType”关联。学完后面的内容之后，再回头看这些内容，会更容易理解。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="第3部分-java自带的Annotation"><a href="#第3部分-java自带的Annotation" class="headerlink" title="第3部分 java自带的Annotation"></a>第3部分 java自带的Annotation</h1><p>理解了上面的3个类的作用之后，我们接下来可以讲解Annotation实现类的语法定义了。</p>
+<h2 id="1-Annotation通用定义"><a href="#1-Annotation通用定义" class="headerlink" title="1 Annotation通用定义"></a>1 Annotation通用定义</h2><pre><code>@Documented
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MyAnnotation1 {
+}</code></pre><p>说明：<br>上面的作用是定义一个Annotation，它的名字是MyAnnotation1。定义了MyAnnotation1之后，我们可以在代码中通过“@MyAnnotation1”来使用它。</p>
+<p>其它的，@Documented, @Target, @Retention, @interface都是来修饰MyAnnotation1的。下面分别说说它们的含义：<br>(01) @interface<br>&nbsp;&nbsp;&nbsp;&nbsp; 使用@interface定义注解时，意味着它实现了java.lang.annotation.Annotation接口，即该注解就是一个Annotation。<br>&nbsp;&nbsp;&nbsp;&nbsp; 定义Annotation时，@interface是必须的。<br>&nbsp;&nbsp;&nbsp;&nbsp; 注意：它和我们通常的implemented实现接口的方法不同。Annotation接口的实现细节都由编译器完成。通过@interface定义注解后，该注解不能继承其他的注解或接口。  </p>
+<p>(02) @Documented<br>&nbsp;&nbsp;&nbsp;&nbsp; 类和方法的Annotation在缺省情况下是不出现在javadoc中的。如果使用@Documented修饰该Annotation，则表示它可以出现在javadoc中。<br>&nbsp;&nbsp;&nbsp;&nbsp; 定义Annotation时，@Documented可有可无；若没有定义，则Annotation不会出现在javadoc中。  </p>
+<p>(03) @Target(ElementType.TYPE)<br>&nbsp;&nbsp;&nbsp;&nbsp; 前面我们说过，ElementType 是Annotation的类型属性。而@Target的作用，就是来指定Annotation的类型属性。<br>&nbsp;&nbsp;&nbsp;&nbsp; @Target(ElementType.TYPE) 的意思就是指定该Annotation的类型是ElementType.TYPE。这就意味着，MyAnnotation1是来修饰“类、接口（包括注释类型）或枚举声明”的注解。<br>&nbsp;&nbsp;&nbsp;&nbsp; 定义Annotation时，@Target可有可无。若有@Target，则该Annotation只能用于它所指定的地方；若没有@Target，则该Annotation可以用于任何地方。  </p>
+<p>(04) @Retention(RetentionPolicy.RUNTIME)<br>&nbsp;&nbsp;&nbsp;&nbsp; 前面我们说过，RetentionPolicy 是Annotation的策略属性，而@Retention的作用，就是指定Annotation的策略属性。<br>&nbsp;&nbsp;&nbsp;&nbsp; @Retention(RetentionPolicy.RUNTIME) 的意思就是指定该Annotation的策略是RetentionPolicy.RUNTIME。这就意味着，编译器会将该Annotation信息保留在.class文件中，并且能被虚拟机读取。<br>&nbsp;&nbsp;&nbsp;&nbsp; 定义Annotation时，@Retention可有可无。若没有@Retention，则默认是RetentionPolicy.CLASS。</p>
+<h2 id="2-java自带的Annotation"><a href="#2-java自带的Annotation" class="headerlink" title="2 java自带的Annotation"></a>2 java自带的Annotation</h2><p>通过上面的示例，我们能理解：@interface用来声明Annotation，@Documented用来表示该Annotation是否会出现在javadoc中， @Target用来指定Annotation的类型，@Retention用来指定Annotation的策略。</p>
+<p>理解这一点之后，我们就很容易理解java中自带的Annotation的实现类，即Annotation架构图的右半边。如下图：</p>
+<p><img src="/media/pic/java/basic/annotation03.jpg" alt="img"></p>
+<p>java 常用的Annotation：</p>
+<table>
+<thead>
+<tr>
+<th>标注</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>@Deprecated</td>
+<td>@Deprecated 所标注内容，不再被建议使用。</td>
+</tr>
+<tr>
+<td>@Override</td>
+<td>@Override 只能标注方法，表示该方法覆盖父类中的方法。</td>
+</tr>
+<tr>
+<td>@Documented</td>
+<td>@Documented 所标注内容，可以出现在javadoc中。</td>
+</tr>
+<tr>
+<td>@Inherited</td>
+<td>@Inherited只能被用来标注“Annotation类型”，它所标注的Annotation具有继承性。</td>
+</tr>
+<tr>
+<td>@Retention</td>
+<td>@Retention只能被用来标注“Annotation类型”，而且它被用来指定Annotation的RetentionPolicy属性。</td>
+</tr>
+<tr>
+<td>@Target</td>
+<td>@Target只能被用来标注“Annotation类型”，而且它被用来指定Annotation的ElementType属性。</td>
+</tr>
+<tr>
+<td>@SuppressWarnings</td>
+<td>@SuppressWarnings 所标注内容产生的警告，编译器会对这些警告保持静默。</td>
+</tr>
+</tbody></table>
+<p>由于“@Deprecated和@Override”类似，“@Documented, @Inherited, @Retention, @Target”类似；下面，我们只对@Deprecated, @Inherited, @SuppressWarnings 这3个Annotation进行说明。</p>
+<h3 id="2-1-Deprecated"><a href="#2-1-Deprecated" class="headerlink" title="2.1 @Deprecated"></a>2.1 @Deprecated</h3><p>@Deprecated 的定义如下：</p>
+<pre><code>@Documented
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Deprecated {
+}</code></pre><p>说明：<br>(01) @interface – 它的用来修饰Deprecated，意味着Deprecated实现了java.lang.annotation.Annotation接口；即Deprecated就是一个注解。  </p>
+<p>(02) @Documented – 它的作用是说明该注解能出现在javadoc中。  </p>
+<p>(03) @Retention(RetentionPolicy.RUNTIME) – 它的作用是指定Deprecated的策略是RetentionPolicy.RUNTIME。这就意味着，编译器会将Deprecated的信息保留在.class文件中，并且能被虚拟机读取。  </p>
+<p>(04) @Deprecated 所标注内容，不再被建议使用。<br>&nbsp;&nbsp;&nbsp;&nbsp; 例如，若某个方法被 @Deprecated 标注，则该方法不再被建议使用。如果有开发人员试图使用或重写被@Deprecated标示的方法，编译器会给相应的提示信息。示例如下:</p>
+<p><img src="/media/pic/java/basic/annotation04.jpg" alt="img"></p>
+<p>源码如下(DeprecatedTest.java)：</p>
+<pre><code>package com.skywang.annotation;
+
+import java.util.Date;
+import java.util.Calendar;
+
+public class DeprecatedTest {
+    // @Deprecated 修饰 getString1(),表示 它是建议不被使用的函数
+    @Deprecated
+    private static void getString1(){
+        System.out.println(&quot;Deprecated Method&quot;);
+    }
+
+    private static void getString2(){
+        System.out.println(&quot;Normal Method&quot;);
+    }
+
+    // Date是日期/时间类。java已经不建议使用该类了
+    private static void testDate() {
+        Date date = new Date(113, 8, 25);
+        System.out.println(date.getYear());
+    }
+    // Calendar是日期/时间类。java建议使用Calendar取代Date表示“日期/时间”
+    private static void testCalendar() {
+        Calendar cal = Calendar.getInstance();
+        System.out.println(cal.get(Calendar.YEAR));
+    }
+
+    public static void main(String[] args) {
+        getString1(); 
+        getString2();
+        testDate(); 
+        testCalendar();
+    }
+}</code></pre><p>说明：<br>上面是eclipse中的截图，比较类中 “getString1() 和 getString2()” 以及 “testDate() 和 testCalendar()” 。</p>
+<p>(01) getString1() 被@Deprecated标注，意味着建议不再使用getString1()；所以getString1()的定义和调用时，都会一横线。这一横线是eclipse()对@Deprecated方法的处理。<br>getString2() 没有被@Deprecated标注，它的显示正常。  </p>
+<p>(02) testDate() 调用了Date的相关方法，而java已经建议不再使用Date操作日期/时间。因此，在调用Date的API时，会产生警告信息，途中的warnings。<br>testCalendar() 调用了Calendar的API来操作日期/时间，java建议用Calendar取代Date。因此，操作Calendar不回产生warning。</p>
+<h3 id="2-2-Inherited"><a href="#2-2-Inherited" class="headerlink" title="2.2 @Inherited"></a>2.2 @Inherited</h3><p>@Inherited 的定义如下：</p>
+<pre><code>@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.ANNOTATION_TYPE)
+public @interface Inherited {
+}</code></pre><p>说明：<br>(01) @interface – 它的用来修饰Inherited，意味着Inherited实现了java.lang.annotation.Annotation接口；即Inherited就是一个注解。  </p>
+<p>(02) @Documented – 它的作用是说明该注解能出现在javadoc中。  </p>
+<p>(03) @Retention(RetentionPolicy.RUNTIME) – 它的作用是指定Inherited的策略是RetentionPolicy.RUNTIME。这就意味着，编译器会将Inherited的信息保留在.class文件中，并且能被虚拟机读取。  </p>
+<p>(04) @Target(ElementType.ANNOTATION_TYPE) – 它的作用是指定Inherited的类型是ANNOTATION_TYPE。这就意味着，@Inherited只能被用来标注“Annotation类型”。  </p>
+<p>(05) @Inherited 的含义是，它所标注的Annotation将具有继承性。<br>&nbsp;&nbsp;&nbsp;&nbsp; 假设，我们定义了某个Annotaion，它的名称是MyAnnotation，并且MyAnnotation被标注为@Inherited。现在，某个类Base使用了MyAnnotation，则Base具有了“具有了注解MyAnnotation”；现在，Sub继承了Base，由于MyAnnotation是@Inherited的(具有继承性)，所以，Sub也“具有了注解MyAnnotation”。</p>
+<p>@Inherited的使用示例<br>源码如下(InheritableSon.java)：</p>
+<pre><code>/**
+ * @Inherited 演示示例
+ * 
+ * @author skywang
+ * @email kuiwu-wang@163.com
+ */
+package com.skywang.annotation;
+
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Inherited;
+
+/**
+ * 自定义的Annotation。
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@interface Inheritable
+{
+}
+
+@Inheritable
+class InheritableFather
+{
+    public InheritableFather() {
+        // InheritableBase是否具有 Inheritable Annotation
+        System.out.println(&quot;InheritableFather:&quot;+InheritableFather.class.isAnnotationPresent(Inheritable.class));
+    }
+}
+
+/**
+ * InheritableSon 类只是继承于 InheritableFather，
+ */
+public class InheritableSon extends InheritableFather
+{
+    public InheritableSon() {
+        super();    // 调用父类的构造函数
+        // InheritableSon类是否具有 Inheritable Annotation
+        System.out.println(&quot;InheritableSon:&quot;+InheritableSon.class.isAnnotationPresent(Inheritable.class));
+    }
+
+    public static void main(String[] args)
+    {
+        InheritableSon is = new InheritableSon();
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code>InheritableFather:true
+InheritableSon:true</code></pre><p>现在，我们对InheritableSon.java进行修改：注释掉“Inheritable的@Inherited注解”。<br>源码如下(InheritableSon.java)：</p>
+<pre><code>/**
+ * @Inherited 演示示例
+ * 
+ * @author skywang
+ * @email kuiwu-wang@163.com
+ */
+package com.skywang.annotation;
+
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Inherited;
+
+/**
+ * 自定义的Annotation。
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+//@Inherited
+@interface Inheritable
+{
+}
+
+@Inheritable
+class InheritableFather
+{
+    public InheritableFather() {
+        // InheritableBase是否具有 Inheritable Annotation
+        System.out.println(&quot;InheritableFather:&quot;+InheritableFather.class.isAnnotationPresent(Inheritable.class));
+    }
+}
+
+/**
+ * InheritableSon 类只是继承于 InheritableFather，
+ */
+public class InheritableSon extends InheritableFather
+{
+    public InheritableSon() {
+        super();    // 调用父类的构造函数
+        // InheritableSon类是否具有 Inheritable Annotation
+        System.out.println(&quot;InheritableSon:&quot;+InheritableSon.class.isAnnotationPresent(Inheritable.class));
+    }
+
+    public static void main(String[] args)
+    {
+        InheritableSon is = new InheritableSon();
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code>InheritableFather:true
+InheritableSon:false</code></pre><p>对比上面的两个结果，我们发现：当注解Inheritable被@Inherited标注时，它具有继承性。否则，没有继承性。</p>
+<h3 id="2-3-SuppressWarnings"><a href="#2-3-SuppressWarnings" class="headerlink" title="2.3 @SuppressWarnings"></a>2.3 @SuppressWarnings</h3><p>@SuppressWarnings 的定义如下：</p>
+<pre><code>@Target({TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE})
+@Retention(RetentionPolicy.SOURCE)
+public @interface SuppressWarnings {
+    String[] value();
+}</code></pre><p>说明：<br>(01) @interface – 它的用来修饰SuppressWarnings，意味着SuppressWarnings实现了java.lang.annotation.Annotation接口；即SuppressWarnings就是一个注解。  </p>
+<p>(02) @Retention(RetentionPolicy.SOURCE) – 它的作用是指定SuppressWarnings的策略是RetentionPolicy.SOURCE。这就意味着，SuppressWarnings信息仅存在于编译器处理期间，编译器处理完之后SuppressWarnings就没有作用了。  </p>
+<p>(03) @Target({TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE}) – 它的作用是指定SuppressWarnings的类型同时包括TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE。  </p>
+<blockquote>
+<p>TYPE意味着，它能标注“类、接口（包括注释类型）或枚举声明”。<br>FIELD意味着，它能标注“字段声明”。<br>METHOD意味着，它能标注“方法”。<br>PARAMETER意味着，它能标注“参数”。<br>CONSTRUCTOR意味着，它能标注“构造方法”。<br>LOCAL_VARIABLE意味着，它能标注“局部变量”。</p>
+</blockquote>
+<p>(04) String[] value(); 意味着，SuppressWarnings能指定参数  </p>
+<p>(05) SuppressWarnings 的作用是，让编译器对“它所标注的内容”的某些警告保持静默。例如，”@SuppressWarnings(value={“deprecation”, “unchecked”})” 表示对“它所标注的内容”中的 “SuppressWarnings不再建议使用警告”和“未检查的转换时的警告”保持沉默。示例如下：</p>
+<p><img src="/media/pic/java/basic/annotation05.jpg" alt="img"></p>
+<p>源码如下(SuppressWarningTest.java)：</p>
+<pre><code>package com.skywang.annotation;
+
+import java.util.Date;
+
+public class SuppressWarningTest {
+
+    //@SuppressWarnings(value={&quot;deprecation&quot;})
+    public static void doSomething(){
+        Date date = new Date(113, 8, 26);
+        System.out.println(date);
+    }
+
+    public static void main(String[] args) {
+        doSomething();
+    }
+}</code></pre><p>说明：<br>(01) 左边的图中，没有使用 @SuppressWarnings(value={“deprecation”}) , 而Date属于java不再建议使用的类。因此，调用Date的API时，会产生警告。<br>而右边的图中，使用了 @SuppressWarnings(value={“deprecation”})。因此，编译器对“调用Date的API产生的警告”保持沉默。</p>
+<p>补充：SuppressWarnings 常用的关键字的表格</p>
+<table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>deprecation</td>
+<td>使用了不赞成使用的类或方法时的警告</td>
+</tr>
+<tr>
+<td>unchecked</td>
+<td>执行了未检查的转换时的警告，例如当使用集合时没有用泛型 (Generics) 来指定集合保存的类型。</td>
+</tr>
+<tr>
+<td>fallthrough</td>
+<td>当 Switch 程序块直接通往下一种情况而没有 Break 时的警告。</td>
+</tr>
+<tr>
+<td>path</td>
+<td>在类路径、源文件路径等中有不存在的路径时的警告。</td>
+</tr>
+<tr>
+<td>serial</td>
+<td>当在可序列化的类上缺少 serialVersionUID 定义时的警告。</td>
+</tr>
+<tr>
+<td>finally</td>
+<td>任何 finally 子句不能正常完成时的警告。</td>
+</tr>
+<tr>
+<td>all</td>
+<td>关于以上所有情况的警告。</td>
+</tr>
+</tbody></table>
+<p><a name="anchor4"></a></p>
+<h1 id="第4部分-Annotation-的作用"><a href="#第4部分-Annotation-的作用" class="headerlink" title="第4部分 Annotation 的作用"></a>第4部分 Annotation 的作用</h1><p>Annotation 是一个辅助类，它在Junit、Struts、Spring等工具框架中被广泛使用。</p>
+<p>我们在编程中经常会使用到的Annotation作用有：</p>
+<h2 id="1-编译检查"><a href="#1-编译检查" class="headerlink" title="1 编译检查"></a>1 编译检查</h2><p>Annotation具有“让编译器进行编译检查的作用”。</p>
+<p>例如，@SuppressWarnings, @Deprecated和@Override都具有编译检查作用。  </p>
+<p>(01) 关于@SuppressWarnings和@Deprecated，已经在“第3部分”中详细介绍过了。这里就不再举例说明了。  </p>
+<p>(02) 若某个方法被 @Override的 标注，则意味着该方法会覆盖父类中的同名方法。如果有方法被@Override标示，但父类中却没有“被@Override标注”的同名方法，则编译器会报错。示例如下：</p>
+<p><img src="/media/pic/java/basic/annotation06.jpg" alt="img"></p>
+<p>源码(OverrideTest.java):</p>
+<pre><code>package com.skywang.annotation;
+
+/**
+ * @Override测试程序
+ * 
+ * @author skywang
+ * @email kuiwu-wang@163.com
+ */
+public class OverrideTest {
+
+    /**
+     * toString() 在java.lang.Object中定义；
+     * 因此，这里用 @Override 标注是对的。
+     */
+    @Override
+    public String toString(){
+        return &quot;Override toString&quot;;
+    }
+
+    /**
+     * getString() 没有在OverrideTest的任何父类中定义；
+     * 但是，这里却用 @Override 标注，因此会产生编译错误！
+     */
+    @Override
+    public String getString(){
+        return &quot;get toString&quot;;
+    }
+
+    public static void main(String[] args) {
+    }
+}</code></pre><p>上面是该程序在eclipse中的截图。从中，我们可以发现“getString()”函数会报错。这是因为“getString() 被@Override所标注，但在OverrideTest的任何父类中都没有定义getString1()函数”。<br>“将getString() 上面的@Override注释掉”，即可解决该错误。</p>
+<h2 id="2-在反射中使用Annotation"><a href="#2-在反射中使用Annotation" class="headerlink" title="2 在反射中使用Annotation"></a>2 在反射中使用Annotation</h2><p>在反射的Class, Method, Field等函数中，有许多于Annotation相关的接口。<br>这也意味着，我们可以在反射中解析并使用Annotation。<br>源码如下(AnnotationTest.java)：</p>
+<pre><code>package com.skywang.annotation;
+
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Inherited;
+import java.lang.reflect.Method;
+
+/**
+ * Annotation在反射函数中的使用示例
+ * 
+ * @author skywang
+ * @email kuiwu-wang@163.com
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@interface MyAnnotation {
+    String[] value() default &quot;unknown&quot;;
+}
+
+/**
+ * Person类。它会使用MyAnnotation注解。
+ */
+class Person {
+
+    /**
+     * empty()方法同时被 &quot;@Deprecated&quot; 和 “@MyAnnotation(value={&quot;a&quot;,&quot;b&quot;})”所标注 
+     * (01) @Deprecated，意味着empty()方法，不再被建议使用
+     * (02) @MyAnnotation, 意味着empty() 方法对应的MyAnnotation的value值是默认值&quot;unknown&quot;
+     */
+    @MyAnnotation
+    @Deprecated
+    public void empty(){
+        System.out.println(&quot;\nempty&quot;);
+    }
+
+    /**
+     * sombody() 被 @MyAnnotation(value={&quot;girl&quot;,&quot;boy&quot;}) 所标注，
+     * @MyAnnotation(value={&quot;girl&quot;,&quot;boy&quot;}), 意味着MyAnnotation的value值是{&quot;girl&quot;,&quot;boy&quot;}
+     */
+    @MyAnnotation(value={&quot;girl&quot;,&quot;boy&quot;})
+    public void somebody(String name, int age){
+        System.out.println(&quot;\nsomebody: &quot;+name+&quot;, &quot;+age);
+    }
+}
+
+public class AnnotationTest {
+
+    public static void main(String[] args) throws Exception {
+
+        // 新建Person
+        Person person = new Person();
+        // 获取Person的Class实例
+        Class&lt;Person&gt; c = Person.class;
+        // 获取 somebody() 方法的Method实例
+        Method mSomebody = c.getMethod(&quot;somebody&quot;, new Class[]{String.class, int.class});
+        // 执行该方法
+        mSomebody.invoke(person, new Object[]{&quot;lily&quot;, 18});
+        iteratorAnnotations(mSomebody);
+
+
+        // 获取 somebody() 方法的Method实例
+        Method mEmpty = c.getMethod(&quot;empty&quot;, new Class[]{});
+        // 执行该方法
+        mEmpty.invoke(person, new Object[]{});        
+        iteratorAnnotations(mEmpty);
+    }
+
+    public static void iteratorAnnotations(Method method) {
+
+        // 判断 somebody() 方法是否包含MyAnnotation注解
+        if(method.isAnnotationPresent(MyAnnotation.class)){
+            // 获取该方法的MyAnnotation注解实例
+            MyAnnotation myAnnotation = method.getAnnotation(MyAnnotation.class);
+            // 获取 myAnnotation的值，并打印出来
+            String[] values = myAnnotation.value();
+            for (String str:values)
+                System.out.printf(str+&quot;, &quot;);
+            System.out.println();
+        }
+
+        // 获取方法上的所有注解，并打印出来
+        Annotation[] annotations = method.getAnnotations();
+        for(Annotation annotation : annotations){
+            System.out.println(annotation);
+        }
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code>somebody: lily, 18
+girl, boy,
+@com.skywang.annotation.MyAnnotation(value=[girl, boy])
+
+empty
+unknown,
+@com.skywang.annotation.MyAnnotation(value=[unknown])
+@java.lang.Deprecated()</code></pre><h2 id="3-根据Annotation生成帮助文档"><a href="#3-根据Annotation生成帮助文档" class="headerlink" title="3 根据Annotation生成帮助文档"></a>3 根据Annotation生成帮助文档</h2><p>通过给Annotation注解加上@Documented标签，能使该Annotation标签出现在javadoc中。</p>
+<h2 id="4-能够帮忙查看查看代码"><a href="#4-能够帮忙查看查看代码" class="headerlink" title="4 能够帮忙查看查看代码"></a>4 能够帮忙查看查看代码</h2><p>通过@Override, @Deprecated等，我们能很方便的了解程序的大致结构。<br>另外，我们也可以通过自定义Annotation来实现一些功能。</p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/java/">#java</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2012/03/04/java/others/2012-03-04-reflection/">Java 反射机制(包括组成、结构、示例说明等内容)</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2012/03/02/java/others/2012-03-02-reference/">Java引用总结--StrongReference、SoftReference、WeakReference、PhantomReference</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

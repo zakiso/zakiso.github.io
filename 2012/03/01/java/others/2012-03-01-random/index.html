@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Java 随机数 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="java">
+
+
+
+
+
+    <meta name="description" content="java">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 随机数">
+<meta property="og:url" content="https://apppills.com/2012/03/01/java/others/2012-03-01-random/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="java">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 随机数">
+<meta name="twitter:description" content="java">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#第1种-利用System-currentTimeMillis-获取随机数">1&nbsp;&nbsp;<b>第1种 利用System.currentTimeMillis()获取随机数</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第2种-利用Math-random-获取随机数">2&nbsp;&nbsp;<b>第2种 利用Math.random()获取随机数</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第3种-利用Random类来获取随机数">3&nbsp;&nbsp;<b>第3种 利用Random类来获取随机数</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#获取随机数示例">4&nbsp;&nbsp;<b>获取随机数示例</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Java 随机数
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-03-01T01:01:00.000Z" itemprop="datePublished">3月 1 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            9 分钟 read (About 1325 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本章先讲解Java随机数的几种产生方式，然后通过示例对其进行演示。</p>
+</blockquote>
+<blockquote>
+<p>广义上讲，Java中的随机数的有三种产生方式：<br>(01). 通过System.currentTimeMillis()来获取一个当前时间毫秒数的long型数字。<br>(02). 通过Math.random()返回一个0到1之间的double值。<br>(03). 通过Random类来产生一个随机数，这个是专业的Random工具类，功能强大。  </p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1种 利用System.currentTimeMillis()获取随机数</a><br><a href="#anchor2">第2种 利用Math.random()获取随机数</a><br><a href="#anchor3">第3种 利用Random类来获取随机数</a><br><a href="#anchor4">获取随机数示例</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第1种-利用System-currentTimeMillis-获取随机数"><a href="#第1种-利用System-currentTimeMillis-获取随机数" class="headerlink" title="第1种 利用System.currentTimeMillis()获取随机数"></a>第1种 利用System.currentTimeMillis()获取随机数</h1><p>通过System.currentTimeMillis()来获取随机数。实际上是获取当前时间毫秒数，它是long类型。使用方法如下：</p>
+<pre><code>final long l = System.currentTimeMillis();</code></pre><p>若要获取int类型的整数，只需要将上面的结果转行成int类型即可。比如，获取[0, 100)之间的int整数。方法如下：</p>
+<pre><code>final long l = System.currentTimeMillis();
+final int i = (int)( l % 100 );</code></pre><p><a name="anchor2"></a></p>
+<h1 id="第2种-利用Math-random-获取随机数"><a href="#第2种-利用Math-random-获取随机数" class="headerlink" title="第2种 利用Math.random()获取随机数"></a>第2种 利用Math.random()获取随机数</h1><p>通过Math.random()来获取随机数。实际上，它返回的是0(包含)到1(不包含)之间的double值。使用方法如下：</p>
+<pre><code>final double d = Math.random();</code></pre><p>若要获取int类型的整数，只需要将上面的结果转行成int类型即可。比如，获取[0, 100)之间的int整数。方法如下：</p>
+<pre><code>final double d = Math.random();
+final int i = (int)(d*100);</code></pre><p><a name="anchor3"></a></p>
+<h1 id="第3种-利用Random类来获取随机数"><a href="#第3种-利用Random类来获取随机数" class="headerlink" title="第3种 利用Random类来获取随机数"></a>第3种 利用Random类来获取随机数</h1><p>通过Random类来获取随机数。</p>
+<p>使用方法如下：<br>(01) 创建Random对象。有两种方法可以创建Random对象，如下：</p>
+<pre><code>Random random = new Random();//默认构造方法
+Random random = new Random(1000);//指定种子数字</code></pre><p>(02) 通过Random对象获取随机数。Random支持的随机值类型包括：boolean, byte, int, long, float, double。<br>比如，获取[0, 100)之间的int整数。方法如下：</p>
+<pre><code>int i2 = random.nextInt(100);</code></pre><p>Random 的函数接口</p>
+<pre><code>// 构造函数(一)： 创建一个新的随机数生成器。 
+Random() 
+// 构造函数(二)： 使用单个 long 种子创建一个新随机数生成器： public Random(long seed) { setSeed(seed); } next 方法使用它来保存随机数生成器的状态。
+Random(long seed) 
+
+boolean nextBoolean()         // 返回下一个“boolean类型”伪随机数。 
+void    nextBytes(byte[] buf) // 生成随机字节并将其置于字节数组buf中。 
+double  nextDouble()          // 返回一个“[0.0, 1.0) 之间的double类型”的随机数。 
+float   nextFloat()           // 返回一个“[0.0, 1.0) 之间的float类型”的随机数。 
+int     nextInt()             // 返回下一个“int类型”随机数。 
+int     nextInt(int n)        // 返回一个“[0, n) 之间的int类型”的随机数。 
+long    nextLong()            // 返回下一个“long类型”随机数。 
+synchronized double nextGaussian()   // 返回下一个“double类型”的随机数，它是呈高斯（“正常地”）分布的 double 值，其平均值是 0.0，标准偏差是 1.0。 
+synchronized void setSeed(long seed) // 使用单个 long 种子设置此随机数生成器的种子。</code></pre><p><a name="anchor4"></a></p>
+<h1 id="获取随机数示例"><a href="#获取随机数示例" class="headerlink" title="获取随机数示例"></a>获取随机数示例</h1><p>下面通过示例演示上面3种获取随机数的使用方法。<br>源码如下(RandomTest.java)：</p>
+<pre><code>import java.util.Random;
+import java.lang.Math;
+
+/**
+ * java 的随机数测试程序。共3种获取随机数的方法：
+ *   (01)、通过System.currentTimeMillis()来获取一个当前时间毫秒数的long型数字。
+ *   (02)、通过Math.random()返回一个0到1之间的double值。
+ *   (03)、通过Random类来产生一个随机数，这个是专业的Random工具类，功能强大。
+ *
+ * @author skywang
+ * @email kuiwu-wang@163.com
+ */
+public class RandomTest{
+
+    public static void main(String args[]){
+
+        // 通过System的currentTimeMillis()返回随机数
+        testSystemTimeMillis();
+
+        // 通过Math的random()返回随机数
+        testMathRandom();
+
+        // 新建“种子为1000”的Random对象，并通过该种子去测试Random的API
+        testRandomAPIs(new Random(1000), &quot; 1st Random(1000)&quot;);
+        testRandomAPIs(new Random(1000), &quot; 2nd Random(1000)&quot;);
+        // 新建“默认种子”的Random对象，并通过该种子去测试Random的API
+        testRandomAPIs(new Random(), &quot; 1st Random()&quot;);
+        testRandomAPIs(new Random(), &quot; 2nd Random()&quot;);
+    }
+
+    /**
+     * 返回随机数-01：测试System的currentTimeMillis()
+     */
+    private static void testSystemTimeMillis() {
+        // 通过
+        final long l = System.currentTimeMillis();
+        // 通过l获取一个[0, 100)之间的整数
+        final int i = (int)( l % 100 );
+
+        System.out.printf(&quot;\n---- System.currentTimeMillis() ----\n l=%s i=%s\n&quot;, l, i);
+    }
+
+
+    /**
+     * 返回随机数-02：测试Math的random()
+     */
+    private static void testMathRandom() {
+        // 通过Math的random()函数返回一个double类型随机数，范围[0.0, 1.0)
+        final double d = Math.random();
+        // 通过d获取一个[0, 100)之间的整数
+        final int i = (int)(d*100);
+
+        System.out.printf(&quot;\n---- Math.random() ----\n d=%s i=%s\n&quot;, d, i);
+    }
+
+
+    /**
+     * 返回随机数-03：测试Random的API
+     */
+    private static void testRandomAPIs(Random random, String title) {
+        final int BUFFER_LEN = 5;
+
+        // 获取随机的boolean值
+        boolean b = random.nextBoolean();
+        // 获取随机的数组buf[]
+        byte[] buf = new byte[BUFFER_LEN];
+        random.nextBytes(buf);
+        // 获取随机的Double值，范围[0.0, 1.0)
+        double d = random.nextDouble();
+        // 获取随机的float值，范围[0.0, 1.0)
+        float f = random.nextFloat();
+        // 获取随机的int值
+        int i1 = random.nextInt();
+        // 获取随机的[0,100)之间的int值
+        int i2 = random.nextInt(100);
+        // 获取随机的高斯分布的double值
+        double g = random.nextGaussian();
+        // 获取随机的long值
+        long l = random.nextLong();
+
+        System.out.printf(&quot;\n---- %s ----\nb=%s, d=%s, f=%s, i1=%s, i2=%s, g=%s, l=%s, buf=[&quot;,
+                title, b, d, f, i1, i2, g, l);
+        for (byte bt:buf) 
+            System.out.printf(&quot;%s, &quot;, bt);
+        System.out.println(&quot;]&quot;);
+    }
+}</code></pre>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/java/">#java</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2012/03/02/java/others/2012-03-02-reference/">Java引用总结--StrongReference、SoftReference、WeakReference、PhantomReference</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2012/02/20/java/collection/2012-02-20-hashcode-and-equals/">Java 集合系列扩展(二) hashCode()和equals()的若干问题解答</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

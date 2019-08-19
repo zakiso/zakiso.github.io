@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/20/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/09/05/android/os/binder/2014-09-05-BinderCommunication-AddService03/" itemprop="url">Android Binder机制(七) addService详解03之 请求的反馈</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-09-05T01:03:00.000Z" itemprop="datePublished">9月 5 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            9 分钟 read (About 1331 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>前面两篇文章分别介绍了addService中”请求的发送”和”请求的处理”这两部分，本文将介绍addService请求的最后一部分–请求的反馈。<br>ServiceManager在处理完addService请求之后，添加了一个待处理事务到MediaPlayerService的事务列表中，并将MediaPlayerService唤醒。我们从上次MediaPlayerService休眠的地方开始，看看它被唤醒之后干了些什么。</p>
+</blockquote>
+<blockquote>
+<p>注意：本文是基于Android 4.4.2版本进行介绍的！</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-Binder驱动中binder-thread-read-的源码"><a href="#1-Binder驱动中binder-thread-read-的源码" class="headerlink" title="1. Binder驱动中binder_thread_read()的源码"></a>1. Binder驱动中binder_thread_read()的源码</h1><pre><code>static int binder_thread_read(struct binder_proc *proc,
+                struct binder_thread *thread,
+                void  __user *buffer, int size,
+                signed long *consumed, int non_block)
+{
+    ...
+    if (wait_for_proc_work) {
+      ...
+      if (non_block) {
+          ...
+      } else
+          // 阻塞式的读取，则阻塞等待事务的发生。
+          ret = wait_event_interruptible_exclusive(proc-&gt;wait, binder_has_proc_work(proc, thread));
+    } else {
+      ...
+    }
+    ...
+
+    while (1) {
+        struct binder_transaction_data tr;
+        struct binder_work *w;
+        struct binder_transaction *t = NULL;
+
+        // 如果当前线程的&quot;待完成工作&quot;不为空，则取出待完成工作。
+        if (!list_empty(&amp;thread-&gt;todo))
+            w = list_first_entry(&amp;thread-&gt;todo, struct binder_work, entry);
+        else if (!list_empty(&amp;proc-&gt;todo) &amp;&amp; wait_for_proc_work)
+            ...
+        else {
+            ...
+        }
+
+        ...
+
+        switch (w-&gt;type) {
+            case BINDER_WORK_TRANSACTION: {
+                t = container_of(w, struct binder_transaction, work);
+            } break;
+            ...
+        }
+
+        if (!t)
+            continue;
+
+        // t-&gt;buffer-&gt;target_node是NULL
+        if (t-&gt;buffer-&gt;target_node) {
+            ...
+        } else {
+            tr.target.ptr = NULL;
+            tr.cookie = NULL;
+            cmd = BR_REPLY;
+        }
+        // 交易码
+        tr.code = t-&gt;code;
+        tr.flags = t-&gt;flags;
+        tr.sender_euid = t-&gt;sender_euid;
+
+        if (t-&gt;from) {
+            struct task_struct *sender = t-&gt;from-&gt;proc-&gt;tsk;
+            tr.sender_pid = task_tgid_nr_ns(sender,
+                            current-&gt;nsproxy-&gt;pid_ns);
+        } else {
+            tr.sender_pid = 0;
+        }
+
+        // 数据大小
+        tr.data_size = t-&gt;buffer-&gt;data_size;
+        // 数据中对象的偏移数组的大小(即对象的个数)
+        tr.offsets_size = t-&gt;buffer-&gt;offsets_size;
+        // 数据
+        tr.data.ptr.buffer = (void *)t-&gt;buffer-&gt;data +
+                    proc-&gt;user_buffer_offset;
+        // 数据中对象的偏移数组
+        tr.data.ptr.offsets = tr.data.ptr.buffer +
+                    ALIGN(t-&gt;buffer-&gt;data_size,
+                        sizeof(void *));
+
+        // 将cmd指令写入到ptr，即传递到用户空间
+        if (put_user(cmd, (uint32_t __user *)ptr))
+            return -EFAULT;
+        // 将tr数据拷贝到用户空间
+        ptr += sizeof(uint32_t);
+        if (copy_to_user(ptr, &amp;tr, sizeof(tr)))
+            return -EFAULT;
+        ptr += sizeof(tr);
+
+        ...
+        // 删除已处理的事务
+        list_del(&amp;t-&gt;work.entry);
+        t-&gt;buffer-&gt;allow_user_free = 1;
+        // 设置回复信息
+        if (cmd == BR_TRANSACTION &amp;&amp; !(t-&gt;flags &amp; TF_ONE_WAY)) {
+            ...
+        } else {
+            t-&gt;buffer-&gt;transaction = NULL;
+            kfree(t);
+        }
+        break;
+    }
+
+done:
+
+    // 更新bwr.read_consumed的值
+    *consumed = ptr - buffer;
+
+    ...
+    return 0;
+}</code></pre><p>说明：MediaPlayerService进程被Service Manager唤醒，同时它的待处理事务队列中有ServiceManager添加的事务；此时，binder_has_thread_work()为true。因此，MediaPlayerService会继续往下执行。<br>(01) 进入while循环后，首先取出待处理事务。<br>(02) 事务的类型是BINDER_WORK_TRANSACTION，得到对应的binder_transaction*类型指针t之后，跳出switch语句。时t不为NULL，因此继续往下执行。下面的工作的目的，是将t中的数据转移到tr中(tr是事务交互数据包结构体binder_transaction_data对应的指针)，然后将指令和tr数据都拷贝到用户空间，让MediaPlayerService读取后进行处理。此时的指令是BR_REPLY。</p>
+<p>binder_thread_read()执行完毕之后，共反馈了两个指令到用户空间：BR_NOOP和BR_REPLY</p>
+<p>现在回到MediaPlayerService位于用户空间的进程。它会逐个解析Binder驱动反馈的指令。<br>对于BR_NOOP，MediaPlayerService不会做任何实质性的动作。<br>对于BR_REPLY，看看MediaPlayerService的处理流程。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-IPCThreadState-waitForResponse"><a href="#2-IPCThreadState-waitForResponse" class="headerlink" title="2. IPCThreadState::waitForResponse"></a>2. IPCThreadState::waitForResponse</h1><pre><code>status_t IPCThreadState::waitForResponse(Parcel *reply, status_t *acquireResult)
+{
+    int32_t cmd;
+    int32_t err;
+
+    while (1) {
+        if ((err=talkWithDriver()) &lt; NO_ERROR) break;
+        ...
+
+        cmd = mIn.readInt32();
+
+        switch (cmd) {
+            ...
+        case BR_REPLY:
+            {
+                binder_transaction_data tr;
+                err = mIn.read(&amp;tr, sizeof(tr));
+                ...
+
+                if (reply) {
+                    if ((tr.flags &amp; TF_STATUS_CODE) == 0) {
+                        reply-&gt;ipcSetDataReference(
+                            reinterpret_cast&lt;const uint8_t*&gt;(tr.data.ptr.buffer),
+                            tr.data_size,
+                            reinterpret_cast&lt;const size_t*&gt;(tr.data.ptr.offsets),
+                            tr.offsets_size/sizeof(size_t),
+                            freeBuffer, this);
+                    } else {
+                        ...
+                    }
+                } else {
+                    ...
+                }
+            }
+            goto finish;
+            ...
+        }
+    }
+
+finish:
+    ...
+
+    return err;
+}</code></pre><p>说明：在BR_REPLY分支中，先读取出数据，并保存到tr中。由于reply不为null，并且tr.flags &amp; TF_STATUS_CODE为0；因此，会执行reply-&gt;ipcSetDataReference()。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-Parcel-ipcSetDataReference"><a href="#3-Parcel-ipcSetDataReference" class="headerlink" title="3. Parcel::ipcSetDataReference"></a>3. Parcel::ipcSetDataReference</h1><pre><code>void Parcel::ipcSetDataReference(const uint8_t* data, size_t dataSize,
+    const size_t* objects, size_t objectsCount, release_func relFunc, void* relCookie)     
+{
+    freeDataNoInit();                   
+    mError = NO_ERROR;
+    mData = const_cast&lt;uint8_t*&gt;(data); 
+    mDataSize = mDataCapacity = dataSize;
+    mDataPos = 0;
+    mObjects = const_cast&lt;size_t*&gt;(objects);
+    mObjectsSize = mObjectsCapacity = objectsCount;
+    mNextObjectHint = 0;
+    mOwner = relFunc;
+    mOwnerCookie = relCookie;           
+    scanForFds();
+}</code></pre><p>说明：ipcSetDataReference()是根据参数的值重新初始化Parcel的数据和对象。<br>(01) freeDataNoInit()的目的是释放原有的内存。为接下来保存Binder驱动反馈的数据做准备。<br>(02) 在<a href="/2014/09/05/BinderCommunication-AddService02/">Android Binder机制(六) addService详解02之 请求的处理</a>中，ServiceManager反馈数据时，我们知道它对应的BR_REPLY的数据实际上是空的！因此，这里的mDataSize和mObjectsSize都是0。</p>
+<p>实际上，Binder驱动反馈给MediaPlayerService的指令就是告诉它addService已经成功处理完毕！</p>
+<p>在MediaPlayerService解析完Binder驱动反馈的数据之后，它会层层向上返回。这样，MediaPlayerService::instantiate()也就正式执行完了！<br>MediaPlayerService::instantiate()执行完毕，但是MediaPlayerService进程似乎还没有进入消息循环中等到Client的请求！那么，它是何时进入消息循环的呢？回到MediaPlayerService进程的main()函数入口中，它后面是通过startThreadPool()进入消息循环的。这部分的内容，我们下一章再来介绍。</p>
+<pre><code>int main(int argc, char** argv)
+{
+    ...
+
+    if (doLog &amp;&amp; (childPid = fork()) != 0) {
+        ...
+    } else {
+        ...
+        MediaPlayerService::instantiate();
+        ...
+        ProcessState::self()-&gt;startThreadPool();
+        IPCThreadState::self()-&gt;joinThreadPool();
+    }
+}</code></pre>
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/19/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/21/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/19/">19</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/20/">20</a></li>
+        
+        <li><a class="pagination-link" href="/page/21/">21</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Category: android - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/categories/android/page/3/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section section-heading">
+    <div class="container">
+        <div class="content">
+            <h5><i class="far fa-folder"></i>android</h5>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/25/android/api_guide/tasks/2014-06-25-Loader/" itemprop="url">Android之Loader介绍</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-25T01:11:00.000Z" itemprop="datePublished">6月 25 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            25 分钟 read (About 3681 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文介绍Loader, CursorLoader, AsyncTaskLoader 和 LoaderManager。先给出它们的使用示例，然后再对它们的架构和原理进行分析。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">Loader简介</a><br><strong>2</strong>. <a href="#anchor2">Loader使用示例</a><br><strong>3</strong>. <a href="#anchor3">Loader架构和原理</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="Loader简介"><a href="#Loader简介" class="headerlink" title="Loader简介"></a>Loader简介</h1><p><strong>Loader</strong>：是一个执行异步数据加载的抽象类。它是AsyncTaskLoader的父类，CursorLoader的祖父类。</p>
+<p><strong>AsyncTaskLoader</strong>：它是继承于Loader的抽象类。在AsyncTaskLoader中有AsyncTask用来执行异步工作。</p>
+<p><strong>CursorLoader</strong>：它是AsyncTaskLoader的子类。它可以查询ContentResolver然后返回一个Cursor，同时CursorLoader内包含ContentObserver对象来监听Cursor数据的变化。</p>
+<p><strong>LoaderManager</strong>：它是一个抽像类，作用是用来管理Loader。LoaderManager关联到一个Activity或Fragment；例如，在Activity中通过getLoaderManager()可以获取到一个LoaderManager对象。</p>
+<p><strong>LoaderManager.LoaderCallbacks</strong>：它提供了与”Activity或Fragment”交互的接口。LoaderCallbacks中共包行三个接口：</p>
+<blockquote>
+<ol>
+<li>onCreateLoader()：根据所给出的ID，初始化并返回一个新的加载器。</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li>onLoadFinished()：当一个先前被创建的加载器完成了它的加载过程时被调用。</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="3">
+<li>onLoaderReset()：当一个先前被创建的加载器被重置时被调用，然后使加载器的数据无效。</li>
+</ol>
+</blockquote>
+<p>总结：Loader, AsyncTaskLoader和CursorLoader都是用来提供异步加载的类；而LoaderManager则提供了管理这些异步加载类的接口。此外，Activity或Fragment保护了获取LoaderManager的接口，通过这样的接口，就可以在Activity或Fragment中实现异步加载任务！</p>
+<p><a name="anchor2"></a></p>
+<h1 id="Loader使用示例"><a href="#Loader使用示例" class="headerlink" title="Loader使用示例"></a>Loader使用示例</h1><p>下面通过一则示例演示Fragment中执行异步加载的完整流程！该示例中，会在FragmentActivity中采用异步加载的方式查找并显示数据库中所有的图片的相关信息。</p>
+<p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/loader/loader_picture/LoaderTest" target="_blank" rel="noopener">Loader示例的完整源码</a></p>
+<h2 id="1-获取LoaderManager，并执行initLoader"><a href="#1-获取LoaderManager，并执行initLoader" class="headerlink" title="1. 获取LoaderManager，并执行initLoader()"></a>1. 获取LoaderManager，并执行initLoader()</h2><pre><code>public class LoaderTest extends FragmentActivity
+    implements LoaderCallbacks&lt;Cursor&gt;, OnItemClickListener {
+
+    ...
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        listView = (ListView)findViewById(android.R.id.list);
+        simpleCursorAdapter = new SimpleCursorAdapter(
+                this, 
+                R.layout.list_item, 
+                null, 
+                STORE_IMAGES, 
+                new int[] { R.id.item_title, R.id.item_value}
+                );  
+
+        simpleCursorAdapter.setViewBinder(new ImageLocationBinder());
+        listView.setAdapter(simpleCursorAdapter);
+        // 注意此处是getSupportLoaderManager()，而不是getLoaderManager()方法。
+        getSupportLoaderManager().initLoader(0, null, this);
+
+        listView.setOnItemClickListener(this);
+    }   
+}</code></pre><p>说明：需要重点关注的是getSupportLoaderManager()，它的作用是获取LoaderManager。然后，通过initLoader()初始化Loader。</p>
+<p>initLoader()的完整声明如下：</p>
+<pre><code>public &lt;D&gt; Loader&lt;D&gt; initLoader(int id, Bundle args, LoaderManager.LoaderCallbacks&lt;D&gt; callback);</code></pre><p>说明：<br>(01) id是Loader的唯一标识。<br>(02) args是Bundle，这里赋值位null。<br>(03) callback是回调函数。后面会给出回调的实现。  </p>
+<h2 id="2-实现LoaderManager-LoaderCallbacks接口"><a href="#2-实现LoaderManager-LoaderCallbacks接口" class="headerlink" title="2. 实现LoaderManager.LoaderCallbacks接口"></a>2. 实现LoaderManager.LoaderCallbacks接口</h2><p>LoaderCallbacks中包行onCreateLoader(), onLoaderReset(), onLoadFinished()三个接口。下面是它们的实现：</p>
+<pre><code>@Override
+public Loader&lt;Cursor&gt; onCreateLoader(int arg0, Bundle arg1) {
+    CursorLoader cursorLoader = new CursorLoader(
+            this, 
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, 
+            STORE_IMAGES, 
+            null, 
+            null, 
+            null);
+    return cursorLoader;
+}
+
+@Override
+public void onLoaderReset(Loader&lt;Cursor&gt; arg0) {
+    simpleCursorAdapter.swapCursor(null);
+}
+
+@Override
+public void onLoadFinished(Loader&lt;Cursor&gt; arg0, Cursor cursor) {
+    simpleCursorAdapter.swapCursor(cursor);
+}</code></pre><p>说明：<br>(01) onCreateLoader()会在初始化Loader之后执行，它的作用是返回一个Loader对象。<br>(02) 而onLoadFinished()是当异步加载完成之后会被执行，当Loader加载完数据时，我们会通过 simpleCursorAdapter.swapCursor(cursor)将simpleCursorAdapter切换到新的Cursor对象(即，加载完后保存数据的对象)。不同于changeCursor()，changeCursor()在切换到新的Cursor之后，会将旧的Cursor关闭掉；而swapCursor()切换到新的Cursor之后，不会关闭旧的Cursor，如果旧的Cursor存在的话，它会返回旧的Cursor。<br>(03) onLoaderReset()则是当异步加载起被重置时会被调用。当Loader被重置会，我们通过simpleCursorAdapter.swapCursor(null)将Cursor设为null。</p>
+<h2 id="3-其他操作"><a href="#3-其他操作" class="headerlink" title="3. 其他操作"></a>3. 其他操作</h2><p>经过上面两步之后，已经能成功的使用异步加载数据了。得到的数据保存在SimpleCursorAdapter对象中，接下来需要做的就是在SimpleCursorAdapter中显示数据。</p>
+<p>在onCreate()中，我们通过simpleCursorAdapter.setViewBinder(new ImageLocationBinder())设置了SimpleCursorAdapter的ViewBinder对象。下面看看ViewBinder中是如何显示的：</p>
+<pre><code>// 将图片的位置绑定到视图
+private class ImageLocationBinder implements ViewBinder {
+    @Override
+    public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+        if (columnIndex == 1) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            String path = cursor.getString(column_index);
+            ((TextView)view).setText(&quot;Location: &quot;+path);
+            return true;
+        }
+
+        return false;
+    }
+}</code></pre><p>至此，数据的异步加载示例差不多介绍完了。总的来说很简单，先获取LoaderManager对象，然后通过initLoader()初始化Loader。接着，需要作的是实现LoaderCallbacks接口！LoaderCallbacks接口中，需要重点关注的是onCreateLoader()和onLoadFinished()接口！</p>
+<p><a name="anchor3"></a></p>
+<h1 id="Loader架构和原理"><a href="#Loader架构和原理" class="headerlink" title="Loader架构和原理"></a>Loader架构和原理</h1><p>在Loader简介中，我们大致介绍了Loader, LoaderManager各个类的作用。这里，我们分析一下它们的源码来查看它们是如何工作的。主要解决的有以下几个问题：<br>(01) <strong>Loader的异步加载原理。也就是说Loader异步是通过什么实现的？是一个Thread，还是AsyncTask，还是其他的什么方式</strong>？<br>(02) <strong>onCreateLoader()和onLoadFinished()是如何回调的。尤其是onLoadFinished()，当数据加载完时，是如何回调的</strong>？<br>(03) <strong>当发生Activity或Fragment被重新加载(例如，发生旋屏动作)时，Loader不会重新加载，它里面的数据仍然存在。这是如何做到的</strong>？<br>(04) <strong>Loader异步加载器，能够自动更新数据。它又是如何做到的</strong>？  </p>
+<h2 id="1-异步加载原理"><a href="#1-异步加载原理" class="headerlink" title="1. 异步加载原理"></a>1. 异步加载原理</h2><p>涉及到的文件：<br>frameworks/base/core/java/android/app/LoaderManager.java<br>frameworks/base/core/java/android/content/Loader.java<br>frameworks/base/core/java/android/content/AsyncTaskLoader.java<br>frameworks/base/core/java/android/content/CursorLoader.java</p>
+<h3 id="1-1-initLoader"><a href="#1-1-initLoader" class="headerlink" title="1.1 initLoader()"></a>1.1 initLoader()</h3><p>LoaderManager.java中initLoader()源码如下：</p>
+<pre><code>public &lt;D&gt; Loader&lt;D&gt; initLoader(int id, Bundle args, LoaderManager.LoaderCallbacks&lt;D&gt; callback) {
+    if (mCreatingLoader) {
+        throw new IllegalStateException(&quot;Called while creating a loader&quot;);
+    }   
+
+    LoaderInfo info = mLoaders.get(id);
+
+    if (DEBUG) Log.v(TAG, &quot;initLoader in &quot; + this + &quot;: args=&quot; + args);
+
+    if (info == null) {
+        // Loader doesn&apos;t already exist; create.
+        info = createAndInstallLoader(id, args,  (LoaderManager.LoaderCallbacks&lt;Object&gt;)callback);
+        if (DEBUG) Log.v(TAG, &quot;  Created new loader &quot; + info);
+    } else {
+        if (DEBUG) Log.v(TAG, &quot;  Re-using existing loader &quot; + info);
+        info.mCallbacks = (LoaderManager.LoaderCallbacks&lt;Object&gt;)callback;
+    }   
+
+    if (info.mHaveData &amp;&amp; mStarted) {
+        // If the loader has already generated its data, report it now.
+        info.callOnLoadFinished(info.mLoader, info.mData);
+    }   
+
+    return (Loader&lt;D&gt;)info.mLoader;
+}   </code></pre><p>说明：<br>(01) initLoader()会现通过mLoaders.get(id)来根据id获取LoaderInfo对象。如果Activity或Fragment第一次调用initLoader()，则获取到的LoaderInfo对象为null。<br>(02) 如果info为null，则执行createAndInstallLoader()来创建LoaderInfo对象。  </p>
+<h3 id="1-2-createAndInstallLoader"><a href="#1-2-createAndInstallLoader" class="headerlink" title="1.2 createAndInstallLoader()"></a>1.2 createAndInstallLoader()</h3><p>LoaderManager.java中createAndInstallLoader()源码如下：</p>
+<pre><code>private LoaderInfo createLoader(int id, Bundle args,
+        LoaderManager.LoaderCallbacks&lt;Object&gt; callback) {
+    LoaderInfo info = new LoaderInfo(id, args,  (LoaderManager.LoaderCallbacks&lt;Object&gt;)callback);
+    Loader&lt;Object&gt; loader = callback.onCreateLoader(id, args);
+    info.mLoader = (Loader&lt;Object&gt;)loader;
+    return info;
+}
+
+private LoaderInfo createAndInstallLoader(int id, Bundle args,
+        LoaderManager.LoaderCallbacks&lt;Object&gt; callback) {
+    try {
+        mCreatingLoader = true;
+        LoaderInfo info = createLoader(id, args, callback);
+        installLoader(info);
+        return info;
+    } finally {
+        mCreatingLoader = false;
+    }
+}
+
+void installLoader(LoaderInfo info) {
+    mLoaders.put(info.mId, info);
+    if (mStarted) {
+        // The activity will start all existing loaders in it&apos;s onStart(),
+        // so only start them here if we&apos;re past that point of the activitiy&apos;s
+        // life cycle
+        info.start();
+    }
+}</code></pre><p>说明：<br>(01) createAndInstallLoader()会分别调用createLoader()和installLoader()接口。<br>(02) createLoader()会新建LoaderInfo对象，然后调用callback.onCreateLoader()接口。<strong>这里的onCreateLoader()就是我们实现的LoaderCallbacks接口中的onCreateLoader()接口</strong>。<br>(03) initLoader()中会调用info.start()接口。  </p>
+<h3 id="1-3-LoaderInfo中的start"><a href="#1-3-LoaderInfo中的start" class="headerlink" title="1.3 LoaderInfo中的start()"></a>1.3 LoaderInfo中的start()</h3><p>LoaderManager.java中的内部类LoaderInfo的源码如下：</p>
+<pre><code>final class LoaderInfo implements Loader.OnLoadCompleteListener&lt;Object&gt;,
+        Loader.OnLoadCanceledListener&lt;Object&gt; {
+
+    final int mId;
+    final Bundle mArgs;
+    LoaderManager.LoaderCallbacks&lt;Object&gt; mCallbacks;
+    Loader&lt;Object&gt; mLoader;
+
+    ...
+
+    public LoaderInfo(int id, Bundle args, LoaderManager.LoaderCallbacks&lt;Object&gt; callbacks) {
+        mId = id;
+        mArgs = args;
+        mCallbacks = callbacks;
+    }
+
+    void start() {
+        if (mRetaining &amp;&amp; mRetainingStarted) {
+            mStarted = true;
+            return;
+        }
+
+        if (mStarted) {
+            return;
+        }
+
+        mStarted = true;
+
+        if (DEBUG) Log.v(TAG, &quot;  Starting: &quot; + this);
+        if (mLoader == null &amp;&amp; mCallbacks != null) {
+           mLoader = mCallbacks.onCreateLoader(mId, mArgs);
+        }
+        if (mLoader != null) {
+            if (mLoader.getClass().isMemberClass()
+                    &amp;&amp; !Modifier.isStatic(mLoader.getClass().getModifiers())) {
+                throw new IllegalArgumentException(
+                        &quot;Object returned from onCreateLoader must not be a non-static inner member class: &quot;
+                        + mLoader);
+            }
+            if (!mListenerRegistered) {
+                mLoader.registerListener(mId, this);
+                mLoader.registerOnLoadCanceledListener(this);
+                mListenerRegistered = true;
+            }
+            mLoader.startLoading();
+        }
+    }
+
+    ...
+}</code></pre><p>说明：start()中一个非常重要的成员是mLoader。<strong>它就是onCreateLoader()返回的Loader对象</strong>。start()会调用mLoaders.startLoading()。</p>
+<h3 id="1-4-startLoading"><a href="#1-4-startLoading" class="headerlink" title="1.4 startLoading()"></a>1.4 startLoading()</h3><p>下面查看startLoading的相关代码。查看代码时，请记得：Loader.java, AsyncTaskLoader和CursorLoader这三者之间存在继承关系！</p>
+<pre><code>// 在Loader.java中
+public final void startLoading() {
+    mStarted = true;
+    mReset = false;
+    mAbandoned = false;
+    onStartLoading();
+}
+
+// 在CursorLoader.java中
+@Override
+protected void onStartLoading() {
+    if (mCursor != null) {
+        deliverResult(mCursor);
+    }   
+    if (takeContentChanged() || mCursor == null) {
+        forceLoad();
+    }   
+}   </code></pre><p>说明：startLoading()是在Loader.java中定义的，它调用了onStartLoading()。而CursorLoader.java覆盖了onStartLoading()函数。在onStartLoading()中，此时的mCursor是为null；所以，它会执行forceLoad()。</p>
+<h3 id="1-5-forceLoad"><a href="#1-5-forceLoad" class="headerlink" title="1.5 forceLoad()"></a>1.5 forceLoad()</h3><p>下面查看forceLoad的相关代码。</p>
+<pre><code>// 在Loader.java中
+public void forceLoad() {
+    onForceLoad();
+}
+
+// 在AsyncTaskLoader.java中
+@Override
+protected void onForceLoad() {
+    super.onForceLoad();
+    cancelLoad();
+    mTask = new LoadTask();
+    if (DEBUG) Slog.v(TAG, &quot;Preparing load: mTask=&quot; + mTask);
+    executePendingTask();
+}  
+
+// 在AsyncTaskLoader.java中
+void executePendingTask() {
+    if (mCancellingTask == null &amp;&amp; mTask != null) {
+        if (mTask.waiting) {
+            mTask.waiting = false;
+            mHandler.removeCallbacks(mTask);
+        }
+        if (mUpdateThrottle &gt; 0) {
+            long now = SystemClock.uptimeMillis();
+            if (now &lt; (mLastLoadCompleteTime+mUpdateThrottle)) {
+                // Not yet time to do another load.
+                if (DEBUG) Slog.v(TAG, &quot;Waiting until &quot;
+                        + (mLastLoadCompleteTime+mUpdateThrottle)
+                        + &quot; to execute: &quot; + mTask);
+                mTask.waiting = true;
+                mHandler.postAtTime(mTask, mLastLoadCompleteTime+mUpdateThrottle);
+                return;
+            }
+        }
+        if (DEBUG) Slog.v(TAG, &quot;Executing: &quot; + mTask);
+        mTask.executeOnExecutor(mExecutor, (Void[]) null);
+    }
+}</code></pre><p>说明：forceLoad()会调用onForceLoad()。而onForceLoad()中会新建LoadTask对象，然后执行executePendingTask()。在executePendingTask()中会调用LoadTask对象的executeOnExecutor()。</p>
+<h3 id="1-6-LoadTask"><a href="#1-6-LoadTask" class="headerlink" title="1.6 LoadTask"></a>1.6 LoadTask</h3><p>LoadTask是AsyncTaskLoader的内部类。实际上，它是AsyncTask的子类。在<a href="/2014/06/25/AsyncTask">介绍AsyncTask的文章中</a>，我们知道executeOnExecutor()会将任务提交到线程池中去执行，而这个被提交到线程池的任务会执行AsyncTask的doInBackground()。</p>
+<pre><code>// AsyncTaskLoader.java中
+final class LoadTask extends AsyncTask&lt;Void, Void, D&gt; implements Runnable {
+    private final CountDownLatch mDone = new CountDownLatch(1);
+
+    boolean waiting;
+
+    @Override
+    protected D doInBackground(Void... params) {
+        if (DEBUG) Slog.v(TAG, this + &quot; &gt;&gt;&gt; doInBackground&quot;);
+        try {
+            D data = AsyncTaskLoader.this.onLoadInBackground();
+            if (DEBUG) Slog.v(TAG, this + &quot;  &lt;&lt;&lt; doInBackground&quot;);
+            return data;
+        } catch (OperationCanceledException ex) {
+            if (!isCancelled()) {
+                throw ex;
+            }
+            if (DEBUG) Slog.v(TAG, this + &quot;  &lt;&lt;&lt; doInBackground (was canceled)&quot;, ex);
+            return null;
+        }
+    }
+
+    /* Runs on the UI thread */
+    @Override
+    protected void onPostExecute(D data) {
+        if (DEBUG) Slog.v(TAG, this + &quot; onPostExecute&quot;);
+        try {
+            AsyncTaskLoader.this.dispatchOnLoadComplete(this, data);
+        } finally {
+            mDone.countDown();
+        }
+    }
+
+    ...
+}</code></pre><p>说明：LoadTask的doInBackground()会调用onLoadInBackground()。</p>
+<h3 id="1-7-onLoadInBackground"><a href="#1-7-onLoadInBackground" class="headerlink" title="1.7 onLoadInBackground()"></a>1.7 onLoadInBackground()</h3><p>下面查看onLoadInBackground()的相关代码。</p>
+<pre><code>// AsyncTaskLoader.java中
+protected D onLoadInBackground() {
+    return loadInBackground();
+}
+
+// CursorLoader.java中
+@Override
+public Cursor loadInBackground() {
+    synchronized (this) {
+        if (isLoadInBackgroundCanceled()) {
+            throw new OperationCanceledException();
+        }
+        mCancellationSignal = new CancellationSignal();
+    }           
+    try {
+        Cursor cursor = getContext().getContentResolver().query(mUri, mProjection, mSelection,
+                mSelectionArgs, mSortOrder, mCancellationSignal);
+        if (cursor != null) {
+            try {
+                // Ensure the cursor window is filled.
+                cursor.getCount();
+                cursor.registerContentObserver(mObserver);
+            } catch (RuntimeException ex) {
+                cursor.close();
+                throw ex;
+            } 
+        }
+        return cursor;
+    } finally {
+        synchronized (this) {
+            mCancellationSignal = null;
+        }
+    }
+}   </code></pre><p>说明：loadInBackground()会执行查询。<strong>这就是后台任务真正执行的动作所在！</strong></p>
+<p>至此，我们已经回答了第一个问题：Loader的异步加载原理。实际上，Loader的异步加载是通过AsyncTask启动一个后台任务，在后台任务中再执行query()查询操作！</p>
+<h2 id="2-onLoadFinished是如何被回调的"><a href="#2-onLoadFinished是如何被回调的" class="headerlink" title="2. onLoadFinished是如何被回调的"></a>2. onLoadFinished是如何被回调的</h2><p>我们知道，当AsyncTask中的任务执行完时，会通过onPostExecute()反馈执行结果。下面，我们看看AsyncTask反馈的结果中是如何调用onLoadFinished()的。</p>
+<h3 id="2-1-onPostExecute"><a href="#2-1-onPostExecute" class="headerlink" title="2.1 onPostExecute"></a>2.1 onPostExecute</h3><p>下面看看onPostExecute()的相关代码。</p>
+<pre><code>// AsyncTaskLoader.java中
+@Override
+protected void onPostExecute(D data) {
+    if (DEBUG) Slog.v(TAG, this + &quot; onPostExecute&quot;);
+    try {
+        AsyncTaskLoader.this.dispatchOnLoadComplete(this, data);
+    } finally {
+        mDone.countDown();
+    }
+}
+
+// AsyncTaskLoader.java中
+void dispatchOnLoadComplete(LoadTask task, D data) {
+    if (mTask != task) {
+        if (DEBUG) Slog.v(TAG, &quot;Load complete of old task, trying to cancel&quot;);
+        dispatchOnCancelled(task, data);
+    } else {
+        if (isAbandoned()) {
+            // This cursor has been abandoned; just cancel the new data.
+            onCanceled(data);
+        } else {
+            commitContentChanged();
+            mLastLoadCompleteTime = SystemClock.uptimeMillis();
+            mTask = null;
+            if (DEBUG) Slog.v(TAG, &quot;Delivering result&quot;);
+            deliverResult(data);
+        }
+    }
+}</code></pre><p>说明：onPostExecute()会执行dispatchOnLoadComplete()，而后者会调用deliverResult()来分发消息。</p>
+<h3 id="2-2-deliverResult"><a href="#2-2-deliverResult" class="headerlink" title="2.2 deliverResult()"></a>2.2 deliverResult()</h3><pre><code>// CursorLoader.java中
+@Override
+public void deliverResult(Cursor cursor) {
+    if (isReset()) {
+        // An async query came in while the loader is stopped
+        if (cursor != null) {
+            cursor.close();
+        }   
+        return;
+    }   
+    Cursor oldCursor = mCursor;
+    mCursor = cursor;
+
+    if (isStarted()) {
+        super.deliverResult(cursor);
+    }   
+
+    if (oldCursor != null &amp;&amp; oldCursor != cursor &amp;&amp; !oldCursor.isClosed()) {
+        oldCursor.close();
+    }   
+}   
+
+// Loader.java中
+public void deliverResult(D data) {
+    if (mListener != null) {
+        mListener.onLoadComplete(this, data);
+    }
+}</code></pre><p>说明：CursorLoader.java中的deliverResult()会通过super.deliverResult()调用父类的deliverResult()，也就是会执行Loader.java中的deliverResult()。最终会执行mListener.onLoadComplete()。mListener是什么呢？它是我们在执行LoaderManager.java的start()函数时，通过mLoader.registerListener(mId, this)注册到Loader上的。也就是说，mListener是LoaderManager中的LoaderInfo对象。</p>
+<h3 id="2-3-LoaderInfo中的onLoadComplete"><a href="#2-3-LoaderInfo中的onLoadComplete" class="headerlink" title="2.3 LoaderInfo中的onLoadComplete()"></a>2.3 LoaderInfo中的onLoadComplete()</h3><pre><code>@Override
+public void onLoadComplete(Loader&lt;Object&gt; loader, Object data) {
+    if (DEBUG) Log.v(TAG, &quot;onLoadComplete: &quot; + this);
+
+    if (mDestroyed) {
+        if (DEBUG) Log.v(TAG, &quot;  Ignoring load complete -- destroyed&quot;);
+        return;
+    }
+
+    if (mLoaders.get(mId) != this) {
+        if (DEBUG) Log.v(TAG, &quot;  Ignoring load complete -- not active&quot;);
+        return;
+    }
+
+    LoaderInfo pending = mPendingLoader;
+    if (pending != null) {
+        mPendingLoader = null;
+        mLoaders.put(mId, null);
+        destroy();
+        installLoader(pending);
+        return;
+    }
+
+    if (mData != data || !mHaveData) {
+        mData = data;
+        mHaveData = true;
+        if (mStarted) {
+            callOnLoadFinished(loader, data);
+        }
+    }
+
+    LoaderInfo info = mInactiveLoaders.get(mId);
+    if (info != null &amp;&amp; info != this) {
+        info.mDeliveredData = false;
+        info.destroy();
+        mInactiveLoaders.remove(mId);
+    }
+
+    if (mActivity != null &amp;&amp; !hasRunningLoaders()) {
+        mActivity.mFragments.startPendingDeferredFragments();
+    }
+}
+
+void callOnLoadFinished(Loader&lt;Object&gt; loader, Object data) {
+    if (mCallbacks != null) {
+        String lastBecause = null;
+        if (mActivity != null) {
+            lastBecause = mActivity.mFragments.mNoTransactionsBecause;
+            mActivity.mFragments.mNoTransactionsBecause = &quot;onLoadFinished&quot;;
+        }
+        try {
+            if (DEBUG) Log.v(TAG, &quot;  onLoadFinished in &quot; + loader + &quot;: &quot;
+                    + loader.dataToString(data));
+            mCallbacks.onLoadFinished(loader, data);
+        } finally {
+            if (mActivity != null) {
+                mActivity.mFragments.mNoTransactionsBecause = lastBecause;
+            }
+        }
+        mDeliveredData = true;
+    }
+}</code></pre><p>说明：onLoadComplete()会调用callOnLoadFinished()，而callOnLoadFinished()最终会调用onLoadFinished()。<strong>这就是我们实现的LoaderCallbacks接口中的onLoadFinished()</strong>。</p>
+<p>至此，我们也搞明白了第二个问题onLoadFinished()是如何被回调的。当AsyncTask任务执行完时，会调用onPostExecute()；而onPostExecute()会通过LoaderManager，LoaderManager最终会调用onLoadFinished()。</p>
+<h2 id="3-当Activity或Fragment被重新加载时，Loader不会被重新加载。"><a href="#3-当Activity或Fragment被重新加载时，Loader不会被重新加载。" class="headerlink" title="3. 当Activity或Fragment被重新加载时，Loader不会被重新加载。"></a>3. 当Activity或Fragment被重新加载时，Loader不会被重新加载。</h2><p>这个原理其实非常简单，关键就是initLoader()的实现方式。</p>
+<pre><code>public &lt;D&gt; Loader&lt;D&gt; initLoader(int id, Bundle args, LoaderManager.LoaderCallbacks&lt;D&gt; callback) {
+    if (mCreatingLoader) {
+        throw new IllegalStateException(&quot;Called while creating a loader&quot;);
+    }   
+
+    LoaderInfo info = mLoaders.get(id);
+
+    if (DEBUG) Log.v(TAG, &quot;initLoader in &quot; + this + &quot;: args=&quot; + args);
+
+    if (info == null) {
+        // Loader doesn&apos;t already exist; create.
+        info = createAndInstallLoader(id, args,  (LoaderManager.LoaderCallbacks&lt;Object&gt;)callback);
+        if (DEBUG) Log.v(TAG, &quot;  Created new loader &quot; + info);
+    } else {
+        if (DEBUG) Log.v(TAG, &quot;  Re-using existing loader &quot; + info);
+        info.mCallbacks = (LoaderManager.LoaderCallbacks&lt;Object&gt;)callback;
+    }   
+
+    if (info.mHaveData &amp;&amp; mStarted) {
+        // If the loader has already generated its data, report it now.
+        info.callOnLoadFinished(info.mLoader, info.mData);
+    }   
+
+    return (Loader&lt;D&gt;)info.mLoader;
+}   </code></pre><p>说明：initLoader()会首先调用mLoaders.get(id)来获取id对应的LoaderInfo对象。如果Activity或Fragment是由于旋屏而发生重载，那么通过id获取到的LoaderInfo就不是null。那么initLoader()就会调用info.callOnLoadFinished()。</p>
+<h2 id="4-Loader异步加载器自动更新数据"><a href="#4-Loader异步加载器自动更新数据" class="headerlink" title="4. Loader异步加载器自动更新数据"></a>4. Loader异步加载器自动更新数据</h2><p>Loader自动更新数据是通过ContentObserver来实现的。</p>
+<h3 id="4-1-注册ContentResolver"><a href="#4-1-注册ContentResolver" class="headerlink" title="4.1 注册ContentResolver"></a>4.1 注册ContentResolver</h3><pre><code>// CursorLoader.java中
+@Override
+public Cursor loadInBackground() {
+    synchronized (this) {
+        if (isLoadInBackgroundCanceled()) {
+            throw new OperationCanceledException();
+        }
+        mCancellationSignal = new CancellationSignal();
+    }           
+    try {
+        Cursor cursor = getContext().getContentResolver().query(mUri, mProjection, mSelection,
+                mSelectionArgs, mSortOrder, mCancellationSignal);
+        if (cursor != null) {
+            try {
+                // Ensure the cursor window is filled.
+                cursor.getCount();
+                cursor.registerContentObserver(mObserver);
+            } catch (RuntimeException ex) {
+                cursor.close();
+                throw ex;
+            } 
+        }
+        return cursor;
+    } finally {
+        synchronized (this) {
+            mCancellationSignal = null;
+        }
+    }
+}   </code></pre><p>说明：在执行query()查询之后，如果得到的Cursor对象不是null。则通过cursor.registerContentObserver(mObserver)来监听该cursor的内容。</p>
+<h3 id="4-2-注册mObserver"><a href="#4-2-注册mObserver" class="headerlink" title="4.2 注册mObserver"></a>4.2 注册mObserver</h3><pre><code>// CursorLoader.java中
+public CursorLoader(Context context) {
+    super(context);
+    mObserver = new ForceLoadContentObserver();
+}
+
+// CursorLoader.java中
+public CursorLoader(Context context, Uri uri, String[] projection, String selection,
+        String[] selectionArgs, String sortOrder) {
+    super(context);
+    mObserver = new ForceLoadContentObserver();
+    mUri = uri;
+    mProjection = projection;
+    mSelection = selection;
+    mSelectionArgs = selectionArgs;
+    mSortOrder = sortOrder;
+}</code></pre><p>说明：在创建CursorLoader对象时，就创建了mObserver，它是ForceLoadContentObserver对象。</p>
+<h3 id="4-3-ForceLoadContentObserver"><a href="#4-3-ForceLoadContentObserver" class="headerlink" title="4.3 ForceLoadContentObserver"></a>4.3 ForceLoadContentObserver</h3><pre><code>// Loader.java
+public final class ForceLoadContentObserver extends ContentObserver {
+    public ForceLoadContentObserver() {
+        super(new Handler());
+    }
+
+    @Override
+    public boolean deliverSelfNotifications() {
+        return true;
+    }
+
+    @Override
+    public void onChange(boolean selfChange) {
+        onContentChanged();
+    }
+}
+
+// Loader.java中
+public void onContentChanged() {
+    if (mStarted) {
+        forceLoad();
+    } else {
+        // This loader has been stopped, so we don&apos;t want to load
+        // new data right now...  but keep track of it changing to
+        // refresh later if we start again.
+        mContentChanged = true;
+    }
+}</code></pre><p>说明：ForceLoadContentObserver是Loader.java的内部类，它继承于ContentObserver。当数据发生变化时，它会回调onChange()，进而调用onContentChanged()。而onContentChanged()则会执行forceLoad()。forceLoad()在前面已经介绍过了，它会启动AsyncTask被执行query查询操作！</p>
+<p>至此，几个问题都回答完了。Loader, AsyncTaskLoader, CursorLoader和LoaderManager的相互关系也整理完了！谢谢观赏！</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/25/android/api_guide/tasks/2014-06-25-AsyncTask/" itemprop="url">Android之AsyncTask介绍</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-25T01:11:00.000Z" itemprop="datePublished">6月 25 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            12 分钟 read (About 1840 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文介绍AsyncTask，它通常用于执行异步任务。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">AsyncTask介绍</a><br><strong>2</strong>. <a href="#anchor2">AsyncTask使用和示例</a><br><strong>3</strong>. <a href="#anchor3">AsyncTask原理</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="AsyncTask介绍"><a href="#AsyncTask介绍" class="headerlink" title="AsyncTask介绍"></a>AsyncTask介绍</h1><p>AsyncTask比Handler更轻量级一些，适用于简单的异步处理。</p>
+<p>使用AsyncTask时，注意重写以下几个方法：</p>
+<h2 id="1-doInBackground"><a href="#1-doInBackground" class="headerlink" title="1. doInBackground()"></a>1. doInBackground()</h2><p><strong>作用</strong>：执行后台任务。<br><strong>要求</strong>：必须重写！<br><strong>注意</strong>：在doInBackground()中不能进行UI操作！  </p>
+<h2 id="2-onPreExecute"><a href="#2-onPreExecute" class="headerlink" title="2. onPreExecute()"></a>2. onPreExecute()</h2><p><strong>作用</strong>：通常用于执行后台任务开始前的准备动作。在用户调用execute()后，并且在AsyncTask主动执行doInBackground()之前被调用。<br><strong>要求</strong>：选择性重写。如果不重写该函数，默认不执行任何动作  </p>
+<h2 id="3-onPostExecute"><a href="#3-onPostExecute" class="headerlink" title="3. onPostExecute()"></a>3. onPostExecute()</h2><p><strong>作用</strong>：通常用于处理后台动作的返回结果。在AsyncTask主动执行doInBackground()之前被调用。<br><strong>要求</strong>：选择性重写。如果不重写该函数，默认不执行任何动作  </p>
+<h2 id="4-onProgressUpdate"><a href="#4-onProgressUpdate" class="headerlink" title="4. onProgressUpdate()"></a>4. onProgressUpdate()</h2><p><strong>作用</strong>：通常用于执行后台任务执行期间的进度更新。因为doInBackground()中不能操作UI，假如我们想在后台任务处理时显示进度，可以在doInBackground()中调用publishProgress()，而publicProgress()会调用onProgressUpdate()；在onProgressUpdate()中进行UI操作即可。<br><strong>要求</strong>：选择性重写。如果不重写该函数，默认不执行任何动作  </p>
+<h2 id="5-onCancelled"><a href="#5-onCancelled" class="headerlink" title="5. onCancelled()"></a>5. onCancelled()</h2><p><strong>作用</strong>：通常用于执行取消AsyncTask任务时的相关动作。如果客户主动调用cancel()，则会执行onCancelled()；否则(AsyncTask执行完之后正常停止)，则不会调用onCancelled()。<br><strong>要求</strong>：选择性重写。如果不重写该函数，默认不执行任何动作  </p>
+<p><a name="anchor2"></a></p>
+<h1 id="AsyncTask使用和示例"><a href="#AsyncTask使用和示例" class="headerlink" title="AsyncTask使用和示例"></a>AsyncTask使用和示例</h1><p>下面是一个自定义的AsyncTask。</p>
+<pre><code>private class MyTask extends AsyncTask&lt;String, Integer, String&gt; {
+    //onPreExecute方法用于在执行后台任务前做一些UI操作
+    @Override
+    protected void onPreExecute() {
+        Log.i(TAG, &quot;onPreExecute&quot;);
+        textView.setText(&quot;loading...&quot;);
+    }
+
+    //doInBackground方法内部执行后台任务,不可在此方法内修改UI
+    @Override
+    protected String doInBackground(String... params) {
+        Log.i(TAG, &quot;doInBackground&quot;);
+        try {
+            for (int i=0; i&lt;6; i++) {
+                Log.d(TAG, &quot;doInBackground: publishProgress=&quot;+i);
+                publishProgress(20*i);
+                Thread.sleep(500);
+            }
+
+            Log.d(TAG, &quot;doInBackground: return OK!&quot;);
+            return &quot;OK&quot;;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Log.d(TAG, &quot;doInBackground: return FAIL!&quot;);
+        return &quot;FAIL&quot;;
+    }
+
+    //onProgressUpdate方法用于更新进度信息
+    @Override
+    protected void onProgressUpdate(Integer... progresses) {
+        Log.i(TAG, &quot;onProgressUpdate&quot;);
+        progressBar.setProgress(progresses[0]);
+        textView.setText(&quot;loading...&quot; + progresses[0] + &quot;%&quot;);
+    }
+
+    //onPostExecute方法用于在执行完后台任务后更新UI,显示结果
+    @Override
+    protected void onPostExecute(String result) {
+        Log.i(TAG, &quot;onPostExecute&quot;);
+        textView.setText(result);
+
+        execute.setEnabled(true);
+        cancel.setEnabled(false);
+    }
+
+    //onCancelled方法用于在取消执行中的任务时更改UI
+    @Override
+    protected void onCancelled() {
+        Log.i(TAG, &quot;onCancelled&quot;);
+        textView.setText(&quot;cancelled&quot;);
+        progressBar.setProgress(0);
+
+        execute.setEnabled(true);
+        cancel.setEnabled(false);
+    }
+}</code></pre><p>说明：<br>(01) textView是一个TextView对象，cancel和execute分别是两个Button按钮，而progressBar则是进度条。<br>(02) 在任务开始时会通过onPreExecute()更新TextView的显示内容。<br>(03) 在任务结束时通过onPreExecute()更新TextView的显示内容。<br>(04) 任务执行过程中会通过publishProgress()更新进度条。<br>(05) 如果任务被强制取消的话，会将进度条重置为0。 </p>
+<p>创建并执行AsyncTask的接口如下：</p>
+<pre><code>mTask = new MyTask();
+mTask.execute(&quot;http://www.baidu.com&quot;);</code></pre><p>取消AsyncTask的接口如下：</p>
+<pre><code>mTask.cancel();</code></pre><p>点击查看：<a href="TODO">AsyncTask示例完整原理</a></p>
+<p><a name="anchor3"></a></p>
+<h1 id="AsyncTask原理"><a href="#AsyncTask原理" class="headerlink" title="AsyncTask原理"></a>AsyncTask原理</h1><p>下面通过Android4.4.2的AsyncTask源码来对AsyncTask原理进行介绍。</p>
+<h2 id="1-AsyncTask构造函数"><a href="#1-AsyncTask构造函数" class="headerlink" title="1. AsyncTask构造函数"></a>1. AsyncTask构造函数</h2><pre><code>public AsyncTask() {
+    mWorker = new WorkerRunnable&lt;Params, Result&gt;() {
+        public Result call() throws Exception {
+            mTaskInvoked.set(true);
+
+            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            //noinspection unchecked
+            return postResult(doInBackground(mParams));
+        }
+    };
+
+    mFuture = new FutureTask&lt;Result&gt;(mWorker) {
+        @Override
+        protected void done() {
+            try {
+                postResultIfNotInvoked(get());
+            } catch (InterruptedException e) {
+                android.util.Log.w(LOG_TAG, e);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(&quot;An error occured while executing doInBackground()&quot;,
+                        e.getCause());
+            } catch (CancellationException e) {
+                postResultIfNotInvoked(null);
+            }
+        }
+    };
+}</code></pre><p>说明：</p>
+<p>(01) mWorker是个WorkerRunnable对象，而WorkerRunnable是Callable的实现类。而在”<a href="http://www.cnblogs.com/skywang12345/p/3544116.html" target="_blank" rel="noopener">线程池中关于Callable的介绍</a>“时，我们说过，Callable类似于Runnable接口，不同之处主要在于Callable能和Future配合使用获取任务的结果，而Runnable不能获取结果！<br>(02) mFuture是FutureTask对象，而FutureTask洽洽是Future的实现类。 mWorker和mFuture配合使用，能获取后台任务的结果！  </p>
+<h2 id="2-execute"><a href="#2-execute" class="headerlink" title="2. execute"></a>2. execute</h2><p>execute()的源码如下：</p>
+<pre><code>public final AsyncTask&lt;Params, Progress, Result&gt; execute(Params... params) {
+    return executeOnExecutor(sDefaultExecutor, params);
+}</code></pre><p>说明：sDefaultExecutor是线程池对象，而executeOnExecutor()是真正执行后台动作的地方。</p>
+<p>下面是线程池相关的代码：</p>
+<pre><code>private static final int CORE_POOL_SIZE = CPU_COUNT + 1;
+private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;
+private static final int KEEP_ALIVE = 1;
+
+public static final Executor THREAD_POOL_EXECUTOR
+        = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
+                TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory);
+
+...
+
+public static final Executor SERIAL_EXECUTOR = new SerialExecutor();
+private static volatile Executor sDefaultExecutor = SERIAL_EXECUTOR;
+
+private static class SerialExecutor implements Executor {
+    final ArrayDeque&lt;Runnable&gt; mTasks = new ArrayDeque&lt;Runnable&gt;();
+    Runnable mActive;
+
+    public synchronized void execute(final Runnable r) {
+        mTasks.offer(new Runnable() {
+            public void run() {
+                try {
+                    r.run();
+                } finally {
+                    scheduleNext();
+                }
+            }
+        });
+        if (mActive == null) {
+            scheduleNext();
+        }
+    }
+
+    protected synchronized void scheduleNext() {
+        if ((mActive = mTasks.poll()) != null) {
+            THREAD_POOL_EXECUTOR.execute(mActive);
+        }
+    }
+}</code></pre><p>说明：该线程池是”通过双向队列实现的串行线程池”。scheduleNext()每次只会执行一个任务。</p>
+<p>下面看看executeOnExecutor()的代码：</p>
+<pre><code>public final AsyncTask&lt;Params, Progress, Result&gt; executeOnExecutor(Executor exec,
+        Params... params) {
+    if (mStatus != Status.PENDING) {
+        switch (mStatus) {
+            case RUNNING:
+                throw new IllegalStateException(&quot;Cannot execute task:&quot;
+                        + &quot; the task is already running.&quot;);
+            case FINISHED:
+                throw new IllegalStateException(&quot;Cannot execute task:&quot;
+                        + &quot; the task has already been executed &quot;
+                        + &quot;(a task can be executed only once)&quot;);
+        }
+    }
+
+    mStatus = Status.RUNNING;
+
+    onPreExecute();
+
+    mWorker.mParams = params;
+    exec.execute(mFuture);
+
+    return this;
+}</code></pre><p>说明：<br>(01) executeOnExecutor()首先会对任务的状态进行处理。任务共三种姿态：  </p>
+<blockquote>
+<p>PENDING: 挂起状态。当AsyncTask被创建时，就进入了PENDING状态。<br>RUNNING: 运行状态。当AsyncTask被执行时，就进入了RUNNING状态。<br>FINISHED: 完成状态。当AsyncTask完成(被客户cancel()或正常运行完毕)时，就进入了FINISHED状态。  </p>
+</blockquote>
+<p>当任务是RUNNING或PENDING状态时，会抛出异常。这就决定了，一个AsyncTask只能被执行一次，即只能对一个AsyncTask调用一次execute()；如果要重新执行任务，则需要新建AsyncTask后再调用execute()。<br>(02) 接着，调用onPreExecute()。这也就是任务执行前的准备动作！<br>(03) 然后，调用exec.execute(mFuture)。作用是将任务提交到线程池中进行执行。线程池的代码前面已经给出，SerialExecutor中的execute()会执行r.run()任务。r.run()实际上是调用FutureTask中run()方法，而FutureTask的run()方法，则会执行Callable的call()函数，即会执行到mWorker的call()方法。而观察前面mWorker的run()方法，我们会发现它会调用doInBackground()接口，并通过postResult()返回任务执行结果。而postResult()的内容如下：   </p>
+<pre><code>private static final InternalHandler sHandler = new InternalHandler();
+
+private Result postResult(Result result) {
+    @SuppressWarnings(&quot;unchecked&quot;)
+    Message message = sHandler.obtainMessage(MESSAGE_POST_RESULT,
+            new AsyncTaskResult&lt;Result&gt;(this, result));
+    message.sendToTarget();
+    return result;
+}
+
+private static class InternalHandler extends Handler {
+    @SuppressWarnings({&quot;unchecked&quot;, &quot;RawUseOfParameterizedType&quot;})
+    @Override
+    public void handleMessage(Message msg) {
+        AsyncTaskResult result = (AsyncTaskResult) msg.obj;
+        switch (msg.what) {
+            case MESSAGE_POST_RESULT:
+                // There is only one result
+                result.mTask.finish(result.mData[0]);
+                break;
+            case MESSAGE_POST_PROGRESS:
+                result.mTask.onProgressUpdate(result.mData);
+                break;
+        }
+    }
+}</code></pre><p>说明：postResult()会发送MESSAGE_POST_RESULT给sHandler，而sHandler中会将任务执行结果传递给finish()。以下是finish()的代码：</p>
+<pre><code>private void finish(Result result) {
+    if (isCancelled()) {
+        onCancelled(result);
+    } else {
+        onPostExecute(result);
+    }
+    mStatus = Status.FINISHED;
+}</code></pre><p>说明：如果是正常执行结束，则调用onPostExecute()方法；否则(异常结束)，则调用onCancelled()方法。</p>
+<p>至此，AsyncTask的原理结果完毕！总的来说，就是通过线程池来实现的，AsyncTask的任务会提交到线程池中，执行完后，线程池再返回结果。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/23/android/api_guide/app_component/fragment/2014-06-23-DialogFragment/" itemprop="url">Android组件--Fragment(五)之 DialogFragment</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-23T02:25:00.000Z" itemprop="datePublished">6月 23 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            几秒 read (About 22 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>关于DialogFragment的相关内容。请参考：<a href="/2014/06/15/Dialog">android对话框</a></p>
+</blockquote>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/23/android/api_guide/app_component/fragment/2014-06-23-SelfDefine-ListPreference/" itemprop="url">Android组件--Fragment(三)之 自定义ListPreference</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-23T01:55:00.000Z" itemprop="datePublished">6月 23 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            10 分钟 read (About 1466 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文介绍自定义ListPreference的相关内容。</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="ListPreference自定义属性"><a href="#ListPreference自定义属性" class="headerlink" title="ListPreference自定义属性"></a>ListPreference自定义属性</h1><p>系统自带的ListPreference的列表中只能显示文本。如果想显示图片或其他内容，只有通过自定义ListPreference的方式。</p>
+<p>接下来，将通过示例来演示如何在ListPreference中显示图片。</p>
+<p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/fragment/preference_fragment/02_selfdeine_ListPreference_with_attr" target="_blank" rel="noopener">ListPreference示例的完整代码</a></p>
+<h2 id="1-自定义属性"><a href="#1-自定义属性" class="headerlink" title="1. 自定义属性"></a>1. 自定义属性</h2><p>添加文件res/values/attrs.xml，内容如下：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;resources&gt;
+    &lt;declare-styleable name=&quot;IconListPreference&quot;&gt;
+        &lt;attr name=&quot;entryIcons&quot; format=&quot;reference&quot; /&gt;
+    &lt;/declare-styleable&gt;
+&lt;/resources&gt;</code></pre><p>说明：<br>(01) name=”IconListPreference”，与自定义的ListPreference类的名称相对应。后面会实现一个继承于ListPreference的IconListPreference.java。<br>(02) name=”entryIcons”，这是属性的名称。<br>(03) format=”reference”，这描述属性的值是引用类型。因为，后面会根据资源id设置该属性，所以将属性格式设为reference。如果是颜色，设为format=”color”；如果是布尔类型，format=”boolean”；如果是字符串，设为format=”string”。  </p>
+<h2 id="2-自定义ListPreference"><a href="#2-自定义ListPreference" class="headerlink" title="2. 自定义ListPreference"></a>2. 自定义ListPreference</h2><h3 id="2-1-构造函数"><a href="#2-1-构造函数" class="headerlink" title="2.1 构造函数"></a>2.1 构造函数</h3><pre><code>public IconListPreference(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    mContext = context;
+
+    // 获取自定义的属性(attrs.xml中)对应行的TypedArray
+    TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.IconListPreference);
+    // 获取entryIcons属性对应的值
+    int iconResId = a.getResourceId(R.styleable.IconListPreference_entryIcons, -1);
+    if (iconResId != -1) {
+        setEntryIcons(iconResId);
+    }   
+
+    // 获取Preferece对应的key
+    mKey = getKey();
+    // 获取SharedPreferences
+    mPref = PreferenceManager.getDefaultSharedPreferences(context);
+    // 获取SharedPreferences.Editor
+    mEditor = mPref.edit();
+    // 获取Entry
+    // 注意：如果配置文件中没有android:entries属性，则getEntries()为空；
+    mEntries = getEntries();
+    // 获取Entry对应的值
+    // 注意：如果配置文件中没有android:entryValues属性，则getEntries()为空
+    mEntryValues = getEntryValues();
+
+    // 获取该ListPreference保存的值
+    String value = mPref.getString(mKey, &quot;&quot;);
+    mPosition = findIndexOfValue(value);
+    // 设置Summary
+    if (mPosition!=-1) {
+        setSummary(mEntries[mPosition]);
+        setIcon(mEntryIcons[mPosition]);
+    }   
+
+    a.recycle();</code></pre><p>   }   </p>
+<p>说明：<br>(01) 首先，根据obtainStyledAttributes()能获取自定义属性对应的TypedArray对象。<br>(02) 在自定义属性中，entryIcons对应的类名是IconListPreference。因为需要通过”类名”_”属性名”，即IconListPreference_entryIcons的方式来获取资源信息。<br>(03) getKey()是获取Preferece对应的Key。该Key是Preference对象的唯一标识。<br>(04) getEntries()是获取Preferece的Entry数组。<br>(05) getEntryValues()是获取Preferece的Entry对应的值的数组。<br>(06) setSummary()是设置Preferece的summary标题内容。<br>(07) setIcon()是设置Preferece的图标。  </p>
+<h3 id="2-2-自定义ListPreference中图片相关代码"><a href="#2-2-自定义ListPreference中图片相关代码" class="headerlink" title="2.2 自定义ListPreference中图片相关代码"></a>2.2 自定义ListPreference中图片相关代码</h3><pre><code>/**
+ * 设置图标：icons数组
+ */
+private void setEntryIcons(int[] entryIcons) {
+    mEntryIcons = entryIcons;
+}
+
+/**
+ * 设置图标：根据icon的id数组
+ */
+public void setEntryIcons(int entryIconsResId) {
+    TypedArray icons = getContext().getResources().obtainTypedArray(entryIconsResId);
+    int[] ids = new int[icons.length()];
+    for (int i = 0; i &lt; icons.length(); i++)
+        ids[i] = icons.getResourceId(i, -1);
+    setEntryIcons(ids);
+    icons.recycle();
+}</code></pre><p>说明：这两个函数是读取图片信息的。</p>
+<h3 id="2-3-自定义ListPreference弹出的列表选项"><a href="#2-3-自定义ListPreference弹出的列表选项" class="headerlink" title="2.3 自定义ListPreference弹出的列表选项"></a>2.3 自定义ListPreference弹出的列表选项</h3><pre><code>@Override
+protected void onPrepareDialogBuilder(Builder builder) {
+    super.onPrepareDialogBuilder(builder);
+
+    IconAdapter adapter = new IconAdapter(mContext);
+    builder.setAdapter(adapter, null);
+}</code></pre><p>说明：点击ListPreference，会弹出一个列表对话框。通过重写onPrepareDialogBuilder()，我们可以自定义弹出的列表对话框。这里是通过IconAdapter来显示的。</p>
+<pre><code>public class IconAdapter extends BaseAdapter{
+
+    private LayoutInflater mInflater;
+
+
+    public IconAdapter(Context context){
+        this.mInflater = LayoutInflater.from(context);
+    }
+    @Override
+    public int getCount() {
+        return mEntryIcons.length;
+    }
+
+    @Override
+    public Object getItem(int arg0) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int arg0) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        ViewHolder holder = null;
+        if (convertView == null) {
+
+            holder = new ViewHolder();
+
+            convertView = mInflater.inflate(R.layout.icon_adapter, parent, false);
+            holder.layout = (LinearLayout)convertView.findViewById(R.id.icon_layout);
+            holder.img = (ImageView)convertView.findViewById(R.id.icon_img);
+            holder.info = (TextView)convertView.findViewById(R.id.icon_info);
+            holder.check = (RadioButton)convertView.findViewById(R.id.icon_check);
+            convertView.setTag(holder);
+
+        }else {
+            holder = (ViewHolder)convertView.getTag();
+        }
+
+        holder.img.setBackgroundResource(mEntryIcons[position]);
+        holder.info.setText(mEntries[position]);
+        holder.check.setChecked(mPosition == position);
+
+        final ViewHolder fholder = holder;
+        final int fpos = position;
+        convertView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                v.requestFocus();
+                // 选中效果
+                fholder.layout.setBackgroundColor(Color.CYAN);
+
+                // 更新mPosition
+                mPosition = fpos;
+                // 更新Summary
+                IconListPreference.this.setSummary(mEntries[fpos]);
+                IconListPreference.this.setIcon(mEntryIcons[fpos]);
+                // 更新该ListPreference保存的值
+                mEditor.putString(mKey, mEntryValues[fpos].toString());
+                mEditor.commit();
+
+                // 取消ListPreference设置对话框
+                getDialog().dismiss();
+            }
+        });
+
+        return convertView;
+    }
+
+    // ListPreference每一项对应的Layout文件的结构体
+    private final class ViewHolder {
+        ImageView img;
+        TextView info;
+        RadioButton check;
+        LinearLayout layout;
+    }
+}</code></pre><p>说明：弹出的列表对话框中的每一项的内容是通过布局icon_adapter.xml来显示的。下面看看icon_adapter.xml的源码。</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:id=&quot;@+id/icon_layout&quot; 
+    android:orientation=&quot;horizontal&quot;
+    android:paddingLeft=&quot;6dp&quot;  
+    android:layout_width=&quot;fill_parent&quot;
+    android:layout_height=&quot;fill_parent&quot;&gt;
+
+
+    &lt;ImageView
+        android:id=&quot;@+id/icon_img&quot; 
+        android:layout_width=&quot;wrap_content&quot;
+        android:layout_height=&quot;wrap_content&quot; 
+        android:gravity=&quot;center_vertical&quot;
+        android:layout_margin=&quot;4dp&quot;/&gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/icon_info&quot; 
+        android:layout_width=&quot;0dp&quot;
+        android:layout_height=&quot;wrap_content&quot; 
+        android:layout_weight=&quot;1&quot;
+        android:paddingLeft=&quot;6dp&quot;
+        android:layout_gravity=&quot;left|center_vertical&quot;
+        android:textAppearance=&quot;?android:attr/textAppearanceLarge&quot; /&gt;
+
+    &lt;RadioButton
+        android:id=&quot;@+id/icon_check&quot;
+        android:layout_width=&quot;wrap_content&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:checked=&quot;false&quot;
+        android:layout_gravity=&quot;right|center_vertical&quot;
+        android:layout_marginRight=&quot;6dp&quot;/&gt;
+
+&lt;/LinearLayout&gt;</code></pre><p>至此，自定义的ListPreference就算完成了。下面就是如何使用它了。</p>
+<h2 id="3-使用该自定义ListPreference"><a href="#3-使用该自定义ListPreference" class="headerlink" title="3. 使用该自定义ListPreference"></a>3. 使用该自定义ListPreference</h2><p>我们是通过PreferenceFragment使用该自定义的ListPreference。</p>
+<h3 id="3-1-PreferenceFragment的配置文件"><a href="#3-1-PreferenceFragment的配置文件" class="headerlink" title="3.1 PreferenceFragment的配置文件"></a>3.1 PreferenceFragment的配置文件</h3><p>res/xml/preferences.xml的内容如下：</p>
+<pre><code>&lt;PreferenceScreen xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:iconlistpreference=&quot;http://schemas.android.com/apk/res/com.skw.fragmenttest&quot;&gt;
+
+    &lt;!-- 系统默认的ListPreference --&gt;
+    &lt;PreferenceCategory
+        android:title=&quot;PreferenceCategory A&quot;&gt;
+
+        &lt;!-- 
+          (01) android:key是Preferece的id
+          (02) android:title是Preferece的大标题
+          (03) android:summary是Preferece的小标题
+          (04) android:dialogTitle是对话框的标题
+          (05) android:defaultValue是默认值
+          (06) android:entries是列表中各项的说明
+          (07) android:entryValues是列表中各项的值
+          --&gt;
+        &lt;ListPreference  
+            android:key=&quot;list_preference&quot;  
+            android:dialogTitle=&quot;Choose font&quot;  
+            android:entries=&quot;@array/pref_font_types&quot;  
+            android:entryValues=&quot;@array/pref_font_types_values&quot;  
+            android:summary=&quot;sans&quot;  
+            android:title=&quot;Font&quot; 
+            android:defaultValue=&quot;sans&quot;/&gt; 
+    &lt;/PreferenceCategory&gt;
+
+    &lt;!-- 自定义的ListPreference --&gt;
+
+    &lt;PreferenceCategory
+        android:title=&quot;PreferenceCategory B&quot;&gt;
+
+        &lt;!-- 
+          iconlistpreference:entryIcons是自定义的属性
+          --&gt;
+        &lt;com.skw.fragmenttest.IconListPreference
+            android:key=&quot;icon_list_preference&quot;  
+            android:dialogTitle=&quot;ChooseIcon&quot;  
+            android:entries=&quot;@array/android_versions&quot;
+            android:entryValues=&quot;@array/android_version_values&quot;  
+            iconlistpreference:entryIcons=&quot;@array/android_version_icons&quot;
+            android:icon=&quot;@drawable/cupcake&quot;
+            android:summary=&quot;summary_icon_list_preference&quot;
+            android:title=&quot;title_icon_list_preference&quot; /&gt; 
+
+    &lt;/PreferenceCategory&gt;
+
+&lt;/PreferenceScreen&gt;</code></pre><p>说明：该配置文件中使用了”系统默认的ListPreference”和”自定义的ListPreference(即IconListPreference)”。<br>注意，<strong>IconListPreference中的”iconlistpreference:entryIcons”属性。前面的”iconlistpreference”与该文件的命名空间表示”xmlns:iconlistpreference=”<a href="http://schemas.android.com/apk/res/com.skw.fragmenttest&quot;中的iconlistpreference一样" target="_blank" rel="noopener">http://schemas.android.com/apk/res/com.skw.fragmenttest&quot;中的iconlistpreference一样</a>! 而entryIcons则是我们自定义的属性名称</strong>。 </p>
+<h3 id="3-2-自定义PreferenceFragment的代码"><a href="#3-2-自定义PreferenceFragment的代码" class="headerlink" title="3.2 自定义PreferenceFragment的代码"></a>3.2 自定义PreferenceFragment的代码</h3><pre><code>public class PrefsFragment extends PreferenceFragment {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        addPreferencesFromResource(R.xml.preferences);
+    }
+
+    ...
+}</code></pre><h2 id="4-使用PrefsFragment"><a href="#4-使用PrefsFragment" class="headerlink" title="4. 使用PrefsFragment"></a>4. 使用PrefsFragment</h2><p>下面，就可以在Activity中使用该PrefsFragment了。</p>
+<h2 id="4-1-使用PrefsFragment的Activity的代码"><a href="#4-1-使用PrefsFragment的Activity的代码" class="headerlink" title="4.1 使用PrefsFragment的Activity的代码"></a>4.1 使用PrefsFragment的Activity的代码</h2><pre><code>public class FragmentTest extends Activity {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        // 获取FragmentManager
+        FragmentManager fragmentManager = getFragmentManager();
+        // 获取FragmentTransaction        
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        PrefsFragment fragment = new PrefsFragment();
+        // 将fragment添加到容器frag_example中
+        fragmentTransaction.add(R.id.prefs, fragment);
+        fragmentTransaction.commit();
+    }   
+}</code></pre><h2 id="4-2-使用PrefsFragment的Activity的配置文件"><a href="#4-2-使用PrefsFragment的Activity的配置文件" class="headerlink" title="4.2 使用PrefsFragment的Activity的配置文件"></a>4.2 使用PrefsFragment的Activity的配置文件</h2><p>res/layout/main.xml的内容如下：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:orientation=&quot;vertical&quot;
+    android:layout_width=&quot;fill_parent&quot;
+    android:layout_height=&quot;fill_parent&quot;
+    &gt;
+
+    &lt;FrameLayout
+        android:id=&quot;@+id/prefs&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot;/&gt;
+
+&lt;/LinearLayout&gt;</code></pre><p><a name="anchor1"></a></p>
+<h1 id="ListPreference自定义说明"><a href="#ListPreference自定义说明" class="headerlink" title="ListPreference自定义说明"></a>ListPreference自定义说明</h1><p>如果你想通过提供API的方式，而不是配置属性的方式完成上面的工作。那么，也是可以办到的！</p>
+<p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/fragment/preference_fragment/03_selfdeine_ListPreference_plus_api" target="_blank" rel="noopener">修改后的自定义ListPreference源码</a></p>
+<p><strong>不过，还是建议采用配置属性的方式！</strong></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/23/android/api_guide/app_component/fragment/2014-06-23-ListFragment/" itemprop="url">Android组件--Fragment(四)之 ListFragment</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-23T01:45:00.000Z" itemprop="datePublished">6月 23 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            5 分钟 read (About 706 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文介绍ListFragment。</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="ListFragment简介"><a href="#ListFragment简介" class="headerlink" title="ListFragment简介"></a>ListFragment简介</h1><p>ListFragment继承于Fragment。因此它具有Fragment的特性，能够作为activity中的一部分，目的也是为了使页面设计更加灵活。</p>
+<p>相比Fragment，ListFragment的内容是以列表(list)的形式显示的。ListFragment的布局默认包含一个ListView。因此，在ListFragment对应的布局文件中，必须指定一个 android:id 为 “@android:id/list” 的ListView控件! </p>
+<h1 id="ListFragment使用示例"><a href="#ListFragment使用示例" class="headerlink" title="ListFragment使用示例"></a>ListFragment使用示例</h1><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/fragment/list_fragment/01_simple" target="_blank" rel="noopener">ListFragment的完整代码</a></p>
+<p>下面介绍在Activity中显示ListFragment的步骤。</p>
+<h2 id="1-Activity对应的代码"><a href="#1-Activity对应的代码" class="headerlink" title="1. Activity对应的代码"></a>1. Activity对应的代码</h2><pre><code>public class FragmentTest extends Activity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+    }   
+}</code></pre><h2 id="2-Activity对应的布局"><a href="#2-Activity对应的布局" class="headerlink" title="2. Activity对应的布局"></a>2. Activity对应的布局</h2><pre><code>&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:tools=&quot;http://schemas.android.com/tools&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;horizontal&quot; &gt;
+
+    &lt;fragment 
+        android:name=&quot;com.skw.fragmenttest.MyListFragment&quot;
+        android:id=&quot;@+id/myfragment&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot; /&gt;
+
+&lt;/LinearLayout&gt;</code></pre><p>说明：该Activity的布局中只包行了一个Fragment。下面看看MyListFragment的内容。</p>
+<h2 id="3-MyListFragment的内容"><a href="#3-MyListFragment的内容" class="headerlink" title="3. MyListFragment的内容"></a>3. MyListFragment的内容</h2><pre><code>public class MyListFragment extends ListFragment {
+    private static final String TAG = &quot;##MyListFragment##&quot;;
+
+    private ListView selfList;
+
+    String[] cities = {
+         &quot;Shenzhen&quot;,
+         &quot;Beijing&quot;,
+         &quot;Shanghai&quot;,
+         &quot;Guangzhou&quot;,
+         &quot;Wuhan&quot;,
+         &quot;Tianjing&quot;,
+         &quot;Changsha&quot;,
+         &quot;Xi&apos;an&quot;,
+         &quot;Chongqing&quot;,
+         &quot;Guilin&quot;,
+    };
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+            Bundle savedInstanceState) {
+        Log.d(TAG, &quot;onCreateView&quot;);
+        return inflater.inflate(R.layout.list_fragment, container, false);
+    }
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, &quot;onCreate&quot;);
+        super.onCreate(savedInstanceState);
+        // 设置ListFragment默认的ListView，即@id/android:list
+        this.setListAdapter(new ArrayAdapter&lt;String&gt;(getActivity(), 
+                android.R.layout.simple_list_item_1, cities));
+
+    }
+
+    public void onListItemClick(ListView parent, View v, 
+            int position, long id) {
+        Log.d(TAG, &quot;onListItemClick&quot;);
+        Toast.makeText(getActivity(), &quot;You have selected &quot; + cities[position],
+                Toast.LENGTH_SHORT).show();
+    }    
+}</code></pre><p>说明：MyListFragment是自定义的ListFragment。它使用了list_fragment.xml作为布局，并通过android.R.layout.simple_list_item_1显示ListView中的每一项。</p>
+<h2 id="4-list-fragment-xml的内容"><a href="#4-list-fragment-xml的内容" class="headerlink" title="4. list_fragment.xml的内容"></a>4. list_fragment.xml的内容</h2><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;vertical&quot; &gt;
+
+    &lt;!-- ListFragment对应的android:id值固定为&quot;@id/android:list&quot; --&gt;
+    &lt;ListView
+        android:id=&quot;@id/android:list&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot; 
+        android:drawSelectorOnTop=&quot;false&quot;
+        /&gt;
+
+&lt;/LinearLayout&gt;</code></pre><h1 id="自定义ListFragment"><a href="#自定义ListFragment" class="headerlink" title="自定义ListFragment"></a>自定义ListFragment</h1><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/fragment/list_fragment/02_self_layout" target="_blank" rel="noopener">自定义ListFragment的完整代码</a></p>
+<p>“Activity的布局以及代码”和前面一样，这里就不再重复说明。</p>
+<h2 id="3-MyListFragment的内容-1"><a href="#3-MyListFragment的内容-1" class="headerlink" title="3. MyListFragment的内容"></a>3. MyListFragment的内容</h2><pre><code>public class MyListFragment extends ListFragment {
+    private static final String TAG = &quot;##MyListFragment##&quot;;
+
+    private ListView selfList;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+            Bundle savedInstanceState) {
+        Log.d(TAG, &quot;onCreateView&quot;);
+        return inflater.inflate(R.layout.list_fragment, container, false);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        final String[] from = new String[] {&quot;title&quot;, &quot;info&quot;};
+        final int[] to = new int[] {R.id.text1, R.id.text2};
+
+        Log.d(TAG, &quot;onCreate&quot;);
+        super.onCreate(savedInstanceState);
+        // 建立SimpleAdapter，将from和to对应起来
+        SimpleAdapter adapter = new SimpleAdapter(
+                this.getActivity(), getSimpleData(), 
+                R.layout.item, from, to);
+        this.setListAdapter(adapter);
+    }
+
+    public void onListItemClick(ListView parent, View v, 
+            int position, long id) {
+        Log.d(TAG, &quot;onListItemClick&quot;);
+        Toast.makeText(getActivity(), 
+                &quot;You have selected &quot; + position,
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private List&lt;Map&lt;String, Object&gt;&gt; getSimpleData() {
+        List&lt;Map&lt;String, Object&gt;&gt; list = new ArrayList&lt;Map&lt;String, Object&gt;&gt;();
+
+        Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
+        map.put(&quot;title&quot;, &quot;Ferris wheel&quot;);
+        map.put(&quot;info&quot;, &quot;Suzhou Ferris wheel&quot;);
+        list.add(map);
+
+        map = new HashMap&lt;String, Object&gt;();
+        map.put(&quot;title&quot;, &quot;Flower&quot;);
+        map.put(&quot;info&quot;, &quot;Roser&quot;);
+        list.add(map);
+
+        map = new HashMap&lt;String, Object&gt;();
+        map.put(&quot;title&quot;, &quot;Disk&quot;);
+        map.put(&quot;info&quot;, &quot;Song Disk&quot;);
+        list.add(map);
+
+        return list;
+    }
+}</code></pre><p>说明：MyListFragment使用了R.layout.list_fragment作为布局，并且对于ListView中的每一项都使用了R.layout.item作为布局。</p>
+<h2 id="4-list-fragment-xml的内容-1"><a href="#4-list-fragment-xml的内容-1" class="headerlink" title="4. list_fragment.xml的内容"></a>4. list_fragment.xml的内容</h2><pre><code>&lt;!-- ListFragment对应的android:id值固定为&quot;@id/android:list&quot; --&gt;
+&lt;ListView
+    android:id=&quot;@id/android:list&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot; 
+    android:drawSelectorOnTop=&quot;false&quot;
+    /&gt;</code></pre><h2 id="5-item-xml的内容"><a href="#5-item-xml的内容" class="headerlink" title="5. item.xml的内容"></a>5. item.xml的内容</h2><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;vertical&quot; &gt;
+
+    &lt;TextView android:id=&quot;@+id/text1&quot;
+        android:textSize=&quot;12sp&quot;
+        android:textStyle=&quot;bold&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;/&gt;
+
+    &lt;TextView android:id=&quot;@+id/text2&quot;
+        android:textSize=&quot;24sp&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/23/android/api_guide/app_component/fragment/2014-06-23-PreferenceFragment/" itemprop="url">Android组件--Fragment(二)之 PreferenceFragment</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-23T01:35:00.000Z" itemprop="datePublished">6月 23 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            5 分钟 read (About 705 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文介绍PreferenceFragment。PreferenceFragment是Android提供的设置碎片。</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="PreferenceFragment使用说明"><a href="#PreferenceFragment使用说明" class="headerlink" title="PreferenceFragment使用说明"></a>PreferenceFragment使用说明</h1><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/fragment/preference_fragment/01_basic" target="_blank" rel="noopener">PreferenceFragment的完整代码</a></p>
+<h2 id="1-创建配置文件"><a href="#1-创建配置文件" class="headerlink" title="1. 创建配置文件"></a>1. 创建配置文件</h2><p>新建res/xml/preferences.xml，内容如下：</p>
+<pre><code>&lt;PreferenceScreen xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;
+
+    &lt;PreferenceCategory
+        android:title=&quot;PreferenceCategory A&quot;&gt;
+
+        &lt;!-- 
+          (01) android:key是Preferece的id
+          (02) android:title是Preferece的大标题
+          (03) android:summary是Preferece的小标题
+          --&gt;
+        &lt;CheckBoxPreference
+            android:key=&quot;checkbox_preference&quot;
+            android:title=&quot;title_checkbox_preference&quot;
+            android:summary=&quot;summary_checkbox_preference&quot; /&gt;
+
+    &lt;/PreferenceCategory&gt;
+
+    &lt;PreferenceCategory
+        android:title=&quot;PreferenceCategory B&quot;&gt;
+
+        &lt;!-- 
+          android:dialogTitle是对话框的标题
+          android:defaultValue是默认值
+          --&gt;
+        &lt;EditTextPreference
+            android:key=&quot;edittext_preference&quot;
+            android:title=&quot;title_edittext_preference&quot;
+            android:summary=&quot;null&quot;  
+            android:dialogTitle=&quot;dialog_title_edittext_preference&quot;
+            android:defaultValue=&quot;null&quot; /&gt;
+
+        &lt;!-- 
+          android:entries是列表中各项的说明
+          android:entryValues是列表中各项的值
+          --&gt;
+        &lt;ListPreference  
+            android:key=&quot;list_preference&quot;  
+            android:dialogTitle=&quot;Choose font&quot;  
+            android:entries=&quot;@array/pref_font_types&quot;  
+            android:entryValues=&quot;@array/pref_font_types_values&quot;  
+            android:summary=&quot;sans&quot;  
+            android:title=&quot;Font&quot; 
+            android:defaultValue=&quot;sans&quot;/&gt; 
+    &lt;/PreferenceCategory&gt;
+
+
+    &lt;PreferenceCategory
+        android:title=&quot;PreferenceCategory C&quot;&gt;
+
+        &lt;SwitchPreference
+            android:key=&quot;switch_preferece&quot;
+            android:title=&quot;title_switch_preferece&quot;
+            android:defaultValue=&quot;true&quot; /&gt;
+
+        &lt;SeekBarPreference
+            android:key=&quot;seekbar_preference&quot;
+            android:title=&quot;title_seekbar_preference&quot;
+            android:max=&quot;100&quot;
+            android:defaultValue=&quot;30&quot; /&gt;
+
+    &lt;/PreferenceCategory&gt;
+
+&lt;/PreferenceScreen&gt;</code></pre><p>说明：PreferenceFragment的组件很多，包括CheckBoxPreference, EditTextPreference, ListPreference, SwitchPreference, SeekBarPreference, VolumePreference等。这些组建的属性定义如下。<br>(01) android:key是Preferece的id，它是Preferece的唯一标识。<br>(02) android:title是Preferece的大标题。<br>(03) android:summary是Preferece的小标题。<br>(04) android:dialogTitle是对话框的标题。<br>(05) android:defaultValue是默认值。<br>(06) android:entries是列表中各项的说明。<br>(07) android:entryValues是列表中各项的值。  </p>
+<p>注意：SwitchPreference是API 14(Android4.0)才支持的。所以，要想使用SwitchPreference的话，必须在manifest中定义apk支持的最小版本。</p>
+<pre><code>&lt;uses-sdk android:minSdkVersion=&quot;14&quot; /&gt;</code></pre><h2 id="2-自定义PreferenceFragment"><a href="#2-自定义PreferenceFragment" class="headerlink" title="2. 自定义PreferenceFragment"></a>2. 自定义PreferenceFragment</h2><pre><code>public class PrefsFragment extends PreferenceFragment 
+    implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener {
+    private static final String TAG = &quot;##PrefsFragment##&quot;;
+
+    private static final String CHECK_PREFERENCE    = &quot;checkbox_preference&quot;;
+    private static final String EDITTEXT_PREFERENCE = &quot;edittext_preference&quot;;
+    private static final String LIST_PREFERENCE     = &quot;list_preference&quot;;
+    private static final String SWITCH_PREFERENCE   = &quot;switch_preferece&quot;;
+    private static final String SEEKBAR_PREFERENCE  = &quot;seekbar_preference&quot;;
+
+    private Preference mEditText;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Load the preferences from an XML resource
+        addPreferencesFromResource(R.xml.preferences);
+
+        mEditText = (Preference) findPreference(EDITTEXT_PREFERENCE);
+        mEditText.setOnPreferenceClickListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        // Set summary to be the user-description for the selected value
+        Preference connectionPref = findPreference(key);
+        if (key.equals(CHECK_PREFERENCE)) {
+            boolean checked = sharedPreferences.getBoolean(key, false);
+            Log.d(TAG, &quot;CheckBox: checked=&quot;+checked);
+        } else if (key.equals(EDITTEXT_PREFERENCE)) {
+            String value = sharedPreferences.getString(key, &quot;&quot;);
+            connectionPref.setSummary(value);
+            Log.d(TAG, &quot;EditText: value=&quot;+value);
+        } else if (key.equals(LIST_PREFERENCE)) {
+            String value = sharedPreferences.getString(key, &quot;&quot;);
+            connectionPref.setSummary(value);
+            Log.d(TAG, &quot;List: value=&quot;+value);
+        } else if (key.equals(SWITCH_PREFERENCE)) {
+            boolean checked = sharedPreferences.getBoolean(key, false);
+            Log.d(TAG, &quot;Switch: checked=&quot;+checked);
+        } else if (key.equals(SEEKBAR_PREFERENCE)) {
+            int value = sharedPreferences.getInt(key, 0);
+            Log.d(TAG, &quot;Seekbar: value=&quot;+value);
+        } 
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+        SharedPreferences sharedPreferences = preference.getSharedPreferences();
+        String value = sharedPreferences.getString(preference.getKey(), &quot;&quot;);
+        Log.d(TAG, &quot;onPreferenceClick: value=&quot;+value);
+
+        return true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+    }
+
+    @Override
+    public void onPause() {
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
+}</code></pre><p>说明：PreferenceFragment中的每一项都是一个SharedPreferences对象，它们会像SharedPreferences存储在该APK的私有数据区。监听PreferenceFragment中的成员有多种方式，常用的两种就是：<br>(01) 监听数据的变化：通过实现SharedPreferences.OnSharedPreferenceChangeListener接口，来监听PreferenceFragment中每一项的数据变化。<br>(02) 监听点击事件：通过实现Preference.OnPreferenceClickListener接口，来监听PreferenceFragment中每一项的点击动作。 </p>
+<h2 id="3-使用PreferenceFragment"><a href="#3-使用PreferenceFragment" class="headerlink" title="3. 使用PreferenceFragment"></a>3. 使用PreferenceFragment</h2><p>前面已经定义好了一个PreferenceFragment。接下来，就可以实例化它的对象，并将其在Activity中进行显示。</p>
+<pre><code>public class FragmentTest extends Activity {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //setContentView(R.layout.main);
+
+        getFragmentManager().beginTransaction().replace(android.R.id.content,  
+                new PrefsFragment()).commit();  
+    }
+}</code></pre>
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/23/android/api_guide/app_component/fragment/2014-06-23-Fragment/" itemprop="url">Android组件--Fragment(一)之 基础知识</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-23T01:25:00.000Z" itemprop="datePublished">6月 23 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            6 分钟 read (About 848 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>Fragment的内容很多。本章介绍Fragment的基础知识，包括：生命周期，以及如何使用Fragment。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">Fragment生命周期图</a><br><strong>2</strong>. <a href="#anchor2">Fragment创建方式</a><br><strong>3</strong>. <a href="#anchor3">Google示例说明</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="Fragment生命周期图"><a href="#Fragment生命周期图" class="headerlink" title="Fragment生命周期图"></a>Fragment生命周期图</h1><p>Fragment的生命周期图如下：</p>
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/training/01_getting_started/05_fragments/lifecycle/pic/fragment_lifecycle.png" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/training/01_getting_started/05_fragments/lifecycle/pic/fragment_lifecycle.png" alt></a></p>
+<p>说明：总的来说，Fragment和Activity的生命周期类似。需要注意的是，它相比于Activity，多了onAttach(), onDetch(), onCreateView()和onDestroyView()这几个回调函数；但是，却少了onRestart()。<br>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/training/01_getting_started/05_fragments/lifecycle" target="_blank" rel="noopener">Fragment生命周期测试源码</a>“</p>
+<p><a name="anchor2"></a></p>
+<h1 id="Fragment创建方式"><a href="#Fragment创建方式" class="headerlink" title="Fragment创建方式"></a>Fragment创建方式</h1><p>Fragment有两种使用方式：静态方式 和 动态方式。</p>
+<h2 id="1-静态方式"><a href="#1-静态方式" class="headerlink" title="1. 静态方式"></a>1. 静态方式</h2><p><strong>第一步</strong>：先定义一个Fragment子类。</p>
+<pre><code>public class ExampleFragment extends Fragment {
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+            Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.example_fragment, container, false);
+    }   
+}</code></pre><p>说明：ExampleFragment是Fragment的子类，它的布局定义是example_fragment.xml文件。</p>
+<p><strong>第二步</strong>：定义Fragment子类对应的布局文件。</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:tools=&quot;http://schemas.android.com/tools&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;horizontal&quot; &gt;
+
+    &lt;EditText android:id=&quot;@+id/edit_message&quot;
+        android:layout_width=&quot;0dp&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:layout_weight=&quot;1&quot;
+        android:hint=&quot;@string/edit_message&quot; /&gt;
+
+    &lt;Button
+        android:layout_width=&quot;wrap_content&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;@string/button_send&quot;
+        android:onClick=&quot;sendMessage&quot; /&gt;
+
+&lt;/LinearLayout&gt;</code></pre><p>说明：上面是example_fragment.xml的内容。</p>
+<p><strong>第三步</strong>：在需要用到该Fragment的Activity对应的布局中使用该Fragment。</p>
+<p>下面是引用Fragment的Activity的代码：</p>
+<pre><code>public class FragmentLayoutTest extends Activity
+{
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);  
+    } 
+}</code></pre><p>下面是main.xml的内容：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:orientation=&quot;vertical&quot;
+    android:layout_width=&quot;fill_parent&quot;
+    android:layout_height=&quot;fill_parent&quot;
+    &gt;
+    &lt;TextView
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;@string/fragment_intro&quot;
+        /&gt;
+
+   &lt;fragment android:name=&quot;com.skw.fragmentlayouttest.ExampleFragment&quot;
+        android:id=&quot;@+id/frag_example&quot;
+        android:layout_weight=&quot;1&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot;/&gt;
+
+&lt;/LinearLayout&gt;</code></pre><p>说明：在该布局文件中通过<fragment>调用了先前自定义的ExampleFragment。</fragment></p>
+<p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/training/01_getting_started/05_fragments/implemention_01" target="_blank" rel="noopener">静态方式的完整源码</a></p>
+<h2 id="2-动态方式"><a href="#2-动态方式" class="headerlink" title="2. 动态方式"></a>2. 动态方式</h2><p>重复”上面的第一步和第二步”，实现一个Fragment子类。</p>
+<p><strong>第三步</strong>：在需要用到该Fragment的Activity对应的布局中使用定义一个FrameLayout。</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:orientation=&quot;vertical&quot;
+    android:layout_width=&quot;fill_parent&quot;
+    android:layout_height=&quot;fill_parent&quot;
+    &gt;
+
+    &lt;TextView
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;@string/fragment_intro&quot;
+        /&gt;
+
+    &lt;FrameLayout
+        android:id=&quot;@+id/frag_example&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot;/&gt;
+
+&lt;/LinearLayout&gt;</code></pre><p><strong>第四步</strong>：在Activity中将Fragment填充到FrameLayout中。</p>
+<pre><code>public class FragmentLayoutTest extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        // 获取FragmentManager
+        FragmentManager fragmentManager = getFragmentManager();
+        // 获取FragmentTransaction        
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // 获取ExampleFragment
+        ExampleFragment fragment = new ExampleFragment();
+        // 将fragment添加到容器frag_example中
+        fragmentTransaction.add(R.id.frag_example, fragment);
+        fragmentTransaction.commit();
+    }
+}</code></pre><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/training/01_getting_started/05_fragments/implemention_02" target="_blank" rel="noopener">动态方式的完整源码</a></p>
+<p><a name="anchor3"></a></p>
+<h1 id="Google示例说明"><a href="#Google示例说明" class="headerlink" title="Google示例说明"></a>Google示例说明</h1><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/training/01_getting_started/05_fragments/google" target="_blank" rel="noopener">Google给出的Fragment的源码</a></p>
+<p>Google的官网上以此APK来对Fragment进行了简单介绍，点击查看：<a href="http://developer.android.com/intl/zh-cn/training/basics/fragments/index.html" target="_blank" rel="noopener">Google官网Fragment简介</a></p>
+<blockquote>
+<p>实际上，Google官网关于Fragment的讲解内容包括三部分：创建Fragment，用Fragment创建灵活的UI，Fragments之间的通信。</p>
+</blockquote>
+<blockquote>
+<ol>
+<li>如何创建Fragment，我在上面已经详细介绍过了。  </li>
+<li>灵活的创建UI，主要是指采用动态方式创建Fragment，并根据屏幕大小，来选择适当的Fragment对UI进行布局。  </li>
+<li>Fragment之间的通信。Fragments之间是无法直接通信的，那怎么办呢？Google官网给出的解答是，采用类似于回调函数的机制。Fragment都是通过Acitivty来显示的，不同的Fragment可以通过Activity这个中介来进行通信。具体的做法是在Fragment给出接口定义，然后再在Activity中实现给接口，从而实现不同Fragment之间的通信。</li>
+</ol>
+</blockquote>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/04/01/android/api_guide/app_component/activity/2014-04-01-Activity01/" itemprop="url">Android 四大组件之Activity篇01之 概述</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-04-01T01:01:00.000Z" itemprop="datePublished">4月 1 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            2 分钟 read (About 358 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本章介绍会对Android的四大组建(Activity、Service、BroadcastReceiver、ContentProvider)中的Activity作概括性的介绍。</p>
+</blockquote>
+<p>首先，了解一下”什么是Activity”，Android中Activity的介绍如下：</p>
+<blockquote>
+<p>An activity is a single, focused thing that the user can do.  Almost all activities interact with the user, so the Activity class takes care of creating a window for you in which you can place your UI with setContentView().  While activities are often presented to the user as full-screen windows, they can also be used in other ways: as floating windows (via a theme with windowIsFloating) or embedded inside of another activity (using ActivityGroup).</p>
+</blockquote>
+<p>从中，可以看出：<br>    Activity 是用户接口程序，原则上它会提供给用户一个交互式的接口功能。它是 android 应用程序的基本功能单元。Activity 本身是没有界面的。所以activity类创建了一个窗口，开发人员可以通过setContentView(View)接口把UI放到activity创建的窗口上，当activity指向全屏窗口时，也可以用其他方式实现：作为漂浮窗口（通过windowIsFloating的主题集合），或者嵌入到其他的activity（使用ActivityGroup）。activity是单独的，用于处理用户操作。几乎所有的activity都要和用户打交道</p>
+<p>接下来，我们将围绕Activity，依次介绍：<br>(1) Activity的生命周期<br>(2) Activity的启动方式和获取结果<br>(3) Activity的启动模式<br>(4) Activity和Application、进程之间的关系</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/categories/android/page/2/">Prev</a>
+    </div>
+    <div class="pagination-next is-invisible is-hidden-mobile">
+        <a href="/categories/android/page/4/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/categories/android/">1</a></li>
+        
+        <li><a class="pagination-link" href="/categories/android/page/2/">2</a></li>
+        
+        <li><a class="pagination-link is-current" href="/categories/android/page/3/">3</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

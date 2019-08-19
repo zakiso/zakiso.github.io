@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/4/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2019/03/29/使用Appium进行App自动化测试体验/" itemprop="url">使用Appium进行App自动化测试体验</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-03-28T16:01:00.000Z" itemprop="datePublished">3月 29 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            6 分钟 read (About 906 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h4 id="1-为什么选择Appium"><a href="#1-为什么选择Appium" class="headerlink" title="1.为什么选择Appium"></a>1.为什么选择Appium</h4><ul>
+<li>脚本编写支持多种语言方便测试人员使用自己喜欢的语言维护脚本</li>
+<li>跨平台同事支持Android和iOS的测试、并且支持应用内嵌RN或者webview等的测试</li>
+<li>纯黑盒，不需要依赖项目源码，可以完全由测试人员控制和维护脚本</li>
+<li>基于seleium如果有做过web自动化测试经验会很容易上手</li>
+</ul>
+<h4 id="2-Appium简介"><a href="#2-Appium简介" class="headerlink" title="2.Appium简介"></a>2.Appium简介</h4><p><a href="http://appium.io/" target="_blank" rel="noopener">Appium</a>是一款基于seleium采用C/S架构的测试工具。有多种语言的客户端比如python和java还有javascript等等，客户端使用rest接口与server端进行通信。server端根据rest请求使用对应的driver和Android真机或者iOS模拟器等设备进行交互。</p>
+<p>目前Appium支持如下驱动：</p>
+<ul>
+<li><p>XCUITest (iOS)</p>
+</li>
+<li><p>XCUITest Real Devices(iOS)</p>
+</li>
+<li><p>UIAutomation (iOS)</p>
+</li>
+<li><p>UIAutomation Safari Launcher(iOS)</p>
+</li>
+<li><p>UIAutomatar（Android）</p>
+</li>
+<li><p>Espresso </p>
+</li>
+<li><p>…等等</p>
+</li>
+</ul>
+<h4 id="3-环境搭建"><a href="#3-环境搭建" class="headerlink" title="3.环境搭建"></a>3.环境搭建</h4><p>要使用appium进行自动化测试首先需要安装AppiumServer，然后配置对应的开发环境，安装对应的client客户端以及配置环境，最后编写用咧脚本，然后运行测试。下面我们采用python做为客户端语言，使用Appium Desktop做为server为Android编写测试用例。</p>
+<h5 id="1-安装Appium-Server-Desktop"><a href="#1-安装Appium-Server-Desktop" class="headerlink" title="1.安装Appium Server Desktop"></a>1.安装Appium Server Desktop</h5><p><a href="https://github.com/appium/appium-desktop/releases/tag/v1.12.0" target="_blank" rel="noopener">选择适合自己系统的最新版本进行下载</a></p>
+<p>下载好后双击打开后点击startServer即可启动该服务</p>
+<h5 id="2-安装Android-Studio和Java-SDK-如果以及配置好这些环境可跳过该步骤"><a href="#2-安装Android-Studio和Java-SDK-如果以及配置好这些环境可跳过该步骤" class="headerlink" title="2.安装Android Studio和Java SDK(如果以及配置好这些环境可跳过该步骤)"></a>2.安装Android Studio和Java SDK(如果以及配置好这些环境可跳过该步骤)</h5><ul>
+<li><p>下载Android Studio，包含有Android SDK以及可以方便的使用Layout Inspector查找界面id</p>
+<p><a href="https://www.androiddevtools.cn/" target="_blank" rel="noopener">https://www.androiddevtools.cn/</a>选择适合自己电脑的最新版本，旧版本没有Layout Inspector</p>
+<p>安装好后配置一下Android Home环境变量</p>
+<p><figure class="highlight bash hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment"># Android Home</span></span><br><span class="line"><span class="hljs-built_in">export</span> ANDROID_HOME=/Users/zhiqiangdeng/Library/Android/sdk</span><br><span class="line"><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$ANDROID_HOME</span>/tools:<span class="hljs-variable">$ANDROID_HOME</span>/platform-tools</span><br></pre></td></tr></table></figure></p>
+</li>
+</ul>
+<ul>
+<li><p>下载JDK并配置Java Home环境变变量</p>
+<p><figure class="highlight bash hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment"># Java Home</span></span><br><span class="line"><span class="hljs-built_in">export</span> JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home</span><br><span class="line"><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$JAVA_HOME</span>/bin</span><br></pre></td></tr></table></figure></p>
+</li>
+</ul>
+<h5 id="3-安装Appium-Client"><a href="#3-安装Appium-Client" class="headerlink" title="3.安装Appium Client"></a>3.安装Appium Client</h5><p>这里我们使用python版本的client<a href="https://github.com/appium/python-client" target="_blank" rel="noopener">https://github.com/appium/python-client</a></p>
+<p>在使用pip安装appium python client之前，建议先安装pyenv用于管理python的版本。使用pyenv-virtualenv管理python的虚拟环境。如果嫌麻烦可跳过。</p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install Appium-Python-Client</span><br></pre></td></tr></table></figure></p>
+<h4 id="4-开发测试脚本"><a href="#4-开发测试脚本" class="headerlink" title="4.开发测试脚本"></a>4.开发测试脚本</h4><p>安装好后创建一个目录作为我们的项目目录<code>mkdir project-test</code></p>
+<p>使用你喜欢的编辑器打开，这里我使用pycharm。</p>
+<p>编写脚本：</p>
+<p>下面我们以一个登录模块的脚本为例子：</p>
+<p><figure class="highlight python hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">#python </span></span><br><span class="line"><span class="hljs-comment"># Android environment</span></span><br><span class="line"><span class="hljs-keyword">import</span> unittest</span><br><span class="line"><span class="hljs-keyword">from</span> time <span class="hljs-keyword">import</span> sleep</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">from</span> appium <span class="hljs-keyword">import</span> webdriver</span><br><span class="line"></span><br><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LoginTests</span><span class="hljs-params">(unittest.TestCase)</span>:</span></span><br><span class="line">    </span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">setUp</span><span class="hljs-params">(self)</span>:</span></span><br><span class="line">        <span class="hljs-comment"># 配置appium需要哪些能力，以及设备信息等基础资料，详细字段可以参考</span></span><br><span class="line">        <span class="hljs-comment"># http://appium.io/docs/en/writing-running-appium/caps/</span></span><br><span class="line">        desired_caps = &#123;&#125;</span><br><span class="line">        desired_caps[<span class="hljs-string">'platformName'</span>] = <span class="hljs-string">'Android'</span></span><br><span class="line">        desired_caps[<span class="hljs-string">'automationName'</span>] = <span class="hljs-string">'uiautomator2'</span></span><br><span class="line">        desired_caps[<span class="hljs-string">'deviceName'</span>] = <span class="hljs-string">'emulator-5556 (9)'</span></span><br><span class="line">        desired_caps[<span class="hljs-string">'appPackage'</span>] = <span class="hljs-string">'com.hd123.apos.ui.debug'</span></span><br><span class="line">        desired_caps[<span class="hljs-string">'appActivity'</span>] = <span class="hljs-string">'com.hd123.apos.ui.view.welcome.SplashActivity'</span></span><br><span class="line">        desired_caps[<span class="hljs-string">"autoGrantPermissions"</span>] = <span class="hljs-literal">True</span></span><br><span class="line">        desired_caps[<span class="hljs-string">"noReset"</span>] = <span class="hljs-literal">True</span></span><br><span class="line">        self.driver = webdriver.Remote(<span class="hljs-string">'http://localhost:4723/wd/hub'</span>, desired_caps)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment"># </span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">testIsLoginPageAndStoreIdCorrected</span><span class="hljs-params">(self)</span>:</span></span><br><span class="line">        <span class="hljs-comment">#执行一个测试，执行UI测试最重要的三点</span></span><br><span class="line">        <span class="hljs-comment"># 1. 查找元素 </span></span><br><span class="line">        <span class="hljs-comment"># 2. 执行动作 </span></span><br><span class="line">        <span class="hljs-comment"># 3. 判断结果 </span></span><br><span class="line">        sleep(<span class="hljs-number">2</span>)</span><br><span class="line">        <span class="hljs-comment"># appium支持通过findbyid以及xpath等进行元素的定位</span></span><br><span class="line">        loginBtn = self.driver.find_element_by_id(<span class="hljs-string">"login_tv"</span>)</span><br><span class="line">        self.assertIsNotNone(loginBtn)</span><br><span class="line">        el = self.driver.find_element_by_xpath(<span class="hljs-string">"//android.widget.TextView[contains(@text,'AP1001')]"</span>)</span><br><span class="line">        self.assertIsNotNone(el)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">testStoreNumberCorrected</span><span class="hljs-params">(self)</span>:</span></span><br><span class="line">        username = self.driver.find_element_by_id(<span class="hljs-string">"code_et"</span>)</span><br><span class="line">        username.set_value(<span class="hljs-string">"5551"</span>)</span><br><span class="line">        password = self.driver.find_element_by_id(<span class="hljs-string">"pwd_et"</span>)</span><br><span class="line">        password.set_value(<span class="hljs-string">"0"</span>)</span><br><span class="line">        loginBtn = self.driver.find_element_by_id(<span class="hljs-string">"login_tv"</span>)</span><br><span class="line">        loginBtn.click()</span><br><span class="line">    <span class="hljs-comment"># def test</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">'__main__'</span>:</span><br><span class="line">    suite = unittest.TestLoader().loadTestsFromTestCase(LoginTests)</span><br><span class="line">    unittest.TextTestRunner(verbosity=<span class="hljs-number">2</span>).run(suite)</span><br></pre></td></tr></table></figure></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/3/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/5/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><a class="pagination-link" href="/page/2/">2</a></li>
+        
+        <li><a class="pagination-link" href="/page/3/">3</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/4/">4</a></li>
+        
+        <li><a class="pagination-link" href="/page/5/">5</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

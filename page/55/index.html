@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/55/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2012/08/11/java/threads/2012-08-11-threads-basic/" itemprop="url">Java多线程系列--“基础篇”11之 生产消费者问题</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-08-11T01:01:00.000Z" itemprop="datePublished">8月 11 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            4 分钟 read (About 672 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本章，会对“生产/消费者问题”进行讨论。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. 生产/消费者模型</a><br><a href="#anchor2">2. 生产/消费者实现</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-生产-消费者模型"><a href="#1-生产-消费者模型" class="headerlink" title="1. 生产/消费者模型"></a>1. 生产/消费者模型</h1><p>生产/消费者问题是个非常典型的多线程问题，涉及到的对象包括“生产者”、“消费者”、“仓库”和“产品”。他们之间的关系如下：<br>(01) 生产者仅仅在仓储未满时候生产，仓满则停止生产。<br>(02) 消费者仅仅在仓储有产品时候才能消费，仓空则等待。<br>(03) 当消费者发现仓储没产品可消费时候会通知生产者生产。<br>(04) 生产者在生产出可消费产品时候，应该通知等待的消费者去消费。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-生产-消费者实现"><a href="#2-生产-消费者实现" class="headerlink" title="2. 生产/消费者实现"></a>2. 生产/消费者实现</h1><p>下面通过wait()/notify()方式实现该模型(后面在学习了线程池相关内容之后，再通过其它方式实现生产/消费者模型)。源码如下：</p>
+<pre><code>// Demo1.java
+// 仓库
+class Depot {
+    private int capacity;    // 仓库的容量
+    private int size;        // 仓库的实际数量
+
+    public Depot(int capacity) {
+        this.capacity = capacity;
+        this.size = 0;
+    }
+
+    public synchronized void produce(int val) {
+        try {
+             // left 表示“想要生产的数量”(有可能生产量太多，需多此生产)
+            int left = val;
+            while (left &gt; 0) {
+                // 库存已满时，等待“消费者”消费产品。
+                while (size &gt;= capacity)
+                    wait();
+                // 获取“实际生产的数量”(即库存中新增的数量)
+                // 如果“库存”+“想要生产的数量”&gt;“总的容量”，则“实际增量”=“总的容量”-“当前容量”。(此时填满仓库)
+                // 否则“实际增量”=“想要生产的数量”
+                int inc = (size+left)&gt;capacity ? (capacity-size) : left;
+                size += inc;
+                left -= inc;
+                System.out.printf(&quot;%s produce(%3d) --&gt; left=%3d, inc=%3d, size=%3d\n&quot;, 
+                        Thread.currentThread().getName(), val, left, inc, size);
+                // 通知“消费者”可以消费了。
+                notifyAll();
+            }
+        } catch (InterruptedException e) {
+        }
+    } 
+
+    public synchronized void consume(int val) {
+        try {
+            // left 表示“客户要消费数量”(有可能消费量太大，库存不够，需多此消费)
+            int left = val;
+            while (left &gt; 0) {
+                // 库存为0时，等待“生产者”生产产品。
+                while (size &lt;= 0)
+                    wait();
+                // 获取“实际消费的数量”(即库存中实际减少的数量)
+                // 如果“库存”&lt;“客户要消费的数量”，则“实际消费量”=“库存”；
+                // 否则，“实际消费量”=“客户要消费的数量”。
+                int dec = (size&lt;left) ? size : left;
+                size -= dec;
+                left -= dec;
+                System.out.printf(&quot;%s consume(%3d) &lt;-- left=%3d, dec=%3d, size=%3d\n&quot;, 
+                        Thread.currentThread().getName(), val, left, dec, size);
+                notifyAll();
+            }
+        } catch (InterruptedException e) {
+        }
+    }
+
+    public String toString() {
+        return &quot;capacity:&quot;+capacity+&quot;, actual size:&quot;+size;
+    }
+} 
+
+// 生产者
+class Producer {
+    private Depot depot;
+
+    public Producer(Depot depot) {
+        this.depot = depot;
+    }
+
+    // 消费产品：新建一个线程向仓库中生产产品。
+    public void produce(final int val) {
+        new Thread() {
+            public void run() {
+                depot.produce(val);
+            }
+        }.start();
+    }
+}
+
+// 消费者
+class Customer {
+    private Depot depot;
+
+    public Customer(Depot depot) {
+        this.depot = depot;
+    }
+
+    // 消费产品：新建一个线程从仓库中消费产品。
+    public void consume(final int val) {
+        new Thread() {
+            public void run() {
+                depot.consume(val);
+            }
+        }.start();
+    }
+}
+
+public class Demo1 {  
+    public static void main(String[] args) {  
+        Depot mDepot = new Depot(100);
+        Producer mPro = new Producer(mDepot);
+        Customer mCus = new Customer(mDepot);
+
+        mPro.produce(60);
+        mPro.produce(120);
+        mCus.consume(90);
+        mCus.consume(150);
+        mPro.produce(110);
+    }
+}</code></pre><p>说明：<br>(01) Producer是“生产者”类，它与“仓库(depot)”关联。当调用“生产者”的produce()方法时，它会新建一个线程并向“仓库”中生产产品。<br>(02) Customer是“消费者”类，它与“仓库(depot)”关联。当调用“消费者”的consume()方法时，它会新建一个线程并消费“仓库”中的产品。<br>(03) Depot是“仓库”类，仓库中记录“仓库的容量(capacity)”以及“仓库中当前产品数目(size)”。<br>&nbsp;&nbsp;&nbsp;&nbsp; “仓库”类的生产方法produce()和消费方法consume()方法都是synchronized方法，进入synchronized方法体，意味着这个线程获取到了该“仓库”对象的同步锁。这也就是说，同一时间，生产者和消费者线程只能有一个能运行。通过同步锁，实现了对“残酷”的互斥访问。<br>&nbsp;&nbsp;&nbsp;&nbsp; 对于生产方法produce()而言：当仓库满时，生产者线程等待，需要等待消费者消费产品之后，生产线程才能生产；生产者线程生产完产品之后，会通过notifyAll()唤醒同步锁上的所有线程，包括“消费者线程”，即我们所说的“通知消费者进行消费”。<br>&nbsp;&nbsp;&nbsp;&nbsp; 对于消费方法consume()而言：当仓库为空时，消费者线程等待，需要等待生产者生产产品之后，消费者线程才能消费；消费者线程消费完产品之后，会通过notifyAll()唤醒同步锁上的所有线程，包括“生产者线程”，即我们所说的“通知生产者进行生产”。</p>
+<p>(某一次)运行结果：</p>
+<pre><code>Thread-0 produce( 60) --&gt; left=  0, inc= 60, size= 60
+Thread-4 produce(110) --&gt; left= 70, inc= 40, size=100
+Thread-2 consume( 90) &lt;-- left=  0, dec= 90, size= 10
+Thread-3 consume(150) &lt;-- left=140, dec= 10, size=  0
+Thread-1 produce(120) --&gt; left= 20, inc=100, size=100
+Thread-3 consume(150) &lt;-- left= 40, dec=100, size=  0
+Thread-4 produce(110) --&gt; left=  0, inc= 70, size= 70
+Thread-3 consume(150) &lt;-- left=  0, dec= 40, size= 30
+Thread-1 produce(120) --&gt; left=  0, inc= 20, size= 50</code></pre>
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/54/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/56/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/54/">54</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/55/">55</a></li>
+        
+        <li><a class="pagination-link" href="/page/56/">56</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

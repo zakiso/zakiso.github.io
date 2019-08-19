@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/2/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2019/06/09/Flutter 开发桌面应用初步体验——Go Flutter还是Flutter Desktop Embedding/" itemprop="url">Flutter 开发桌面应用对比</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-06-08T16:01:00.000Z" itemprop="datePublished">6月 9 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            12 分钟 read (About 1763 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>最近用flutter做了一款App，已经发布了Android和iOS的版本，因为有计划支持全部平台。所以开始尝试flutter desktop的解决方案。在github上我们能发现两个方案，一个是flutter官方的方案<a href="https://github.com/google/flutter-desktop-embedding" target="_blank" rel="noopener">flutter-desktop-embedding</a>还有一个是使用go和glfw开发的<a href="https://github.com/go-flutter-desktop/go-flutter" target="_blank" rel="noopener">go-flutter</a></p>
+<h3 id="两种方案对比"><a href="#两种方案对比" class="headerlink" title="两种方案对比"></a>两种方案对比</h3><p>在选择使用flutter-desktop还是go-flutter之前，我们先对两种方案做一些介绍和对比。</p>
+<p><img src="/media/typora-user-images/image-20190609214047338.png" alt="image-20190609214047338"></p>
+<h3 id="两种方式的项目结构："><a href="#两种方式的项目结构：" class="headerlink" title="两种方式的项目结构："></a>两种方式的项目结构：</h3><p><img src="/media/typora-user-images/image-20190609213521705.png" alt="image-20190609213521705"></p>
+<h4 id="Flutter-Desktop-Embedding"><a href="#Flutter-Desktop-Embedding" class="headerlink" title="Flutter Desktop Embedding:"></a>Flutter Desktop Embedding:</h4><p>在flutter desktop中我们可以看到目录结构和flutter开发手机App的结构是类似的，一个主项目下有各个平台的壳工程(这里面也可以包含Android和iOS)，然后由壳工程集成flutter的渲染引擎。flutter的代码写在lib目录中。</p>
+<p>如果我们懂一些macOS开发或者windows开发，可以直接在项目中修改原生代码，比如你想修改整个程序的window的样式直接在原工程中就能修改，又比如macOS你要集成苹果的IAP，可以直接在原生项目中实现即可。</p>
+<p>它的缺点就是三个平台的开发你最好都得懂一些</p>
+<h4 id="Go-Flutter"><a href="#Go-Flutter" class="headerlink" title="Go Flutter:"></a>Go Flutter:</h4><p>Go Flutter由于本身Go语言就是跨平台的，所有它只有一个desktop目录，表示桌面版，相比于flutter desktop它让开发者完全不需要去关心macOS或者windows开发了，desktop中全是go语言编写的内容，最后desktop可以编译成三中平台的可执行文件。开发者只需要会Go语言即可。</p>
+<p>它的缺点就是如果win或者mac或者linux你要在不同的平台做一些特殊的功能或者界面，会特别麻烦，不像在Flutter desktop中直接在宿主项目中实现即可。</p>
+<h3 id="对比结果如何选择"><a href="#对比结果如何选择" class="headerlink" title="对比结果如何选择"></a>对比结果如何选择</h3><p>首先我们要明确，两种方案都不太成熟，但是如果要用来开发，也不是用不了。大家选择的时候可以根据自身技术栈，以及产品的特性来选择。</p>
+<p>如果你懂Go语言，同时你的程序是阅读类，或者偏业务类，基本不需要和本身Native交互的，选 Go Flutter真的很爽。</p>
+<p>如果你懂一点macOS或者windows开发，同时你的程序经常三个桌面端各有特色，而且需要修改本身整个window的一些样式，那么选择Flutter desktop embedding。</p>
+<h3 id="Go-Flutter实际使用"><a href="#Go-Flutter实际使用" class="headerlink" title="Go Flutter实际使用"></a>Go Flutter实际使用</h3><p>上面说了这么多，我们来实际体验一下Go flutter。先说一下背景，我已经使用flutter开发了一款App，现在我要把App变成可以运行到桌面的版本。我写的软件叫做Everything是一款记录类软件，在这里可以下载到<a href="https://everything.apppills.com" target="_blank" rel="noopener">https://everything.apppills.com</a>大家可以先看一下效果。</p>
+<ol>
+<li>安装Go ，由于Go flutter使用Go编写，所以需要安装Go工具包。大家可以在<a href="https://golang.org/doc/install" target="_blank" rel="noopener">官网下载安装</a></li>
+</ol>
+<ol start="2">
+<li><p>安装hover，hover是 Go Flutter的一个命令行工具，简化了项目初始化以及运行等步骤。</p>
+<p>使用下面命令安装</p>
+<p><figure class="highlight go hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">go</span> get -u github.com/<span class="hljs-keyword">go</span>-flutter-desktop/hover</span><br></pre></td></tr></table></figure></p>
+<p>注意如果上面的命令卡住下载不下来，大家可以设置一下代理，设置命令行代理可以开启ss或者v2ray，然后在命令行输入命令设置</p>
+<p><figure class="highlight go hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export http_proxy=<span class="hljs-string">"http://127.0.0.1:8001"</span>; export HTTP_PROXY=<span class="hljs-string">"http://127.0.0.1:8001"</span>; export https_proxy=<span class="hljs-string">"http://127.0.0.1:8001"</span>; export HTTPS_PROXY=<span class="hljs-string">"http://127.0.0.1:8001"</span></span><br><span class="line"><span class="hljs-comment">//8001改成你的ss或者v2ray监听的端口</span></span><br></pre></td></tr></table></figure></p>
+<p>⚠️ 注意：安装好hover之后，官网上说就可以使用hover命令了，但是可能你在命令行里敲hover可能还是得到的是command not found。 这里我用的是mac系统，在安装好之后，在home目录多了一个go的目录，需要在你的环境变量里加入一下go的包路径。</p>
+<p><figure class="highlight go hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export PATH=$PATH:/usr/local/<span class="hljs-keyword">go</span>/bin</span><br><span class="line">export PATH=$PATH:/Users/&#123;你的用户名&#125;/<span class="hljs-keyword">go</span>/bin</span><br><span class="line"><span class="hljs-comment">//可以检查一下你的home目录是否有了go的目录，里面有个bin，将那个目录加入到环境变量即可</span></span><br></pre></td></tr></table></figure></p>
+</li>
+<li><p>进入你以前开发App的flutter项目，执行命令初始化项目</p>
+<p><figure class="highlight go hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hover init github.com/my-organization/simpleApplication</span><br><span class="line"><span class="hljs-comment">//后面这个github.com xxxx就是你的项目仓库地址。没有的话随便写也行</span></span><br></pre></td></tr></table></figure></p>
+<p>初始化项目完成后，你会在你的项目中发现一个desktop目录，和以前的iOS和Android是平级的。这个desktop目录就是桌面版的项目。</p>
+</li>
+<li><p>把你的main.dart复制一份名字改为main_desktop.dart，Go flutter有个特别的地方，就是程序的入口不是用的main.dart，而是用的main_desktop.dart。</p>
+<p>修改main_desktop.dart为使用桌面版运行</p>
+<p><figure class="highlight dart hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">void</span> main() &#123;</span><br><span class="line">  <span class="hljs-comment">// 关键是下面这一句</span></span><br><span class="line">  debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;</span><br><span class="line">  runApp(<span class="hljs-keyword">new</span> MyApp());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</li>
+<li><p>大功告成，运行项目吧。</p>
+<p><figure class="highlight go hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hover run</span><br><span class="line"><span class="hljs-comment">//执行 hover run 可以运行项目</span></span><br></pre></td></tr></table></figure></p>
+</li>
+</ol>
+<p>我们先来看一下运行效果下面是App的运行效果和桌面版的运行效果。</p>
+<p><strong>手机版本身效果：</strong></p>
+<p><img src="/media/flutter-image/16b3cb3588b93eac.gif" alt="phone"></p>
+<p><strong>Go Flutter运行的桌面版效果：</strong></p>
+<p><img src="/media/flutter-image/16b3cd31cee0dfbc.gif" alt="desktop"></p>
+<h3 id="FAQ："><a href="#FAQ：" class="headerlink" title="FAQ："></a>FAQ：</h3><h5 id="1-程序按照上面那样迁移完成就能跑？"><a href="#1-程序按照上面那样迁移完成就能跑？" class="headerlink" title="1.程序按照上面那样迁移完成就能跑？"></a>1.程序按照上面那样迁移完成就能跑？</h5><p>当然不是，我们都知道我们用了很多插件，其实是只支持Android或者iOS的，如果你用得比较多的这种插件，那么你可能迁移到桌面端过来会比较麻烦。我的整体迁移的时间大概只用了2-3个小时，我用到了sqflite和shared preference，这两个插件Go flutter已有实现，所以很容易替换。</p>
+<h5 id="2-如何使用Go-flutter的插件"><a href="#2-如何使用Go-flutter的插件" class="headerlink" title="2.如何使用Go flutter的插件"></a>2.如何使用Go flutter的插件</h5><p>我们知道我们所有和原生通信都是通过定义一个method channel来通信的。如果你用到的插件只支持Android或者iOS，那么你就需要在desktop中去实现这个插件的method channel的所有方法。目前Go flutter只有三个插件可以用，在这里可以找到。<a href="https://github.com/go-flutter-desktop/plugins" target="_blank" rel="noopener">https://github.com/go-flutter-desktop/plugins</a> 点击某个插件，就可以看到使用方法，就是把对应代码贴到，desktop里面的option文件中即可，不要找错地方了，官网没说得太清楚。</p>
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>感谢大家的阅读，我们用flutter开发了个小App也欢迎大家试用：</p>
+<p>Everything 把记账本日记本，行程，待办等等都装进一个App里。</p>
+<h4 id="https-everything-apppills-com"><a href="#https-everything-apppills-com" class="headerlink" title="https://everything.apppills.com/"></a><a href="https://everything.apppills.com/" target="_blank" rel="noopener">https://everything.apppills.com/</a></h4><p><img src="/media/typora-user-images/image-20190609223616844.png" alt="image-20190609223616844"></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/3/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/2/">2</a></li>
+        
+        <li><a class="pagination-link" href="/page/3/">3</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/73/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2012/03/02/java/others/2012-03-02-reference/" itemprop="url">Java引用总结--StrongReference、SoftReference、WeakReference、PhantomReference</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-03-02T01:02:00.000Z" itemprop="datePublished">3月 2 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            13 分钟 read (About 1963 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. Java引用介绍</a><br><a href="#anchor2">2. 内存回收</a><br><a href="#anchor3">3. Java对引用的分类</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-Java引用介绍"><a href="#1-Java引用介绍" class="headerlink" title="1. Java引用介绍"></a>1. Java引用介绍</h1><p>Java从1.2版本开始引入了4种引用，这4种引用的级别由高到低依次为：</p>
+<blockquote>
+<p>强引用  &gt;  软引用  &gt;  弱引用  &gt;  虚引用</p>
+</blockquote>
+<p><strong>(01) 强引用（StrongReference）</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; 强引用是使用最普遍的引用。如果一个对象具有强引用，那垃圾回收器绝不会回收它。当内存空间不足，Java虚拟机宁愿抛出OutOfMemoryError错误，使程序异常终止，也不会靠随意回收具有强引用的对象来解决内存不足的问题。</p>
+<p><strong>(02) 软引用（SoftReference）</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; 如果一个对象只具有软引用，则内存空间足够，垃圾回收器就不会回收它；如果内存空间不足了，就会回收这些对象的内存。只要垃圾回收器没有回收它，该对象就可以被程序使用。软引用可用来实现内存敏感的高速缓存。<br>&nbsp;&nbsp;&nbsp;&nbsp; 软引用可以和一个引用队列（ReferenceQueue）联合使用，如果软引用所引用的对象被垃圾回收器回收，Java虚拟机就会把这个软引用加入到与之关联的引用队列中。</p>
+<p><strong>(03) 弱引用（WeakReference）</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; 弱引用与软引用的区别在于：只具有弱引用的对象拥有更短暂的生命周期。在垃圾回收器线程扫描它所管辖的内存区域的过程中，一旦发现了只具有弱引用的对象，不管当前内存空间足够与否，都会回收它的内存。不过，由于垃圾回收器是一个优先级很低的线程，因此不一定会很快发现那些只具有弱引用的对象。<br>&nbsp;&nbsp;&nbsp;&nbsp; 弱引用可以和一个引用队列（ReferenceQueue）联合使用，如果弱引用所引用的对象被垃圾回收，Java虚拟机就会把这个弱引用加入到与之关联的引用队列中。</p>
+<p><strong>(04) 虚引用（PhantomReference）</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; “虚引用”顾名思义，就是形同虚设，与其他几种引用都不同，虚引用并不会决定对象的生命周期。如果一个对象仅持有虚引用，那么它就和没有任何引用一样，在任何时候都可能被垃圾回收器回收。<br>&nbsp;&nbsp;&nbsp;&nbsp; 虚引用主要用来跟踪对象被垃圾回收器回收的活动。虚引用与软引用和弱引用的一个区别在于：虚引用必须和引用队列 （ReferenceQueue）联合使用。当垃圾回收器准备回收一个对象时，如果发现它还有虚引用，就会在回收对象的内存之前，把这个虚引用加入到与之 关联的引用队列中。</p>
+<p>由于引用和内存回收关系紧密。下面，先通过实例对内存回收有个认识；然后，进一步通过引用实例加深对引用的了解。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-内存回收"><a href="#2-内存回收" class="headerlink" title="2. 内存回收"></a>2. 内存回收</h1><p>创建公共类MyDate，它的作用是覆盖finalize()函数：在finalize()中输出打印信息，方便追踪。</p>
+<p>说明：finalize()函数是在JVM回收内存时执行的，但JVM并不保证在回收内存时一定会调用finalize()。</p>
+<p>MyDate代码如下：</p>
+<pre><code>package com.skywang.java;
+
+import java.util.Date;
+
+public class MyDate extends Date { 
+
+    /** Creates a new instance of MyDate */
+    public MyDate() {
+    }
+    // 覆盖finalize()方法
+    protected void finalize() throws Throwable {
+        super.finalize();
+        System.out.println(&quot;obj [Date: &quot; + this.getTime() + &quot;] is gc&quot;);
+    }   
+
+    public String toString() {
+        return &quot;Date: &quot; + this.getTime();
+    }
+}</code></pre><p>在这个类中，对java.util.Date类进行了扩展，并重写了finalize()和toString()方法。</p>
+<br>
+创建公共类ReferenceTest，它的作用是定义一个方法drainMemory()：消耗大量内存，以此来引发JVM回收内存。
+
+<p>ReferenceTest代码如下：</p>
+<pre><code>package com.skywang.java;
+
+public class ReferenceTest {   
+    /** Creates a new instance of ReferenceTest */
+    public ReferenceTest() {
+    }   
+
+    // 消耗大量内存
+    public static void drainMemory() {
+        String[] array = new String[1024 * 10];
+        for(int i = 0; i &lt; 1024 * 10; i++) {
+            for(int j = &apos;a&apos;; j &lt;= &apos;z&apos;; j++) {
+                array[i] += (char)j;
+            }           
+        }
+    }
+} </code></pre><p>在这个类中定义了一个静态方法drainMemory()，此方法旨在消耗大量的内存，促使JVM运行垃圾回收。</p>
+<br>
+有了上面两个公共类之后，我们即可测试JVM什么时候进行垃圾回收。下面分3种情况进行测试：
+
+<p><strong>情况1：清除对象</strong></p>
+<p>实现代码：</p>
+<pre><code>package com.skywang.java;
+
+public class NoGarbageRetrieve {
+
+    public static void main(String[] args) {
+        MyDate date = new MyDate();
+        date = null;
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code>&lt;无任何输出&gt;</code></pre><p>结果分析：date虽然设为null，但由于JVM没有执行垃圾回收操作，MyDate的finalize()方法没有被运行。</p>
+<p><strong>情况2：显式调用垃圾回收</strong></p>
+<p>实现代码： </p>
+<pre><code>package com.skywang.java;
+
+public class ExplicitGarbageRetrieve {
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        MyDate date = new MyDate();
+        date = null;
+        System.gc();
+    }
+
+}</code></pre><p>运行结果：</p>
+<pre><code>obj [Date: 1372137067328] is gc</code></pre><p>结果分析：调用了System.gc()，使JVM运行垃圾回收，MyDate的finalize()方法被运行。</p>
+<p><strong>情况3：隐式调用垃圾回收</strong></p>
+<p>实现代码： </p>
+<pre><code>package com.skywang.java;
+
+public class ImplicitGarbageRetrieve {
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        MyDate date = new MyDate();
+        date = null;
+        ReferenceTest.drainMemory();
+    }
+
+} </code></pre><p>运行结果：</p>
+<pre><code>obj [Date: 1372137171965] is gc</code></pre><p>结果分析：虽然没有显式调用垃圾回收方法System.gc()，但是由于运行了耗费大量内存的方法，触发JVM进行垃圾回收。</p>
+<p>总结：JVM的垃圾回收机制，在内存充足的情况下，除非你显式调用System.gc()，否则它不会进行垃圾回收；在内存不足的情况下，垃圾回收将自动运行</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-Java对引用的分类"><a href="#3-Java对引用的分类" class="headerlink" title="3. Java对引用的分类"></a>3. Java对引用的分类</h1><h2 id="3-1-强引用"><a href="#3-1-强引用" class="headerlink" title="3.1 强引用"></a>3.1 强引用</h2><p>实例代码：</p>
+<pre><code>package com.skywang.java;
+
+public class StrongReferenceTest {
+
+    public static void main(String[] args) {
+        MyDate date = new MyDate();
+        System.gc();
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code>&lt;无任何输出&gt;</code></pre><p>结果说明：即使显式调用了垃圾回收，但是用于date是强引用，date没有被回收。</p>
+<h2 id="3-2-软引用"><a href="#3-2-软引用" class="headerlink" title="3.2 软引用"></a>3.2 软引用</h2><p>实例代码：</p>
+<pre><code>package com.skywang.java;
+
+import java.lang.ref.SoftReference;
+
+public class SoftReferenceTest {
+
+    public static void main(String[] args) {
+        SoftReference ref = new SoftReference(new MyDate());
+        ReferenceTest.drainMemory();
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code>&lt;无任何输出&gt;</code></pre><p>结果说明：在内存不足时，软引用被终止。软引用被禁止时，</p>
+<pre><code>SoftReference ref = new SoftReference(new MyDate());
+ReferenceTest.drainMemory();</code></pre><p>等价于</p>
+<pre><code>MyDate date = new MyDate();
+
+// 由JVM决定运行
+if(JVM.内存不足()) {
+    date = null;
+    System.gc();
+}</code></pre><h2 id="3-3-弱引用"><a href="#3-3-弱引用" class="headerlink" title="3.3 弱引用"></a>3.3 弱引用</h2><p>示例代码： </p>
+<pre><code>package com.skywang.java;
+
+import java.lang.ref.WeakReference;
+
+public class WeakReferenceTest {
+
+    public static void main(String[] args) {
+        WeakReference ref = new WeakReference(new MyDate());
+        System.gc(); 
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code>obj [Date: 1372142034360] is gc</code></pre><p>结果说明：在JVM垃圾回收运行时，弱引用被终止.</p>
+<pre><code>WeakReference ref = new WeakReference(new MyDate());
+System.gc();</code></pre><p>等同于：</p>
+<pre><code>MyDate date = new MyDate();
+
+// 垃圾回收
+if(JVM.内存不足()) {
+    date = null;
+    System.gc();
+}</code></pre><h2 id="3-4-假象引用"><a href="#3-4-假象引用" class="headerlink" title="3.4 假象引用"></a>3.4 假象引用</h2><p>示例代码： </p>
+<pre><code>package com.skywang.java;
+
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.PhantomReference;
+
+public class PhantomReferenceTest {
+
+    public static void main(String[] args) {
+        ReferenceQueue queue = new ReferenceQueue();
+        PhantomReference ref = new PhantomReference(new MyDate(), queue);
+        System.gc();
+    }
+}</code></pre><p>运行结果：</p>
+<pre><code>obj [Date: 1372142282558] is gc</code></pre><p>结果说明：假象引用，在实例化后，就被终止了。</p>
+<pre><code>ReferenceQueue queue = new ReferenceQueue();
+PhantomReference ref = new PhantomReference(new MyDate(), queue);
+System.gc();</code></pre><p>等同于：</p>
+<pre><code>MyDate date = new MyDate();
+date = null;</code></pre><p>可以用以下表格总结上面的内容： </p>
+<table>
+<thead>
+<tr>
+<th>级别</th>
+<th>什么时候被垃圾回收</th>
+<th>用途</th>
+<th>生存时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>强引用</td>
+<td>从来不会</td>
+<td>对象的一般状态</td>
+<td>JVM停止运行时终止</td>
+</tr>
+<tr>
+<td>软引用</td>
+<td>在内存不足时</td>
+<td>对象简单？缓存</td>
+<td>内存不足时终止</td>
+</tr>
+<tr>
+<td>弱引用</td>
+<td>在垃圾回收时</td>
+<td>对象缓存</td>
+<td>gc运行后终止</td>
+</tr>
+<tr>
+<td>虚引用</td>
+<td>Unknown</td>
+<td>Unknown</td>
+<td>Unknown</td>
+</tr>
+</tbody></table>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/72/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/74/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/72/">72</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/73/">73</a></li>
+        
+        <li><a class="pagination-link" href="/page/74/">74</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Tag: flutter - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/tags/flutter/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section section-heading">
+    <div class="container">
+        <div class="content">
+            <h5>#flutter</h5>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2019/06/09/Flutter 开发桌面应用初步体验——Go Flutter还是Flutter Desktop Embedding/" itemprop="url">Flutter 开发桌面应用对比</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-06-08T16:01:00.000Z" itemprop="datePublished">6月 9 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            12 分钟 read (About 1763 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>最近用flutter做了一款App，已经发布了Android和iOS的版本，因为有计划支持全部平台。所以开始尝试flutter desktop的解决方案。在github上我们能发现两个方案，一个是flutter官方的方案<a href="https://github.com/google/flutter-desktop-embedding" target="_blank" rel="noopener">flutter-desktop-embedding</a>还有一个是使用go和glfw开发的<a href="https://github.com/go-flutter-desktop/go-flutter" target="_blank" rel="noopener">go-flutter</a></p>
+<h3 id="两种方案对比"><a href="#两种方案对比" class="headerlink" title="两种方案对比"></a>两种方案对比</h3><p>在选择使用flutter-desktop还是go-flutter之前，我们先对两种方案做一些介绍和对比。</p>
+<p><img src="/media/typora-user-images/image-20190609214047338.png" alt="image-20190609214047338"></p>
+<h3 id="两种方式的项目结构："><a href="#两种方式的项目结构：" class="headerlink" title="两种方式的项目结构："></a>两种方式的项目结构：</h3><p><img src="/media/typora-user-images/image-20190609213521705.png" alt="image-20190609213521705"></p>
+<h4 id="Flutter-Desktop-Embedding"><a href="#Flutter-Desktop-Embedding" class="headerlink" title="Flutter Desktop Embedding:"></a>Flutter Desktop Embedding:</h4><p>在flutter desktop中我们可以看到目录结构和flutter开发手机App的结构是类似的，一个主项目下有各个平台的壳工程(这里面也可以包含Android和iOS)，然后由壳工程集成flutter的渲染引擎。flutter的代码写在lib目录中。</p>
+<p>如果我们懂一些macOS开发或者windows开发，可以直接在项目中修改原生代码，比如你想修改整个程序的window的样式直接在原工程中就能修改，又比如macOS你要集成苹果的IAP，可以直接在原生项目中实现即可。</p>
+<p>它的缺点就是三个平台的开发你最好都得懂一些</p>
+<h4 id="Go-Flutter"><a href="#Go-Flutter" class="headerlink" title="Go Flutter:"></a>Go Flutter:</h4><p>Go Flutter由于本身Go语言就是跨平台的，所有它只有一个desktop目录，表示桌面版，相比于flutter desktop它让开发者完全不需要去关心macOS或者windows开发了，desktop中全是go语言编写的内容，最后desktop可以编译成三中平台的可执行文件。开发者只需要会Go语言即可。</p>
+<p>它的缺点就是如果win或者mac或者linux你要在不同的平台做一些特殊的功能或者界面，会特别麻烦，不像在Flutter desktop中直接在宿主项目中实现即可。</p>
+<h3 id="对比结果如何选择"><a href="#对比结果如何选择" class="headerlink" title="对比结果如何选择"></a>对比结果如何选择</h3><p>首先我们要明确，两种方案都不太成熟，但是如果要用来开发，也不是用不了。大家选择的时候可以根据自身技术栈，以及产品的特性来选择。</p>
+<p>如果你懂Go语言，同时你的程序是阅读类，或者偏业务类，基本不需要和本身Native交互的，选 Go Flutter真的很爽。</p>
+<p>如果你懂一点macOS或者windows开发，同时你的程序经常三个桌面端各有特色，而且需要修改本身整个window的一些样式，那么选择Flutter desktop embedding。</p>
+<h3 id="Go-Flutter实际使用"><a href="#Go-Flutter实际使用" class="headerlink" title="Go Flutter实际使用"></a>Go Flutter实际使用</h3><p>上面说了这么多，我们来实际体验一下Go flutter。先说一下背景，我已经使用flutter开发了一款App，现在我要把App变成可以运行到桌面的版本。我写的软件叫做Everything是一款记录类软件，在这里可以下载到<a href="https://everything.apppills.com" target="_blank" rel="noopener">https://everything.apppills.com</a>大家可以先看一下效果。</p>
+<ol>
+<li>安装Go ，由于Go flutter使用Go编写，所以需要安装Go工具包。大家可以在<a href="https://golang.org/doc/install" target="_blank" rel="noopener">官网下载安装</a></li>
+</ol>
+<ol start="2">
+<li><p>安装hover，hover是 Go Flutter的一个命令行工具，简化了项目初始化以及运行等步骤。</p>
+<p>使用下面命令安装</p>
+<p><figure class="highlight go hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">go</span> get -u github.com/<span class="hljs-keyword">go</span>-flutter-desktop/hover</span><br></pre></td></tr></table></figure></p>
+<p>注意如果上面的命令卡住下载不下来，大家可以设置一下代理，设置命令行代理可以开启ss或者v2ray，然后在命令行输入命令设置</p>
+<p><figure class="highlight go hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export http_proxy=<span class="hljs-string">"http://127.0.0.1:8001"</span>; export HTTP_PROXY=<span class="hljs-string">"http://127.0.0.1:8001"</span>; export https_proxy=<span class="hljs-string">"http://127.0.0.1:8001"</span>; export HTTPS_PROXY=<span class="hljs-string">"http://127.0.0.1:8001"</span></span><br><span class="line"><span class="hljs-comment">//8001改成你的ss或者v2ray监听的端口</span></span><br></pre></td></tr></table></figure></p>
+<p>⚠️ 注意：安装好hover之后，官网上说就可以使用hover命令了，但是可能你在命令行里敲hover可能还是得到的是command not found。 这里我用的是mac系统，在安装好之后，在home目录多了一个go的目录，需要在你的环境变量里加入一下go的包路径。</p>
+<p><figure class="highlight go hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export PATH=$PATH:/usr/local/<span class="hljs-keyword">go</span>/bin</span><br><span class="line">export PATH=$PATH:/Users/&#123;你的用户名&#125;/<span class="hljs-keyword">go</span>/bin</span><br><span class="line"><span class="hljs-comment">//可以检查一下你的home目录是否有了go的目录，里面有个bin，将那个目录加入到环境变量即可</span></span><br></pre></td></tr></table></figure></p>
+</li>
+<li><p>进入你以前开发App的flutter项目，执行命令初始化项目</p>
+<p><figure class="highlight go hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hover init github.com/my-organization/simpleApplication</span><br><span class="line"><span class="hljs-comment">//后面这个github.com xxxx就是你的项目仓库地址。没有的话随便写也行</span></span><br></pre></td></tr></table></figure></p>
+<p>初始化项目完成后，你会在你的项目中发现一个desktop目录，和以前的iOS和Android是平级的。这个desktop目录就是桌面版的项目。</p>
+</li>
+<li><p>把你的main.dart复制一份名字改为main_desktop.dart，Go flutter有个特别的地方，就是程序的入口不是用的main.dart，而是用的main_desktop.dart。</p>
+<p>修改main_desktop.dart为使用桌面版运行</p>
+<p><figure class="highlight dart hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">void</span> main() &#123;</span><br><span class="line">  <span class="hljs-comment">// 关键是下面这一句</span></span><br><span class="line">  debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;</span><br><span class="line">  runApp(<span class="hljs-keyword">new</span> MyApp());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</li>
+<li><p>大功告成，运行项目吧。</p>
+<p><figure class="highlight go hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hover run</span><br><span class="line"><span class="hljs-comment">//执行 hover run 可以运行项目</span></span><br></pre></td></tr></table></figure></p>
+</li>
+</ol>
+<p>我们先来看一下运行效果下面是App的运行效果和桌面版的运行效果。</p>
+<p><strong>手机版本身效果：</strong></p>
+<p><img src="/media/flutter-image/16b3cb3588b93eac.gif" alt="phone"></p>
+<p><strong>Go Flutter运行的桌面版效果：</strong></p>
+<p><img src="/media/flutter-image/16b3cd31cee0dfbc.gif" alt="desktop"></p>
+<h3 id="FAQ："><a href="#FAQ：" class="headerlink" title="FAQ："></a>FAQ：</h3><h5 id="1-程序按照上面那样迁移完成就能跑？"><a href="#1-程序按照上面那样迁移完成就能跑？" class="headerlink" title="1.程序按照上面那样迁移完成就能跑？"></a>1.程序按照上面那样迁移完成就能跑？</h5><p>当然不是，我们都知道我们用了很多插件，其实是只支持Android或者iOS的，如果你用得比较多的这种插件，那么你可能迁移到桌面端过来会比较麻烦。我的整体迁移的时间大概只用了2-3个小时，我用到了sqflite和shared preference，这两个插件Go flutter已有实现，所以很容易替换。</p>
+<h5 id="2-如何使用Go-flutter的插件"><a href="#2-如何使用Go-flutter的插件" class="headerlink" title="2.如何使用Go flutter的插件"></a>2.如何使用Go flutter的插件</h5><p>我们知道我们所有和原生通信都是通过定义一个method channel来通信的。如果你用到的插件只支持Android或者iOS，那么你就需要在desktop中去实现这个插件的method channel的所有方法。目前Go flutter只有三个插件可以用，在这里可以找到。<a href="https://github.com/go-flutter-desktop/plugins" target="_blank" rel="noopener">https://github.com/go-flutter-desktop/plugins</a> 点击某个插件，就可以看到使用方法，就是把对应代码贴到，desktop里面的option文件中即可，不要找错地方了，官网没说得太清楚。</p>
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>感谢大家的阅读，我们用flutter开发了个小App也欢迎大家试用：</p>
+<p>Everything 把记账本日记本，行程，待办等等都装进一个App里。</p>
+<h4 id="https-everything-apppills-com"><a href="#https-everything-apppills-com" class="headerlink" title="https://everything.apppills.com/"></a><a href="https://everything.apppills.com/" target="_blank" rel="noopener">https://everything.apppills.com/</a></h4><p><img src="/media/typora-user-images/image-20190609223616844.png" alt="image-20190609223616844"></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2019/06/09/现有项目集成flutter混合开发和踩过的坑/" itemprop="url">原生App项目集成flutter混合开发详细指南</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-06-08T16:01:00.000Z" itemprop="datePublished">6月 9 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            21 分钟 read (About 3082 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>记得去年9月份的时候谷歌在上海有一次开发者大会，去参加的时候关注到了flutter，随后没过多久就发布了1.0版本。18年底的时候用flutter做了个小项目，发现flutter确实挺好用的。于是尝试在公司找个小项目上马，进行混合开发试试。</p>
+<h3 id="方案选择"><a href="#方案选择" class="headerlink" title="方案选择"></a>方案选择</h3><p>目前主流的混合开发方案有两种集成方式：</p>
+<p><strong>源码集成：</strong>也就是谷歌官方提供的方案[<a href="https://github.com/flutter/flutter/wiki/Add-Flutter-to-existing-apps]" target="_blank" rel="noopener">https://github.com/flutter/flutter/wiki/Add-Flutter-to-existing-apps]</a></p>
+<p><strong>产物集成：</strong>Flutter项目单独开发，开发完成后发布成aar包或者iOS的framework形式，原生项目依赖flutter输出的制品即可。具体可以参考闲鱼的文章</p>
+<p><img src="/media/typora-user-images/image-20190221145655505.png" alt="image-20190221145655505"></p>
+<p>两种方式各有优劣，其实产物集成更好一些，不过即使是进行产物集成，也需要弄懂源码集成的方式，因为当有很多和原生交互的功能进行开发的时候，源码集成的方式可以直接调试会方便很多。</p>
+<p>根据目前我们的情况：</p>
+<p>1.参与人员都要进行flutter开发、</p>
+<p>2.持续发布和构建我可以修改控制</p>
+<p>我们现在这个项目选择了<strong>源码集成</strong>的方式。</p>
+<h3 id="为原生项目集成flutter"><a href="#为原生项目集成flutter" class="headerlink" title="为原生项目集成flutter"></a>为原生项目集成flutter</h3><p>整个的集成方案是参考谷歌方法：[<a href="https://github.com/flutter/flutter/wiki/Add-Flutter-to-existing-apps]，但是有一些不一样，我是创建了一个flutter项目后，在原生的项目中使用`git" target="_blank" rel="noopener">https://github.com/flutter/flutter/wiki/Add-Flutter-to-existing-apps]，但是有一些不一样，我是创建了一个flutter项目后，在原生的项目中使用`git</a> submodule`的形式进行管理的。</p>
+<h4 id="1-创建flutter-module-project"><a href="#1-创建flutter-module-project" class="headerlink" title="1.创建flutter module project"></a>1.创建flutter module project</h4><p>我们假定已经有了原生的项目<code>Native-iOS</code>和<code>Native-Android</code>；现在我们需要创建我们的flutter项目。</p>
+<ol>
+<li><p>把我们的flutter的channel切换到master(master分支下是flutter的preview版本)</p>
+<p><code>flutter channel master</code></p>
+</li>
+<li><p>创建flutter模块的项目</p>
+<p><code>flutter create -t module {moduleName}</code></p>
+<p>我这里创建一个flutter的模块项目叫<code>flutter_module</code></p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">➜ flutter create -t module flutter_module</span><br><span class="line">Creating project flutter_module...</span><br><span class="line">  flutter_module/test/widget_test.dart (created)</span><br><span class="line">  ...</span><br><span class="line">  ...</span><br><span class="line">  flutter_module/.idea/workspace.xml (created)</span><br><span class="line">Running &quot;flutter packages get&quot; in flutter_module...                 7.2s</span><br><span class="line">Wrote 12 files.</span><br><span class="line"></span><br><span class="line">All done!</span><br><span class="line">Your module code is in flutter_module/lib/main.dart.</span><br></pre></td></tr></table></figure></p>
+<p>创建成功后我们可以看一下目录结构</p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">➜  flutter_module git:(master) ✗ tree -L 2 -a</span><br><span class="line">.</span><br><span class="line">├── .android</span><br><span class="line">│   ├── Flutter</span><br><span class="line">│   ├── app</span><br><span class="line">│   ├── ...</span><br><span class="line">├── .gitignore</span><br><span class="line">├── .ios</span><br><span class="line">│   ├── Config</span><br><span class="line">│   ├── Flutter</span><br><span class="line">│   ├── ...</span><br><span class="line">│   └── Runner.xcworkspace</span><br><span class="line">├── lib</span><br><span class="line">│   └── main.dart</span><br><span class="line">├── pubspec.lock</span><br><span class="line">├── pubspec.yaml</span><br><span class="line">└── test</span><br><span class="line">    └── widget_test.dart</span><br></pre></td></tr></table></figure></p>
+<p>在flutter的模块项目中包含有一个隐藏的<code>.android</code>和<code>.ios</code>目录这个目录下是可运行的Android和iOS项目，我们的flutter代码还是在<code>lib</code>下编写，注意在<code>.android</code>和<code>.ios</code>目录下都有一个Flutter目录，这个是我们flutter的库项目了。也就是Android用来生成aar，iOS用来生产framework的库。如果我们用<code>flutter create xxx</code> 生成的纯flutter项目是没有这个Flutter目录的。</p>
+</li>
+<li><p>把该项目使用git管理起来，稍后我们要在native项目中以子模块的形式添加进去。</p>
+<p><figure class="highlight bash hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">➜  <span class="hljs-built_in">cd</span> flutter_module</span><br><span class="line">➜  git init</span><br><span class="line">Initialized empty Git repository <span class="hljs-keyword">in</span> /Users/zhiqiangdeng/Documents/ProjectSource/FlutterProject/flutter_module/.git/</span><br><span class="line">➜  flutter_module git:(master) ✗</span><br></pre></td></tr></table></figure></p>
+<p>初始化git仓库后我们先编辑一下项目下的<code>.gitignore</code>文件，当前这个文件是把项目下的<code>.ios</code>和<code>.android</code>忽略掉的。这个两个项目我们需要跟踪一下，大家可以去github上找一下iOS和Android的gitignore模版文件，然后添加到这个两个目录中，然后把顶层目录的文件作出如下修改，删除<code>.android和.ios</code>添加<code>.ios/Flutter/Generated.xcconfig</code></p>
+<p>.gitignore文件：</p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-.android/</span><br><span class="line">-.ios/</span><br><span class="line">+.ios/Flutter/Generated.xcconfig</span><br></pre></td></tr></table></figure></p>
+</li>
+<li><p>提交你的flutter模块项目到你的git服务器(我提交到github上了[<a href="https://github.com/zakiso/flutter-module-demo.git]大家可以参考" target="_blank" rel="noopener">https://github.com/zakiso/flutter-module-demo.git]大家可以参考</a>)</p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin &#123;你的flutter module的仓库地址&#125;</span><br><span class="line">git push origin master</span><br></pre></td></tr></table></figure></p>
+</li>
+</ol>
+<h4 id="2-给iOS项目集成flutter"><a href="#2-给iOS项目集成flutter" class="headerlink" title="2.给iOS项目集成flutter"></a>2.给iOS项目集成flutter</h4><p>1.进入我们原生的iOS项目根目录中，为它添加一个git submodule，把我们的flutter项目拉取下来.</p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git submodule add &#123;你的flutter module的仓库地址&#125;</span><br><span class="line">git submodule update</span><br></pre></td></tr></table></figure></p>
+<p>2.在项目的<code>Podfile</code>文件中添加下面的代码，在每次执行pod install会运行podhelper.rb</p>
+<p><figure class="highlight ruby hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">platform <span class="hljs-symbol">:ios</span>, <span class="hljs-string">'8.0'</span></span><br><span class="line">use_frameworks!</span><br><span class="line"></span><br><span class="line">target <span class="hljs-string">'MyApp'</span> <span class="hljs-keyword">do</span></span><br><span class="line">  pod <span class="hljs-string">'AFNetworking'</span>, <span class="hljs-string">'~&gt; 2.6'</span></span><br><span class="line">  xxxx</span><br><span class="line"><span class="hljs-keyword">end</span></span><br><span class="line"><span class="hljs-comment">#添加如下两行代码，路径修改为我们的fluter module的路径</span></span><br><span class="line">flutter_application_path = <span class="hljs-string">'./flutter-module-demo'</span></span><br><span class="line">  eval(File.read(File.join(flutter_application_path, <span class="hljs-string">'.ios'</span>, <span class="hljs-string">'Flutter'</span>, <span class="hljs-string">'podhelper.rb'</span>)), binding)</span><br></pre></td></tr></table></figure></p>
+<p>3.打开Xcode关闭bitcode配置<code>Build Settings-&gt;Build Options-&gt;Enable Bitcode</code></p>
+<p>4.添加编译脚本，打开Xcode在 Build Phases中添加<code>New Run Script Phase</code>在里面填入如下脚本</p>
+<p><figure class="highlight bash hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-string">"<span class="hljs-variable">$FLUTTER_ROOT</span>/packages/flutter_tools/bin/xcode_backend.sh"</span> build</span><br><span class="line"><span class="hljs-string">"<span class="hljs-variable">$FLUTTER_ROOT</span>/packages/flutter_tools/bin/xcode_backend.sh"</span> embed</span><br></pre></td></tr></table></figure></p>
+<p><img src="/media/typora-user-images/image-20190221164146532.png" alt="image-20190221164146532"></p>
+<p>5.项目的配置完成现在需要生成一些配置文件</p>
+<p>​    a. 进入原生项目的flutter模块目录中执行<code>flutter packages get</code>命令</p>
+<p>​    b. 回到原生项目根目录执行<code>pod install</code></p>
+<p><figure class="highlight shell hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">➜  cd flutter-module-demo</span><br><span class="line">➜  flutter-module-demo git:(master) flutter packages get</span><br><span class="line">Running "flutter packages get" in flutter-module-demo...            0.4s</span><br><span class="line">➜  flutter-module-demo git:(master) cd ..</span><br><span class="line">➜  FlutterNativeiOS git:(master) ✗ pod install</span><br><span class="line">Analyzing dependencies</span><br><span class="line">Fetching podspec for `Flutter` from `./flutter-module-demo/.ios/Flutter/engine`</span><br><span class="line">Fetching podspec for `FlutterPluginRegistrant` from `./flutter-module-demo/.ios/Flutter/FlutterPluginRegistrant`</span><br><span class="line">Downloading dependencies</span><br><span class="line">Using AFNetworking (2.6.3)</span><br><span class="line">Installing Flutter (1.0.0)</span><br><span class="line">Installing FlutterPluginRegistrant (0.0.1)</span><br><span class="line">Generating Pods project</span><br><span class="line">Integrating client project</span><br><span class="line">Sending stats</span><br><span class="line">Pod installation complete! There are 3 dependencies from the Podfile and 3 total pods installed.</span><br></pre></td></tr></table></figure></p>
+<p>到此为止我们的原生项目就已经集成好了flutter项目了。</p>
+<p>5.在原生项目中使用flutter，下面以swift项目为例</p>
+<p>修改AppDelegate.swift:注意AppDelegate是集成自FlutterAppDelegate</p>
+<p><figure class="highlight swift hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">import</span> UIKit</span><br><span class="line"><span class="hljs-keyword">import</span> Flutter</span><br><span class="line"><span class="hljs-keyword">import</span> FlutterPluginRegistrant <span class="hljs-comment">// Only if you have Flutter Plugins.</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-meta">@UIApplicationMain</span></span><br><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AppDelegate</span>: <span class="hljs-title">FlutterAppDelegate</span> </span>&#123;</span><br><span class="line">  <span class="hljs-keyword">var</span> flutterEngine : <span class="hljs-type">FlutterEngine?</span>;</span><br><span class="line">  <span class="hljs-comment">// Only if you have Flutter plugins.</span></span><br><span class="line">  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">application</span><span class="hljs-params">(<span class="hljs-number">_</span> application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: <span class="hljs-keyword">Any</span>]?)</span></span> -&gt; <span class="hljs-type">Bool</span> &#123;</span><br><span class="line">    <span class="hljs-keyword">self</span>.flutterEngine = <span class="hljs-type">FlutterEngine</span>(name: <span class="hljs-string">"io.flutter"</span>, project: <span class="hljs-literal">nil</span>);</span><br><span class="line">    <span class="hljs-keyword">self</span>.flutterEngine?.run(withEntrypoint: <span class="hljs-literal">nil</span>);</span><br><span class="line">    <span class="hljs-type">GeneratedPluginRegistrant</span>.register(with: <span class="hljs-keyword">self</span>.flutterEngine);</span><br><span class="line">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.application(application, didFinishLaunchingWithOptions: launchOptions);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>修改Controller代码</p>
+<p><figure class="highlight swift hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">import</span> UIKit</span><br><span class="line"><span class="hljs-keyword">import</span> Flutter</span><br><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ViewController</span>: <span class="hljs-title">UIViewController</span> </span>&#123;</span><br><span class="line">  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">viewDidLoad</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">    <span class="hljs-keyword">super</span>.viewDidLoad()</span><br><span class="line">    <span class="hljs-keyword">let</span> button = <span class="hljs-type">UIButton</span>(type:<span class="hljs-type">UIButtonType</span>.custom)</span><br><span class="line">	...</span><br><span class="line">    <span class="hljs-keyword">self</span>.view.addSubview(button)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="hljs-meta">@objc</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handleButtonAction</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">    <span class="hljs-keyword">let</span> flutterEngine = (<span class="hljs-type">UIApplication</span>.shared.delegate <span class="hljs-keyword">as</span>? <span class="hljs-type">AppDelegate</span>)?.flutterEngine;</span><br><span class="line">    <span class="hljs-keyword">let</span> flutterViewController = <span class="hljs-type">FlutterViewController</span>(engine: flutterEngine, nibName: <span class="hljs-literal">nil</span>, bundle: <span class="hljs-literal">nil</span>)!;</span><br><span class="line">    <span class="hljs-keyword">self</span>.present(flutterViewController, animated: <span class="hljs-literal">true</span>, completion: <span class="hljs-literal">nil</span>)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<ol start="6">
+<li>RUN….</li>
+</ol>
+<h4 id="3-iOS项目集成过程梳理"><a href="#3-iOS项目集成过程梳理" class="headerlink" title="3.iOS项目集成过程梳理"></a>3.iOS项目集成过程梳理</h4><p>整个的集成过程其实总得来说是如下三个步骤：</p>
+<p>1.将flutter项目放入原生项目的文件夹下</p>
+<p>2.在podfile中添加<code>podhelper.rb</code>配置</p>
+<p>3.在Xcode的build phases添加<code>&quot;$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh&quot;</code>iOS编译脚本。</p>
+<p>其中podhelper.rb文件位于我们flutter模块项目的<code>.ios/Flutter/podhelper.rb</code>下，大家查看它的源码可以发现，它有下面几个作用：</p>
+<p>1.把Flutter（flutterEngine）和FlutterPluginRegistrant两个库用pod给原生项目导入进入</p>
+<p>2.如果flutter项目有用到flutter plugin插件，把插件用pod导入</p>
+<p>3.导入<code>Generated.xcconfig</code>的相关配置信息，在<code>podhelper.rb</code>同级别的目录下还有一个<code>Generated.xcconfig</code>文件，这个文件在使用<code>flutter create xx、flutter run xxx、flutter packages get</code>命令的时候如果该文件不存在则会生成这个文件。这个文件内容如下：</p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// This is a generated file; do not edit or check into version control.</span><br><span class="line">FLUTTER_ROOT=/Users/zhiqiangdeng/.flutter_wrapper/1.2.2-pre.43</span><br><span class="line">FLUTTER_APPLICATION_PATH=/Users/zhiqiangdeng/Documents/ProjectSource/XcodeProject/lianhua-order-iOS/order-check-module-flutter</span><br><span class="line">FLUTTER_TARGET=lib/main.dart</span><br><span class="line">FLUTTER_BUILD_DIR=build</span><br><span class="line">SYMROOT=$&#123;SOURCE_ROOT&#125;/../build/ios</span><br><span class="line">FLUTTER_BUILD_NAME=1.0.0</span><br><span class="line">FLUTTER_BUILD_NUMBER=1</span><br></pre></td></tr></table></figure></p>
+<p>他记录了当前flutter sdk的目录位置，以及版本号，还有项目模块的目录位置。这个文件的内容在执行<code>pod install</code>的时候会被写入到xcode build setting中，在执行完pod install之后，可以在原生项目根目录使用<code>xcodebuild -showBuildSettings|grep flutter</code> 查看相关的信息。</p>
+<p><img src="/media/typora-user-images/image-20190221183656596.png" alt="image-20190221183656596"></p>
+<p>最后一步就是运行程序，运行程序的时候在Build phase添加了<code>xcode_backend.sh</code>该脚本会使用到上面pod install给xcode build setting设置的那些环境变量，然后找到项目目录生成AppFramework。</p>
+<h4 id="4-给原生Android项目集成Flutter"><a href="#4-给原生Android项目集成Flutter" class="headerlink" title="4.给原生Android项目集成Flutter"></a>4.给原生Android项目集成Flutter</h4><p>Android的文章很多，这里不再详细描述了</p>
+<p>1.在原生Android项目中添加子模块，将上面创建的flutter module项目拉取到原生安卓项目中</p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git submodule add &#123;你的flutter module的仓库地址&#125;</span><br><span class="line">git submodule update</span><br></pre></td></tr></table></figure></p>
+<p>2.在根目录的<code>settings.gradle</code>中添加如下配置</p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">setBinding(new Binding([gradle: this]))                                 </span><br><span class="line">evaluate(new File(                                                                 </span><br><span class="line">  &apos;&#123;xxxxx你的flutter module目录&#125;/.android/include_flutter.groovy&apos;                    </span><br><span class="line">))</span><br></pre></td></tr></table></figure></p>
+<p>3.在原生项目的app目录下的build.gradle文件中添加Flutter库的依赖</p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">  implementation project(&apos;:flutter&apos;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.在原生代码中集成flutter跳转到flutter页面</p>
+<p>我使用了一个新的Activity进行跳转。具体可以参看源码</p>
+<p><figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Button open = findViewById(R.id.openBtn);</span><br><span class="line">open.setOnClickListener(<span class="hljs-keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">    <span class="hljs-meta">@Override</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onClick</span><span class="hljs-params">(View v)</span> </span>&#123;</span><br><span class="line">        Intent intent = <span class="hljs-keyword">new</span> Intent();</span><br><span class="line">        intent.setClass(MainActivity.<span class="hljs-keyword">this</span>, MyFlutterActivity.class);</span><br><span class="line">        startActivity(intent);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p><figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyFlutterActivity</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="hljs-meta">@Override</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onCreate</span><span class="hljs-params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_flutter);</span><br><span class="line">        <span class="hljs-keyword">final</span> FlutterView flutterView = Flutter.createView(</span><br><span class="line">                <span class="hljs-keyword">this</span>,</span><br><span class="line">                getLifecycle(),</span><br><span class="line">                <span class="hljs-string">"route1"</span></span><br><span class="line">        );</span><br><span class="line">        <span class="hljs-keyword">final</span> FrameLayout layout = findViewById(R.id.flutter_container);</span><br><span class="line">        layout.addView(flutterView);</span><br><span class="line">        <span class="hljs-keyword">final</span> FlutterView.FirstFrameListener[] listeners = <span class="hljs-keyword">new</span> FlutterView.FirstFrameListener[<span class="hljs-number">1</span>];</span><br><span class="line">        listeners[<span class="hljs-number">0</span>] = <span class="hljs-keyword">new</span> FlutterView.FirstFrameListener() &#123;</span><br><span class="line">            <span class="hljs-meta">@Override</span></span><br><span class="line">            <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onFirstFrame</span><span class="hljs-params">()</span> </span>&#123;</span><br><span class="line">                layout.setVisibility(View.VISIBLE);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        flutterView.addFirstFrameListener(listeners[<span class="hljs-number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>Android从原生跳到Flutter模块的黑屏问题</strong>，在网上看到很多说设置透明主题的但是没有用，后来看到一种先隐藏显示，等待渲染好第一帧后才显示flutter页面的方法。这里要注意一点要在布局中先把flutter的Container布局设置为InVisible状态，不要使用Gone，用gone的话是不显示也不渲染，用InVisible不显示但是会渲染界面占位置，等待渲染完成后再设置为Visible即可。</p>
+<p>项目demo我已经传到github中：有遇到问题的可以参考项目源码</p>
+<ul>
+<li><p>原生Android集成Flutter项目：<a href="https://github.com/zakiso/flutter-native-android.git" target="_blank" rel="noopener">https://github.com/zakiso/flutter-native-android.git</a></p>
+</li>
+<li><p>原生iOS集成Flutter项目：<a href="https://github.com/zakiso/flutter-native-ios.git" target="_blank" rel="noopener">https://github.com/zakiso/flutter-native-ios.git</a></p>
+</li>
+<li><p>Flutter模块项目：<a href="https://github.com/zakiso/flutter-module-demo.git" target="_blank" rel="noopener">https://github.com/zakiso/flutter-module-demo.git</a></p>
+</li>
+</ul>
+<h4 id="5-flutter的版本管理"><a href="#5-flutter的版本管理" class="headerlink" title="5.flutter的版本管理"></a>5.flutter的版本管理</h4><p>在我们的开发过程中遇到了一个问题，就是各个开发者使用的flutter sdk版本不一致，导致一些库无法运行，在网上也遇到有相同问题的人，提出了模仿gradle wrapper来做一个flutter_wrapper的思路。于是我根据自己的需要写了一个flutter_wrapper的小工具。它的主要作用是统一开发人员的本地flutter环境。</p>
+<p>项目仓库地址：<a href>https://github.com/zakiso/flutterw.git</a></p>
+<p><strong>使用说明</strong></p>
+<ol>
+<li>在你的项目根目录中执行命令下载脚本<br><code>curl -O https://raw.githubusercontent.com/zakiso/flutterw/master/flutterw &amp;&amp; chmod 755 flutterw</code></li>
+<li>下载好脚本后在根目录中使用<br><code>./flutterw init</code><br>该命令会收集你当前系统中的flutter版本，并将相关信息写入<code>flutter_wrapper.properties</code>文件中，团队中所有成员都会以该版本号做为该项目的标准版本  </li>
+<li>将flutterw文件和flutter_wrapper.properties文件添加到git中提交到仓库里</li>
+<li>其他成员拉取代码后在项目中使用<code>flutter</code>命令的地方使用<code>./flutterw</code>代替，如果使用ide请选择home目录下对应版本的sdk包</li>
+</ol>
+<p><strong>flutterw做了什么？</strong></p>
+<ol>
+<li>使用flutterw的时候会获取当前目录下的flutter_wrapper.properties文件中的版本号</li>
+<li>去用户的<code>${HOME}/flutter_wrapper/{版本号}/</code> 目录下查找是否有该版本sdk</li>
+<li>如果没有该版本sdk会下载下来，然后使用该目录下的sdk执行命令</li>
+</ol>
+<p><strong>注意事项</strong></p>
+<p>如果flutter版本是preview的版本是直接使用master的最新代码来管理的。大家可以查看源码很简单，根据自己的需要定制。</p>
+<h3 id="最后："><a href="#最后：" class="headerlink" title="最后："></a>最后：</h3><p>我们整个项目都是使用git进行管理的，虽然每个开发者都需要安装flutter环境，但是对于小团队来说成本并不高，加上flutter_wrapper也保证了版本的一致性。iOS开发者可以在原来的iOS项目中开发flutter的项目，Android开发者可以在原android项目中开发flutter，flutter开发者也可以自己单独开发flutter项目，这种方式其实对于开发者来说也是很方便的。</p>
+<p><img src="/media/typora-user-images/image-20190221223543845.png" alt="image-20190221223543845"></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2019/02/21/Flutter快速入门文档/" itemprop="url">Futter快速入门学习指南</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-02-20T16:01:00.000Z" itemprop="datePublished">2月 21 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            3 分钟 read (About 444 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>flutter是什么？</p>
+<p>flutter是google退出的一款跨平台app开发框架，他采用自己绘制界面的方式，采用了Android的skia绘制引擎，性能较高，同时不是像react native一样渲染成原生组件，所以跨平台兼容性较好，不需要依赖原生实现。</p>
+<p><img src="https://cdn-images-1.medium.com/max/1440/1*5MY5yRErZcv46mN3er8JIA.png" alt="img"></p>
+<h4 id="（一）flutter基础"><a href="#（一）flutter基础" class="headerlink" title="（一）flutter基础"></a>（一）flutter基础</h4><p>flutter项目目录介绍</p>
+<ul>
+<li>项目结构</li>
+<li>常用命令<ul>
+<li>flutter doctor、flutter build、flutter —version</li>
+<li>flutter packages get</li>
+<li>hot reload如何进行的</li>
+<li>flutter —help演示</li>
+</ul>
+</li>
+</ul>
+<p>程序是如何运行的</p>
+<ul>
+<li>main函数 入口</li>
+<li>演示demo的布局讲解<ul>
+<li>flutter inspector使用</li>
+</ul>
+</li>
+</ul>
+<h4 id="（二）flutter布局介绍"><a href="#（二）flutter布局介绍" class="headerlink" title="（二）flutter布局介绍"></a>（二）flutter布局介绍</h4><p>Text  Textfield. Container</p>
+<p>Column Row</p>
+<p>Stack</p>
+<p>ListView</p>
+<p>Scofford</p>
+<p>页面传值与原生交互</p>
+<p>Flutter平台特定的API支持不依赖于代码生成，而是依赖于灵活的消息传递的方式：</p>
+<p>应用的Flutter部分通过平台通道（platform channel）将消息发送到其应用程序的所在的宿主（iOS或Android）。</p>
+<p>宿主监听的平台通道，并接收该消息。然后它会调用特定于该平台的API（使用原生编程语言） - 并将响应发送回客户端，即应用程序的Flutter部分。</p>
+<p>用平台通道在客户端（Flutter UI）和宿主（平台）之间传递消息，如下图所示：</p>
+<p><img src="http://wx3.sinaimg.cn/mw690/0060lm7Tly1fqi6oy9kj6j30g40hzmxi.jpg" alt="img"></p>
+<h3 id="界面绘制："><a href="#界面绘制：" class="headerlink" title="界面绘制："></a>界面绘制：</h3><p><img src="https://cdn-images-1.medium.com/max/1440/1*NEMl_CrH4mAKeVCgxXRhiA.png" alt="img"></p>
+<p><img src="https://cdn-images-1.medium.com/max/1440/1*h3CuR6jpaGAel6HyVpv8RA.png" alt="img"></p>
+<p><img src="https://cdn-images-1.medium.com/max/1440/1*2NGvaOqMyGwX7Cp1k0JTxg.png" alt="img"></p>
+<p><img src="https://cdn-images-1.medium.com/max/1440/1*d-Q8fAT5YjedMOXfpATtlw.png" alt="img"></p>
+<p><img src="https://cdn-images-1.medium.com/max/1440/1*Kvjwl5DpKmYOGyNE5ytYbA.png" alt="img"></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

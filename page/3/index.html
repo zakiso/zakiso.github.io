@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/3/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2019/05/07/优化使用kotlin开发Android app的编译速度/" itemprop="url">优化使用kotlin开发Android app的编译速度</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2019-05-06T16:01:00.000Z" itemprop="datePublished">5月 7 2019</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            6 分钟 read (About 830 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>团队使用kotlin挺长时间了，一直以来都不太满意kotlin的编译速度，但是也能忍受。最近开了一个新项目，有不少同事从java过来的，他们就实在是受不了，优化编译速度就变得很重要了。</p>
+<h3 id="优化之前和之后的对比"><a href="#优化之前和之后的对比" class="headerlink" title="优化之前和之后的对比"></a>优化之前和之后的对比</h3><p><strong>在优化之前我们的一次完整编译时间是2分21秒</strong></p>
+<p><img src="/media/typora-user-images/image-20190507140625016.png" alt="image-20190507140625016"></p>
+<p>具体的耗时任务在Run Tasks中：</p>
+<p><img src="/media/typora-user-images/image-20190507140746857.png" alt="image-20190507140746857"></p>
+<p>可以看到具体的耗时任务如上，主要是kapt相关的编译和编译kotlin代码，以及最后的transformClassedWithXXX。</p>
+<p><strong>优化之后的完整编译时间31s</strong></p>
+<p><img src="/media/typora-user-images/image-20190507151442005.png" alt="image-20190507151442005"></p>
+<p><strong>优化之后的增量编译时间15s</strong></p>
+<p><img src="/media/typora-user-images/image-20190507151649144.png" alt="image-20190507151649144"></p>
+<p><img src="/media/ypora-user-images/image-20190507151800539.png" alt="image-20190507151800539"></p>
+<h3 id="优化步骤："><a href="#优化步骤：" class="headerlink" title="优化步骤："></a>优化步骤：</h3><h5 id="1-优化gradle配置："><a href="#1-优化gradle配置：" class="headerlink" title="1.优化gradle配置："></a>1.优化gradle配置：</h5><p>在项目根目录创建一个gradle.properties文件</p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">//开启gradle并行编译，开启daemon，调整jvm内存大小</span><br><span class="line">org.gradle.daemon=true</span><br><span class="line">org.gradle.configureondemand=true</span><br><span class="line">org.gradle.parallel=true</span><br><span class="line">org.gradle.jvmargs=-Xmx4096m -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8</span><br><span class="line"></span><br><span class="line">//开启gradle缓存</span><br><span class="line">org.gradle.caching=true</span><br><span class="line">android.enableBuildCache=true</span><br><span class="line"></span><br><span class="line">//开启kotlin的增量和并行编译</span><br><span class="line">kotlin.incremental=true</span><br><span class="line">kotlin.incremental.java=true</span><br><span class="line">kotlin.incremental.js=true</span><br><span class="line">kotlin.caching.enabled=true</span><br><span class="line">kotlin.parallel.tasks.in.project=true //开启kotlin并行编译</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//优化kapt</span><br><span class="line">kapt.use.worker.api=true  //并行运行kapt1.2.60版本以上支持</span><br><span class="line">kapt.incremental.apt=true  //增量编译 kapt1.3.30版本以上支持</span><br><span class="line">kapt.include.compile.classpath=false  //kapt avoiding 如果用kapt依赖的内容没有变化，会完全重用编译内容，省掉最上图中的:app:kaptGenerateStubsDebugKotlin的时间</span><br></pre></td></tr></table></figure></p>
+<p>在上面的配置中，我们首先调整了gradle的配置，然后开启了缓存和kotlin和kapt的增量编译。</p>
+<p>如果项目中使用了kapt请使用最新版本的kapt，当前写该文章时kapt的最新版本为<code>1.3.31</code></p>
+<h5 id="2-优化app的build-gradle"><a href="#2-优化app的build-gradle" class="headerlink" title="2.优化app的build.gradle"></a>2.优化app的build.gradle</h5><p>1.在项目的app目录中的build.gradle文件中修改：</p>
+<p><figure class="highlight groovy hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">//如果有用到kapt添加如下配置</span></span><br><span class="line">kapt &#123;</span><br><span class="line">    useBuildCache = <span class="hljs-literal">true</span></span><br><span class="line">    javacOptions &#123;</span><br><span class="line">        option(<span class="hljs-string">"-Xmaxerrs"</span>, <span class="hljs-number">500</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">//在Android代码块中添加如下配置：（可优化最上图中transformClassDexBuilderForDebug的时间）</span></span><br><span class="line">android &#123;</span><br><span class="line">    dexOptions &#123;</span><br><span class="line">        preDexLibraries <span class="hljs-literal">true</span></span><br><span class="line">        maxProcessCount <span class="hljs-number">8</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.其他不太重要的优化，好像对时间影响不算特别大</p>
+<p>优化版本号的配置，如果是debug版本不要使用动态版本号</p>
+<p><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">//原配置</span><br><span class="line">defaultConfig &#123;</span><br><span class="line">	...</span><br><span class="line">    minSdkVersion 19</span><br><span class="line">    targetSdkVersion 28</span><br><span class="line">    versionCode gitVersionCode()</span><br><span class="line">    versionName currentName()</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">//修改为</span><br><span class="line">defaultConfig &#123;</span><br><span class="line">	...</span><br><span class="line">    minSdkVersion 19</span><br><span class="line">    targetSdkVersion 28</span><br><span class="line">    versionCode 1</span><br><span class="line">    versionName &quot;1.0.0&quot;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">applicationVariants.all &#123; variant -&gt;</span><br><span class="line">    ...</span><br><span class="line">    if (variant.buildType.name == &quot;release&quot;) &#123;</span><br><span class="line">        versionName = currentName()</span><br><span class="line">        versionCode = gitVersionCode()</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以前我们的配置上versionCode是使用的git的提交次数作为版本号的，在本地debug状态的时候其实最好是写死版本号，如果版本号变化会导致需要重新生成Manifest文件以及完整的编译应用，导致InstantRun无法使用(PS其实我们一直没用InstantRun)。所以修改为写死版本号，然后在applicationVariants中判断如果是release才使用正常的版本号。然后还有一个就是使用依赖版本的时候，尽量不要使用+号的版本依赖，使用固定版本号速度会更快。</p>
+<p>希望大家省下的编译时间，能够好好陪陪家人。 enjoy～</p>
+<p>参考资料：</p>
+<p><a href="https://developer.android.com/studio/build/optimize-your-build" target="_blank" rel="noopener">https://developer.android.com/studio/build/optimize-your-build</a></p>
+<p><a href="https://www.kotlincn.net/docs/reference/kapt.html" target="_blank" rel="noopener">https://www.kotlincn.net/docs/reference/kapt.html</a></p>
+<p><a href="https://blog.jetbrains.com/kotlin/2019/01/kotlin-1-3-20-released/" target="_blank" rel="noopener">https://blog.jetbrains.com/kotlin/2019/01/kotlin-1-3-20-released/</a></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/2/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/4/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><a class="pagination-link" href="/page/2/">2</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/3/">3</a></li>
+        
+        <li><a class="pagination-link" href="/page/4/">4</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

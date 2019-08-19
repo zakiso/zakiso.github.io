@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/77/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2012/02/18/java/collection/2012-02-18-collection-18-iterator_enumeration/" itemprop="url">Java 集合系列18之 Iterator和Enumeration比较</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-02-18T01:01:00.000Z" itemprop="datePublished">2月 18 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            8 分钟 read (About 1247 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>这一章，我们对Iterator和Enumeration进行比较学习。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1部分 Iterator和Enumeration区别</a><br><a href="#anchor2">第2部分 Iterator和Enumeration实例</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第1部分-Iterator和Enumeration区别"><a href="#第1部分-Iterator和Enumeration区别" class="headerlink" title="第1部分 Iterator和Enumeration区别"></a>第1部分 Iterator和Enumeration区别</h1><p>在Java集合中，我们通常都通过 “Iterator(迭代器)” 或 “Enumeration(枚举类)” 去遍历集合。今天，我们就一起学习一下它们之间到底有什么区别。</p>
+<p>我们先看看 Enumeration.java 和 Iterator.java的源码，再说它们的区别。</p>
+<p>Enumeration是一个接口，它的源码如下：</p>
+<pre><code>package java.util;
+
+public interface Enumeration&lt;E&gt; {
+
+    boolean hasMoreElements();
+
+    E nextElement();
+}</code></pre><p>Iterator也是一个接口，它的源码如下：</p>
+<pre><code>package java.util;
+
+public interface Iterator&lt;E&gt; {
+    boolean hasNext();
+
+    E next();
+
+    void remove();
+}</code></pre><p>看完代码了，我们再来说说它们之间的区别。</p>
+<p><strong>(01) 函数接口不同</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; Enumeration只有2个函数接口。通过Enumeration，我们只能读取集合的数据，而不能对数据进行修改。<br>&nbsp;&nbsp;&nbsp;&nbsp;Iterator只有3个函数接口。Iterator除了能读取集合的数据之外，也能数据进行删除操作。</p>
+<p><strong>(02) Iterator支持fail-fast机制，而Enumeration不支持。</strong><br>&nbsp;&nbsp;&nbsp;&nbsp;Enumeration 是JDK 1.0添加的接口。使用到它的函数包括Vector、Hashtable等类，这些类都是JDK 1.0中加入的，Enumeration存在的目的就是为它们提供遍历接口。Enumeration本身并没有支持同步，而在Vector、Hashtable实现Enumeration时，添加了同步。<br>&nbsp;&nbsp;&nbsp;&nbsp;而Iterator 是JDK 1.2才添加的接口，它也是为了HashMap、ArrayList等集合提供遍历接口。Iterator是支持fail-fast机制的：当多个线程对同一个集合的内容进行操作时，就可能会产生fail-fast事件。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="第2部分-Iterator和Enumeration实例"><a href="#第2部分-Iterator和Enumeration实例" class="headerlink" title="第2部分 Iterator和Enumeration实例"></a>第2部分 Iterator和Enumeration实例</h1><p>下面，我们编写一个Hashtable，然后分别通过 Iterator 和 Enumeration 去遍历它，比较它们的效率。代码如下：</p>
+<pre><code>import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Random;
+
+/*
+ * 测试分别通过 Iterator 和 Enumeration 去遍历Hashtable
+ * @author skywang
+ */
+public class IteratorEnumeration {
+
+    public static void main(String[] args) {
+        int val;
+        Random r = new Random();
+        Hashtable table = new Hashtable();
+        for (int i=0; i&lt;100000; i++) {
+            // 随机获取一个[0,100)之间的数字
+            val = r.nextInt(100);
+            table.put(String.valueOf(i), val);
+        }
+
+        // 通过Iterator遍历Hashtable
+        iterateHashtable(table) ;
+
+        // 通过Enumeration遍历Hashtable
+        enumHashtable(table);
+    }
+
+    /*
+     * 通过Iterator遍历Hashtable
+     */
+    private static void iterateHashtable(Hashtable table) {
+        long startTime = System.currentTimeMillis();
+
+        Iterator iter = table.entrySet().iterator();
+        while(iter.hasNext()) {
+            //System.out.println(&quot;iter:&quot;+iter.next());
+            iter.next();
+        }
+
+        long endTime = System.currentTimeMillis();
+        countTime(startTime, endTime);
+    }
+
+    /*
+     * 通过Enumeration遍历Hashtable
+     */
+    private static void enumHashtable(Hashtable table) {
+        long startTime = System.currentTimeMillis();
+
+        Enumeration enu = table.elements();
+        while(enu.hasMoreElements()) {
+            //System.out.println(&quot;enu:&quot;+enu.nextElement());
+            enu.nextElement();
+        }
+
+        long endTime = System.currentTimeMillis();
+        countTime(startTime, endTime);
+    }
+
+    private static void countTime(long start, long end) {
+        System.out.println(&quot;time: &quot;+(end-start)+&quot;ms&quot;);
+    }
+}</code></pre><p>运行结果如下：</p>
+<pre><code>time: 9ms
+time: 5ms</code></pre><p>从中，我们可以看出。Enumeration 比 Iterator 的遍历速度更快。为什么呢？<br>这是因为，Hashtable中Iterator是通过Enumeration去实现的，而且Iterator添加了对fail-fast机制的支持；所以，执行的操作自然要多一些。</p>
+<h1 id="更多内容"><a href="#更多内容" class="headerlink" title="更多内容"></a>更多内容</h1><p><a href="/2012/02/01/collection-00-index">00. Java 集合系列目录(Category)</a><br><a href="/2012/02/01/collection-01-summary">01. Java 集合系列01之 总体框架</a><br><a href="/2012/02/02/collection-02-framework">02. Java 集合系列02之 Collection架构</a><br><a href="/2012/02/03/collection-03-arraylist">03. Java 集合系列03之 ArrayList详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/04/collection-04-fail-fast">04. Java 集合系列04之 fail-fast总结(通过ArrayList来说明fail-fast的原理、解决办法)</a><br><a href="/2012/02/05/collection-05-linkedlist">05. Java 集合系列05之 LinkedList详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/06/collection-06-vector">06. Java 集合系列06之 Vector详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/07/collection-07-stack">07. Java 集合系列07之 Stack详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/08/collection-08-List">08. Java 集合系列08之 List总结(LinkedList, ArrayList等使用场景和性能分析)</a><br><a href="/2012/02/09/collection-09-map">09. Java 集合系列09之 Map架构</a><br><a href="/2012/02/10/collection-10-hashmap">10. Java 集合系列10之 HashMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/11/collection-11-hashtable">11. Java 集合系列11之 Hashtable详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/12/collection-12-treemap">12. Java 集合系列12之 TreeMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/13/collection-13-weakhashmap">13. Java 集合系列13之 WeakHashMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/14/collection-14-mapsummary">14. Java 集合系列14之 Map总结(HashMap, Hashtable, TreeMap, WeakHashMap等使用场景)</a><br><a href="/2012/02/15/collection-15-set">15. Java 集合系列15之 Set架构</a><br><a href="/2012/02/16/collection-16-hashset">16. Java 集合系列16之 HashSet详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/17/collection-17-treeset">17. Java 集合系列17之 TreeSet详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/18/collection-18-iterator_enumeration">18. Java 集合系列18之 Iterator和Enumeration比较</a></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/76/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/78/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/76/">76</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/77/">77</a></li>
+        
+        <li><a class="pagination-link" href="/page/78/">78</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

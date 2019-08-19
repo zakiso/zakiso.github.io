@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/16/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/09/07/android/os/binder/2014-09-07-BinderCommunication-GetService03/" itemprop="url">Android Binder机制(十一) getService详解03之 请求的反馈</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-09-07T01:03:00.000Z" itemprop="datePublished">9月 7 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            13 分钟 read (About 2012 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>前面两篇文章分别介绍了getService中”请求的发送”和”请求的处理”这两部分，本文将介绍getService请求的最后一部分–请求的反馈。下面就说说MediaPlayer收到请求反馈之后的处理流程。</p>
+</blockquote>
+<blockquote>
+<p>注意：本文是基于Android 4.4.2版本进行介绍的！</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-Binder驱动中binder-thread-read-的源码"><a href="#1-Binder驱动中binder-thread-read-的源码" class="headerlink" title="1. Binder驱动中binder_thread_read()的源码"></a>1. Binder驱动中binder_thread_read()的源码</h1><p>从MediaPlayer开始唤醒开始说起。</p>
+<pre><code>static int binder_thread_read(struct binder_proc *proc,
+                struct binder_thread *thread,
+                void  __user *buffer, int size,
+                signed long *consumed, int non_block)
+{
+    ...
+    if (wait_for_proc_work) {
+      ...
+      if (non_block) {
+          ...
+      } else
+          ret = wait_event_interruptible_exclusive(proc-&gt;wait, binder_has_proc_work(proc, thread));
+    } else {
+      ...
+    }
+    ...
+
+    while (1) {
+        struct binder_transaction_data tr;
+        struct binder_work *w;
+        struct binder_transaction *t = NULL;
+
+        // 如果当前线程的&quot;待完成工作&quot;不为空，则取出待完成工作。
+        if (!list_empty(&amp;thread-&gt;todo))
+            w = list_first_entry(&amp;thread-&gt;todo, struct binder_work, entry);
+        else if (!list_empty(&amp;proc-&gt;todo) &amp;&amp; wait_for_proc_work)
+            ...
+        else {
+            ...
+        }
+
+        ...
+
+        switch (w-&gt;type) {
+            case BINDER_WORK_TRANSACTION: {
+                t = container_of(w, struct binder_transaction, work);
+            } break;
+            ...
+        }
+
+        if (!t)
+            continue;
+
+        // t-&gt;buffer-&gt;target_node是目标节点。
+        // 这里，MediaPlayer的getService请求的目标是Service Manager，因此target_node是Service Manager对应的节点；
+        if (t-&gt;buffer-&gt;target_node) {
+            ...
+        } else {
+            tr.target.ptr = NULL;
+            tr.cookie = NULL;
+            cmd = BR_REPLY;
+        }
+        // 交易码
+        tr.code = t-&gt;code;
+        tr.flags = t-&gt;flags;
+        tr.sender_euid = t-&gt;sender_euid;
+
+        if (t-&gt;from) {
+            struct task_struct *sender = t-&gt;from-&gt;proc-&gt;tsk;
+            tr.sender_pid = task_tgid_nr_ns(sender,
+                            current-&gt;nsproxy-&gt;pid_ns);
+        } else {
+            ...
+        }
+
+        // 数据大小
+        tr.data_size = t-&gt;buffer-&gt;data_size;
+        // 数据中对象的偏移数组的大小(即对象的个数)
+        tr.offsets_size = t-&gt;buffer-&gt;offsets_size;
+        // 数据
+        tr.data.ptr.buffer = (void *)t-&gt;buffer-&gt;data +
+                    proc-&gt;user_buffer_offset;
+        // 数据中对象的偏移数组
+        tr.data.ptr.offsets = tr.data.ptr.buffer +
+                    ALIGN(t-&gt;buffer-&gt;data_size,
+                        sizeof(void *));
+
+        // 将cmd指令写入到ptr，即传递到用户空间
+        if (put_user(cmd, (uint32_t __user *)ptr))
+            return -EFAULT;
+        // 将tr数据拷贝到用户空间
+        ptr += sizeof(uint32_t);
+        if (copy_to_user(ptr, &amp;tr, sizeof(tr)))
+            return -EFAULT;
+        ptr += sizeof(tr);
+
+        ...
+        // 删除已处理的事务
+        list_del(&amp;t-&gt;work.entry);
+        t-&gt;buffer-&gt;allow_user_free = 1;
+        if (cmd == BR_TRANSACTION &amp;&amp; !(t-&gt;flags &amp; TF_ONE_WAY)) {
+            ...
+        } else {
+            t-&gt;buffer-&gt;transaction = NULL;
+            kfree(t);
+        }
+        break;
+    }
+
+done:
+
+    // 更新bwr.read_consumed的值
+    *consumed = ptr - buffer;
+
+    ...
+    return 0;
+}</code></pre><p>说明：MediaPlayer进程被唤醒之后，binder_has_thread_work()为true，因为MediaPlayer进程中有个BINDER_WORK_TRANSACTION类型的待处理事务。<br>(01) 进入while循环后，首先取出待处理事务。<br>(02) 事务的类型是BINDER_WORK_TRANSACTION，得到对应的binder_transaction<em>类型指针t之后，跳出switch语句。很显然，此时t不为NULL，因此继续往下执行。下面的工作的目的，是将t中的数据转移到tr中(tr是事务交互数据包结构体binder_transaction_data对应的指针)，然后将指令和tr数据都拷贝到用户空间，让MediaPlayer读取后进行处理。此时的指令为BR_REPLY！<br>(03) 最后，更新</em>consumed的值，即更新bwr.read_consumed的值。</p>
+<p>binder_thread_read()执行完毕之后，共反馈了两个指令到用户空间：BR_NOOP和BR_REPLY。</p>
+<p>之后的流程应该都比较熟悉了，首先返回到binder_ioctl()中，接着将ServiceManager反馈的数据拷贝到用户空间。接下来的工作就交给MediaPlayer进程进行处理了。<br>从Binder驱动返回后，首先回到talkWithDriver()中，接着便返回到waitForResponse()中。在waitForResponse()会反馈数据进行解析。  </p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-IPCThreadState-waitForResponse"><a href="#2-IPCThreadState-waitForResponse" class="headerlink" title="2. IPCThreadState::waitForResponse"></a>2. IPCThreadState::waitForResponse</h1><pre><code>status_t IPCThreadState::waitForResponse(Parcel *reply, status_t *acquireResult)
+{
+    int32_t cmd;
+    int32_t err;
+
+    while (1) {
+        if ((err=talkWithDriver()) &lt; NO_ERROR) break;
+        ...
+
+        cmd = mIn.readInt32();
+
+        switch (cmd) {
+            ...
+        case BR_REPLY:
+            {
+                binder_transaction_data tr;
+                err = mIn.read(&amp;tr, sizeof(tr));
+                ...
+
+                if (reply) {
+                    if ((tr.flags &amp; TF_STATUS_CODE) == 0) {
+                        reply-&gt;ipcSetDataReference(
+                            reinterpret_cast&lt;const uint8_t*&gt;(tr.data.ptr.buffer),
+                            tr.data_size,
+                            reinterpret_cast&lt;const size_t*&gt;(tr.data.ptr.offsets),
+                            tr.offsets_size/sizeof(size_t),
+                            freeBuffer, this);
+                    } else {
+                        ...
+                    }
+                } else {
+                    ...
+                }
+            }
+            goto finish;
+            ...
+        }
+    }
+
+finish:
+    ...
+
+    return err;
+}</code></pre><p>说明：在BR_REPLY分支中，先读取出数据，并保存到tr中。由于reply不为null，并且tr.flags &amp; TF_STATUS_CODE为0；因此，会执行reply-&gt;ipcSetDataReference()。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-Parcel-ipcSetDataReference"><a href="#3-Parcel-ipcSetDataReference" class="headerlink" title="3. Parcel::ipcSetDataReference"></a>3. Parcel::ipcSetDataReference</h1><pre><code>void Parcel::ipcSetDataReference(const uint8_t* data, size_t dataSize,
+    const size_t* objects, size_t objectsCount, release_func relFunc, void* relCookie)     
+{
+    freeDataNoInit();                   
+    mError = NO_ERROR;
+    mData = const_cast&lt;uint8_t*&gt;(data); 
+    mDataSize = mDataCapacity = dataSize;
+    mDataPos = 0;
+    mObjects = const_cast&lt;size_t*&gt;(objects);
+    mObjectsSize = mObjectsCapacity = objectsCount;
+    mNextObjectHint = 0;
+    mOwner = relFunc;
+    mOwnerCookie = relCookie;           
+    scanForFds();
+}</code></pre><p>说明： data就是ServiceManager返回来的数据。数据中包含一个flat_binder_object对象(对应ServiceManager中的binder_object)，因此objectsCount则为1。先通过freeDataNoInit()将原始的数据清空，然后再给mData和mObjects赋值，这样就将数据保存到了Parcel中。<br>为什么objectsCount的值是1呢？请返回查看一下Service Manager在执行binder_send_reply()即可知，这里就不再多说。</p>
+<p>waitForResponse()执行完BR_REPLY之后，便返回到IPCThreadState::transact()中；然后层层返回，直到退回到checkService()。  </p>
+<p><a name="anchor4"></a></p>
+<h1 id="4-BpServiceManager-checkService"><a href="#4-BpServiceManager-checkService" class="headerlink" title="4. BpServiceManager::checkService()"></a>4. BpServiceManager::checkService()</h1><pre><code>virtual sp&lt;IBinder&gt; checkService( const String16&amp; name) const
+{
+    Parcel data, reply;             
+    data.writeInterfaceToken(IServiceManager::getInterfaceDescriptor());               
+    data.writeString16(name);       
+    remote()-&gt;transact(CHECK_SERVICE_TRANSACTION, data, &amp;reply);
+    return reply.readStrongBinder();
+}     </code></pre><p>说明：到目前为止，通过transact()来获取MediaPlayerService的事务已经执行完毕！MediaPlayerService的接入点已经保存在replay中。接下来的工作就是调用reply.readStrongBinder()来从replay中解析出所需要的数据，即MediaPlayerService在Biner驱动中的Binder引用描述，也就是C++层的句柄。</p>
+<p><a name="anchor5"></a></p>
+<h1 id="5-Parcel-readStrongBinder"><a href="#5-Parcel-readStrongBinder" class="headerlink" title="5. Parcel::readStrongBinder"></a>5. Parcel::readStrongBinder</h1><pre><code>sp&lt;IBinder&gt; Parcel::readStrongBinder() const
+{
+    sp&lt;IBinder&gt; val; 
+    unflatten_binder(ProcessState::self(), *this, &amp;val);
+    return val; 
+}</code></pre><p>说明：readStrongBinder()会调用unflatten_binder()来解析Parcel中的数据。</p>
+<p><a name="anchor6"></a></p>
+<h1 id="6-Parcel-unflatten-binder"><a href="#6-Parcel-unflatten-binder" class="headerlink" title="6. Parcel::unflatten_binder"></a>6. Parcel::unflatten_binder</h1><pre><code>status_t unflatten_binder(const sp&lt;ProcessState&gt;&amp; proc,
+    const Parcel&amp; in, sp&lt;IBinder&gt;* out)
+{
+    const flat_binder_object* flat = in.readObject(false);
+
+    if (flat) {
+        switch (flat-&gt;type) {
+            case BINDER_TYPE_BINDER:
+                ...
+            case BINDER_TYPE_HANDLE:
+                *out = proc-&gt;getStrongProxyForHandle(flat-&gt;handle);
+                return finish_unflatten_binder(
+                    static_cast&lt;BpBinder*&gt;(out-&gt;get()), *flat, in);
+        }        
+    }
+    return BAD_TYPE;
+}</code></pre><p>说明：readObject()的作用是从Parcel中读取出它所保存的flat_binder_object类型的对象。该对象的类型是BINDER_TYPE_HANDLE，因此会指向BINDER_TYPE_HANDLE对应的switch分支。<br>(01) 这里的proc是ProcessState对象，执行proc-&gt;getStrongProxyForHandle()会将句柄(MediaPlayerService的Binder引用描述)保存到ProcessState的链表中，然后再创建并返回该句柄的BpBinder对象(即Binder的代理)。在<a href="/2014/09/04/Binder-defaultServiceManager/">Android Binder机制(四) defaultServiceManager()的实现</a>中有getStrongProxyForHandle()的详细说明，下面只给出getStrongProxyForHandle()代码。<br>(02) finish_unflatten_binder()中只有return NO_ERROR。</p>
+<pre><code>sp&lt;IBinder&gt; ProcessState::getStrongProxyForHandle(int32_t handle)
+{
+    sp&lt;IBinder&gt; result;
+
+    AutoMutex _l(mLock);
+
+    // 在矢量数组中查找&quot;句柄值为handle的handle_entry对象&quot;；
+    // 找到的话，则直接返回；找不到的话，则新建handle对应的handle_entry。
+    handle_entry* e = lookupHandleLocked(handle);
+
+    if (e != NULL) {
+        IBinder* b = e-&gt;binder;
+        if (b == NULL || !e-&gt;refs-&gt;attemptIncWeak(this)) {
+            // 当handle==0(即是Service Manager的句柄)时，尝试去ping Binder驱动。
+            if (handle == 0) {
+                Parcel data;
+                status_t status = IPCThreadState::self()-&gt;transact(
+                        0, IBinder::PING_TRANSACTION, data, NULL, 0);
+                if (status == DEAD_OBJECT)
+                   return NULL;
+            }
+
+            // 新建BpBinder代理
+            b = new BpBinder(handle);
+            e-&gt;binder = b;
+            if (b) e-&gt;refs = b-&gt;getWeakRefs();
+            result = b;
+        } else {
+            ...
+        }
+    }
+
+    return result;
+}</code></pre><p>这样，getService()的内容就全部执行完毕。getService()的返回结果IBinder=BpBinder对象，该对象包含了”MediaPlayerService(在Binder驱动)中的Binder引用的描述”，该描述在C++层而言就是个整型句柄。之后，若MediaPlayer要向MediaPlayerService发送请求，就根据该IBinder对象和”MediaPlayerService”进行通信。</p>
+<p>上面只是执行完了getService()，它返回了IBinder对象。但是，getMediaPlayerService()并没有执行完毕。下面继续回到getMediaPlayerService()中。</p>
+<p><a name="anchor7"></a></p>
+<h1 id="7-IMediaDeathNotifier-getMediaPlayerService"><a href="#7-IMediaDeathNotifier-getMediaPlayerService" class="headerlink" title="7. IMediaDeathNotifier::getMediaPlayerService()"></a>7. IMediaDeathNotifier::getMediaPlayerService()</h1><pre><code>const sp&lt;IMediaPlayerService&gt;&amp; IMediaDeathNotifier::getMediaPlayerService()
+{
+    ...
+    if (sMediaPlayerService == 0) {
+        sp&lt;IServiceManager&gt; sm = defaultServiceManager();
+        sp&lt;IBinder&gt; binder;             
+        do {
+            binder = sm-&gt;getService(String16(&quot;media.player&quot;));
+            ...
+            usleep(500000); // 0.5 s    
+        } while (true);                 
+
+        ...
+        sMediaPlayerService = interface_cast&lt;IMediaPlayerService&gt;(binder);
+    }     
+    ...
+    return sMediaPlayerService;         
+}</code></pre><p>说明：在成功获取MediaPlayerService对应的IBinder对象(binder)之后，可以通过interface_cast<imediaplayerservice>(binder)获取它的代理。<br>是不是对interface_cast()很熟悉！不错，在<a href="/2014/09/04/Binder-defaultServiceManager/">Android Binder机制(四) defaultServiceManager()的实现</a>中就是通过该宏获取IServiceManager的代理的。</imediaplayerservice></p>
+<p><a name="anchor8"></a></p>
+<h1 id="8-IMediaDeathNotifier-getMediaPlayerService"><a href="#8-IMediaDeathNotifier-getMediaPlayerService" class="headerlink" title="8. IMediaDeathNotifier::getMediaPlayerService()"></a>8. IMediaDeathNotifier::getMediaPlayerService()</h1><pre><code>template&lt;typename INTERFACE&gt;
+inline sp&lt;INTERFACE&gt; interface_cast(const sp&lt;IBinder&gt;&amp; obj)
+{
+    return INTERFACE::asInterface(obj);
+}   </code></pre><p>下面直接给出IMediaPlayerService::asInterface()的代码。</p>
+<pre><code>android::sp&lt;IMediaPlayerService&gt; IMediaPlayerService::asInterface(
+        const android::sp&lt;android::IBinder&gt;&amp; obj)
+{
+    android::sp&lt;IMediaPlayerService&gt; intr;
+    if (obj != NULL) {
+        intr = static_cast&lt;IMediaPlayerService*&gt;(
+            obj-&gt;queryLocalInterface(
+                    IMediaPlayerService::descriptor).get());
+        if (intr == NULL) {
+            intr = new BpServiceManager(obj);
+        }
+    }
+    return intr;
+}</code></pre><p>说明：asInterface()会调用new BpMediaPlayerService()新建BpServiceManager对象，并返回给对象。</p>
+<p>这样，MediaPlayer进程的getService请求就全部介绍完毕了。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/15/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/17/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/15/">15</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/16/">16</a></li>
+        
+        <li><a class="pagination-link" href="/page/17/">17</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

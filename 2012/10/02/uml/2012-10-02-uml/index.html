@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>UML系列02之  UML类图(一) - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="uml">
+
+
+
+
+
+    <meta name="description" content="uml">
+<meta name="keywords" content="uml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UML系列02之  UML类图(一)">
+<meta property="og:url" content="https://apppills.com/2012/10/02/uml/2012-10-02-uml/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="uml">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml02-01.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml02-02.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml02-03.jpg">
+<meta property="og:image" content="https://apppills.com/media/pic/uml/uml02-04.jpg">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="UML系列02之  UML类图(一)">
+<meta name="twitter:description" content="uml">
+<meta name="twitter:image" content="https://apppills.com/media/pic/uml/uml02-01.jpg">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#第1部分-类图介绍">1&nbsp;&nbsp;<b>第1部分 类图介绍</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第2部分-实体类的UML表示">2&nbsp;&nbsp;<b>第2部分 实体类的UML表示</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-类名">2.1&nbsp;&nbsp;1. 类名</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-操作">2.2&nbsp;&nbsp;3. 操作</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#第3部分-抽象类和接口的UML表示">3&nbsp;&nbsp;<b>第3部分 抽象类和接口的UML表示</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-抽象类的UML表示">3.1&nbsp;&nbsp;1. 抽象类的UML表示</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-接口的UML表示">3.2&nbsp;&nbsp;2. 接口的UML表示</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            UML系列02之  UML类图(一)
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-10-02T01:01:00.000Z" itemprop="datePublished">10月 2 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/pattern/">pattern</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            5 分钟 read (About 818 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本章介绍类图中类的UML表示方法。内容包括：</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1部分 类图介绍</a><br><a href="#anchor2">第2部分 实体类的UML表示</a><br><a href="#anchor3">第3部分 抽象类和接口的UML表示</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第1部分-类图介绍"><a href="#第1部分-类图介绍" class="headerlink" title="第1部分 类图介绍"></a>第1部分 类图介绍</h1><p>类图，是UML(统一建模语言)中用于描述”类”以及”类与类”之间的示意图。它形象的描述出了系统的结构，帮助人们理解系统。</p>
+<p>类图是在”所有的UML图”中，实用频率非常之高；掌握它对于我们软件设计，以及交流都很有帮助。</p>
+<p>对于类图而言，它的基本单位是类。类主要由三部分组成：类名、属性、操作(函数)。UML类的表示大致如下：</p>
+<p><img src="/media/pic/uml/uml02-01.jpg" alt="img"></p>
+<p>下面，分别介绍”实体类”, “抽象类”, “接口”的UML表示方法。</p>
+<p>注：本章的图形都是通过”<a href="/2012/10/01/uml">UML系列01之 UML和绘图工具Visio介绍</a>“中介绍的Visio工具进行绘制的！</p>
+<p><a name="anchor2"></a></p>
+<h1 id="第2部分-实体类的UML表示"><a href="#第2部分-实体类的UML表示" class="headerlink" title="第2部分 实体类的UML表示"></a>第2部分 实体类的UML表示</h1><p><strong>实体类的UML示例</strong></p>
+<p><img src="/media/pic/uml/uml02-02.jpg" alt="img"></p>
+<p><strong>对应的java代码</strong></p>
+<pre><code>public class Student {
+    private int id;
+    protected int age;
+    public String name;
+
+    private void setId(int id);
+    private int getId() ;
+    protected void setAge(int age);
+    protected int getAge() ;
+    private void setName(String name);
+    private String getName() ;
+}</code></pre><h2 id="1-类名"><a href="#1-类名" class="headerlink" title="1. 类名"></a>1. 类名</h2><p>类名是类的名称。 </p>
+<p>##2. 属性<br>UML类图中，属性的基本格式:     </p>
+<blockquote>
+<p>可见性  名称: 类型 [=缺省值]</p>
+</blockquote>
+<p>(01) 可见性 – 表示该属性对于类外的元素而言是否可见。</p>
+<p> 主要包括公有(public)、私有(private)和受保护(protected)三种，在类图中分别用符号+、-和#表示。</p>
+<table>
+<thead>
+<tr>
+<th>标志</th>
+<th>可见性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>+</td>
+<td>Public</td>
+</tr>
+<tr>
+<td>#</td>
+<td>Protected</td>
+</tr>
+<tr>
+<td>-</td>
+<td>Private</td>
+</tr>
+</tbody></table>
+<p>(02) 名称   – 表示属性名。</p>
+<p>(03) 类型   – 表示属性的数据类型。可以是基本数据类型，也可以是用户自定义类型。</p>
+<p>(04) 缺省值 – 属性的初始值。它是一个可选项。</p>
+<h2 id="3-操作"><a href="#3-操作" class="headerlink" title="3. 操作"></a>3. 操作</h2><p>UML类图中，属性的基本格式:  </p>
+<blockquote>
+<p>可见性 名称(参数类表)  [:返回类型]</p>
+</blockquote>
+<p>(01) 可见性 – 表示该属性对于类外的元素而言是否可见。它的表示方法与”属性的可见性”相同。</p>
+<table>
+<thead>
+<tr>
+<th>标志</th>
+<th>可见性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>+</td>
+<td>Public</td>
+</tr>
+<tr>
+<td>#</td>
+<td>Protected</td>
+</tr>
+<tr>
+<td>-</td>
+<td>Private</td>
+</tr>
+</tbody></table>
+<p>(02) 名称 – 表示方法名。</p>
+<p>(03) 参数列表 – 表示方法的参数。参数个数是任意的，多个参数之间用逗号”,”隔开。</p>
+<p>(04) 返回类型 – 表示方法的返回值类型。它是一个可选项；可以是具体的返回类型，可以是void，也可以无返回类型(构造方法)。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="第3部分-抽象类和接口的UML表示"><a href="#第3部分-抽象类和接口的UML表示" class="headerlink" title="第3部分 抽象类和接口的UML表示"></a>第3部分 抽象类和接口的UML表示</h1><h2 id="1-抽象类的UML表示"><a href="#1-抽象类的UML表示" class="headerlink" title="1. 抽象类的UML表示"></a>1. 抽象类的UML表示</h2><p>抽象类和实体类的UML表示法类似。区别是: “抽象类的类名是斜体”，而”实体类的类名不是斜体”！</p>
+<p><strong>抽象类的UML示例</strong></p>
+<p>将上面”实体类示例”中的实体类Student改为抽象类AbstractStudent，对应的UML图如下：</p>
+<p><img src="/media/pic/uml/uml02-03.jpg" alt="img"></p>
+<h2 id="2-接口的UML表示"><a href="#2-接口的UML表示" class="headerlink" title="2. 接口的UML表示"></a>2. 接口的UML表示</h2><p>在UML中，通过在”类名”位置添加“interface”关键字来表示接口。示意图如下：</p>
+<p><img src="/media/pic/uml/uml02-04.jpg" alt="img"></p>
+<p>对应的代码：</p>
+<pre><code>public interface Runnable {
+    public void run();
+}</code></pre>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/uml/">#uml</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2012/10/03/uml/2012-10-03-uml/">UML系列03之  UML类图(二)</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2012/10/01/uml/2012-10-01-uml/">UML系列01之  UML和绘图工具Visio介绍</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

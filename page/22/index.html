@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/page/22/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/09/05/android/os/binder/2014-09-05-BinderCommunication-AddService01/" itemprop="url">Android Binder机制(五) addService详解01之 请求的发送</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-09-05T01:01:00.000Z" itemprop="datePublished">9月 5 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            1 小时 read (About 13173 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>终于要开始讲解Client-Server交互了，若标题所示，本文要讲解的是addService请求，即添加服务请求。本文选取的题材是MediaPlayerService服务通过addService请求注册到ServiceManager中。<br>在这个addService请求中，MediaPlayerService是Client，而ServiceManager是Server。由于涉及到的过程比较复杂，这里会将addService请求分为3篇进行说明，这3篇的主题分别是：请求的发送，请求的处理，以及请求的反馈。和以往一样，在讲解详细的代码之前，先做个整体介绍。</p>
+</blockquote>
+<blockquote>
+<p>注意：本文是基于Android 4.4.2版本进行介绍的！</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-addService流程的时序图"><a href="#1-addService流程的时序图" class="headerlink" title="1. addService流程的时序图"></a>1. addService流程的时序图</h1><p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/addService_01_flow.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/addService_01_flow.jpg" alt></a></p>
+<p>上面是addService流程的时序图。理解这个图的前提是理解图中的三种角色之间的关系：<br>(01) MediaPlayerService和ServiceManager是两个不同的进程。它们都位于用户空间，都有各自的内存单元，两者之间不能直接进行通信；因此，需要Binder驱动的帮助才能通信。<br>(02) Binder驱动位于内核空间，它映射到节点”/dev/binder”上。MediaPlayerService和ServiceManager都有通过open(“/dev/binder”)打开该节点，并通过mmap()将内存映射到各自所在的进程中；这也就是说MediaPlayerService能和Binder驱动通信，而且ServiceManager也能和Binder驱动通信。而在Binder驱动中，有一个全局变量，依靠这个全局变量，就能实现MediaPlayerService和ServiceManager之间的通信。  依靠的这个全局变量，就是<a href="/2014/09/03/Binder-ServiceManager-Daemon/">Android Binder机制(三) ServiceManager守护进程</a>中介绍过的binder_context_mgr_node变量，它是ServiceManager的Binder实体。</p>
+<p>搞清楚它们三者之间的关系之后，再回到上面的时序图中。  </p>
+<ol>
+<li><p>WAIT<br>这表示ServiceManager进入了中断等待状态。它进入等待状态的详细流程，在<a href="/2014/09/03/Binder-ServiceManager-Daemon/">Android Binder机制(三) ServiceManager守护进程</a>有介绍过。  </p>
+</li>
+<li><p>BC_TRANSACTION<br>这是MediaPlayerService向ServiceManager发送addService请求对应的事务。这个事务是请求，而不是回复；因此是BC开发，B代表Binder，而C代表Command。如果是回复，则会以BR开发，R表示Reply。Binder驱动在收到BC_TRANSACTION之后，会将分配内存，将请求数据保存到所分配的内存中。</p>
+</li>
+<li><p>WAKE_UP<br>MediaPlayerService通过BC_TRANSACTION提交一个请求，该请求是交给ServiceManager来处理的。因此，Binder驱动在收到该请求后，会将其发送到ServiceManager的待处理事务队列中，并将ServiceManager唤醒。</p>
+</li>
+<li><p>BR_TRANSACTION_COMPLETE<br>MediaPlayerService在发起了一个请求之后，它需要知道该请求是否发送成功。因此，Binder驱动在将该请求提交给ServiceManager之后，会反馈一个BR_TRANSACTION_COMPLETE给MediaPlayerService，表示MediaPlayerService发送的请求已经被Binder驱动收到了。</p>
+</li>
+<li><p>WAIT<br>MediaPlayerService在知道自己的请求已经发送成功之后，就进入等待状态，等待请求的反馈结果。</p>
+</li>
+<li><p>BR_NOOP和BR_TRANSACTION<br>ServiceManager被唤醒之后，收到Binder驱动的BR_NOOP和BR_TRANSACTION指令。BR_NOOP指令什么也不会做；而对于BR_TRANSACTION指令时，ServiceManager在解析出该事务是添加服务请求，会将MediaPlayerService的相关信息保存到一个链表中。</p>
+</li>
+<li><p>BC_FREE_BUFFER和BC_REPLY<br>ServiceManager在保存了MediaPlayerService的相关信息之后，便处理完毕了MediaPlayerService的请求。此时，它便反馈BC_FREE_BUFFER和BC_REPLY给Binder驱动。Binder驱动在收到BC_FREE_BUFFER之后，会释放保存请求数据所申请的内存；收到BC_REPLY之后，Binder驱动则知道ServiceManager已经处理完了MediaPlayerService的请求。<br>接着，Binder驱动便会唤醒MediaPlayerService，并发送BR_NOOP和BR_REPLY给MediaPlayerService，告诉MediaPlayerService请求已经处理完毕。同时，它还会发送一个BR_TRANSACTION_COMPLETE给ServiceManager，告诉ServiceManager该事务已经处理完毕。 MediaPlayerService在收到BR_REPLY反馈之后，知道addService请求已经成功处理；接着，它会再次进入等待状态，等待Client的请求。<br>最后，ServiceManager处理MediaPlayerService的请求之后，没有其他事务可处理，也再次进入了等待状态。</p>
+</li>
+</ol>
+<p><a name="anchor2"></a></p>
+<h1 id="2-IMediaPlayerService的类图"><a href="#2-IMediaPlayerService的类图" class="headerlink" title="2. IMediaPlayerService的类图"></a>2. IMediaPlayerService的类图</h1><p>本文是以MediaPlayerService为例，对addService进行解析。下面看看MediaPlayerService相关联的类图。</p>
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/IMediaPlayerService_leitu.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/IMediaPlayerService_leitu.jpg" alt></a></p>
+<p>IMediaPlayerService的类图和”<a href="/2014/09/04/Binder-defaultServiceManager/">Android Binder机制(四) defaultServiceManager()的实现</a>“中IServiceManager的类图类似。这里就不再逐一对每个类进行介绍了。</p>
+<p>需要知道的是，对于一个MediaPlayerService而言，它存在一个”远程BpBinder对象”和”本地BBinder对象”。<br>(01) 远程BpBinder对象的作用，是和Binder驱动进行交互。例如，当本文所讲到的addService请求，就是通过defaultServiceManager()调用到远程BpBinder对象的transact()方法，而该方法又会调用到IPCThreadState::transact()接口，通过IPCThreadState类来和Binder驱动交互。<br>(02) MediaPlayerService是”本地BBinder的子类”。当Client向MediaPlayerService发起请求时，会调用BBinder的onTransact()方法，而BnServiceManager又重写了该方法，从而调用onTransact()完成对请求的处理。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="addService请求发送的代码解析"><a href="#addService请求发送的代码解析" class="headerlink" title="addService请求发送的代码解析"></a>addService请求发送的代码解析</h1><p>下面通过代码来查看addService请求的发送流程。</p>
+<p><a name="anchor3_1"></a></p>
+<h2 id="1-MediaPlayerService的main-函数"><a href="#1-MediaPlayerService的main-函数" class="headerlink" title="1. MediaPlayerService的main()函数"></a>1. MediaPlayerService的main()函数</h2><p>先看看MediaPlayerService的main()函数代码。</p>
+<pre><code>int main(int argc, char** argv)
+{
+    signal(SIGPIPE, SIG_IGN);
+    char value[PROPERTY_VALUE_MAX];
+    bool doLog = (property_get(&quot;ro.test_harness&quot;, value, &quot;0&quot;) &gt; 0) &amp;&amp; (atoi(value) == 1);
+    pid_t childPid;
+
+    if (doLog &amp;&amp; (childPid = fork()) != 0) {
+        ...
+    } else {
+        // all other services
+        ...
+        sp&lt;ProcessState&gt; proc(ProcessState::self());
+        sp&lt;IServiceManager&gt; sm = defaultServiceManager();
+        ...
+        MediaPlayerService::instantiate();
+        ...
+        ProcessState::self()-&gt;startThreadPool();
+        IPCThreadState::self()-&gt;joinThreadPool();
+    }
+}</code></pre><p>说明：该代码在frameworks/av/media/mediaserver/main_mediaserver.cpp中。<br>(01) property_get(“ro.test_harness”, value, “0”)是获取”ro.test_harness”属性，为false。<br>(02) ProcessState:self()是获取ProcessState对象，并赋值给proc。ProcessState::self()在<a href="/2014/09/04/Binder-defaultServiceManager/">Android Binder机制(四) defaultServiceManager()的实现</a>中已经介绍过了。<br>(03) defaultServiceManager()是获取IServiceManager对象，它的实现在<a href="/2014/09/04/Binder-defaultServiceManager/">Android Binder机制(四) defaultServiceManager()的实现</a>中也有详细介绍。<br>(04) MediaPlayerService::instantiate()是初始化MediaPlayerService服务。  </p>
+<p><a name="anchor3_2"></a></p>
+<h2 id="2-MediaPlayerService-instantiate"><a href="#2-MediaPlayerService-instantiate" class="headerlink" title="2. MediaPlayerService::instantiate()"></a>2. MediaPlayerService::instantiate()</h2><pre><code>void MediaPlayerService::instantiate() {
+    defaultServiceManager()-&gt;addService(
+            String16(&quot;media.player&quot;), new MediaPlayerService());
+}</code></pre><p>说明：该代码在frameworks/av/media/libmediaplayerservice/MediaPlayerService.cpp中。它会新建MediaPlayerService对象；然后调用defaultServiceManager()获取到的BpServiceManager的实例；最后，调用BpServiceManager的addService()方法，将MediaPlayerService对象添加到Service Manager中。MediaPlayerService服务的名称是”media.player”。</p>
+<p><a name="anchor3_3"></a></p>
+<h2 id="3-MediaPlayerService-MediaPlayerService"><a href="#3-MediaPlayerService-MediaPlayerService" class="headerlink" title="3. MediaPlayerService::MediaPlayerService()"></a>3. MediaPlayerService::MediaPlayerService()</h2><pre><code>MediaPlayerService::MediaPlayerService()
+{
+    ALOGV(&quot;MediaPlayerService created&quot;);
+    mNextConnId = 1; 
+
+    mBatteryAudio.refCount = 0; 
+    for (int i = 0; i &lt; NUM_AUDIO_DEVICES; i++) {
+        mBatteryAudio.deviceOn[i] = 0; 
+        mBatteryAudio.lastTime[i] = 0; 
+        mBatteryAudio.totalTime[i] = 0; 
+    }    
+    // speaker is on by default
+    mBatteryAudio.deviceOn[SPEAKER] = 1; 
+    mOOMKilling = false;
+    MediaPlayerFactory::registerBuiltinFactories();
+}</code></pre><p>说明：MediaPlayerService的构造函数比较简单，就是进行一些变量的初始化。</p>
+<p><a name="anchor3_4"></a></p>
+<h2 id="4-BpServiceManager-addService"><a href="#4-BpServiceManager-addService" class="headerlink" title="4. BpServiceManager::addService()"></a>4. BpServiceManager::addService()</h2><pre><code>class BpServiceManager : public BpInterface&lt;IServiceManager&gt;
+{
+public:
+    ...
+
+    virtual status_t addService(const String16&amp; name, const sp&lt;IBinder&gt;&amp; service,          
+            bool allowIsolated)         
+    {     
+        Parcel data, reply;             
+        data.writeInterfaceToken(IServiceManager::getInterfaceDescriptor());
+        data.writeString16(name);       
+        data.writeStrongBinder(service);
+        data.writeInt32(allowIsolated ? 1 : 0);
+        status_t err = remote()-&gt;transact(ADD_SERVICE_TRANSACTION, data, &amp;reply);          
+        return err == NO_ERROR ? reply.readExceptionCode() : err;
+    }     
+
+    ...
+}</code></pre><p>说明：该代码在frameworks/native/libs/binder/IServiceManager.cpp中。addService()会现将MediaPlayerService服务的名称(“media.player”)以及它的实例等参数保存到data(Parcel对象)中，然后再调用remote()返回的BpBinder对象的transact()与Binder驱动进行交互。<br>(01) 先看看addService()的各个参数。name=”media.player”，即MediaPlayerService服务的名称；service就是MediaPlayerService对象，而IBinder是MediaPlayerService的父类；allowIsolated这个值默认为false，默认值的定义在frameworks/native/include/binder/IServiceManager.h的addService()函数声明中。<br>(02) Parcel是Binder通信的数据存储结构，它的各个成员和函数在<a href="/2014/09/02/Binder-Datastruct/">Android Binder机制(二) Binder中的数据结构</a>中有详细说明。<br>在向data中写入数据时，先通过writeInterfaceToken()写入数据头，这里的数据头是：int32的整形数+字符串(字符串是”android.os.IServiceManager”)。writeString16(name)写入的是服务的名称，即”media.player”。writeStrongBinder(service)是将MediaPlayerService封装到flat_binder_object结构体中。最后的writeInt32()暂时不用关心。<br>下面，我们逐个对data的赋值进行介绍。</p>
+<p><a name="anchor3_5"></a></p>
+<h2 id="5-Parcel-Parcel"><a href="#5-Parcel-Parcel" class="headerlink" title="5. Parcel::Parcel()"></a>5. Parcel::Parcel()</h2><p>先看看Parcel的构造函数。</p>
+<pre><code>Parcel::Parcel()
+{   
+    initState(); 
+}   </code></pre><p>说明：该代码在frameworks/native/libs/binder/Parcel.cpp中。  </p>
+<p><a name="anchor3_6"></a></p>
+<h2 id="6-Parcel-initState"><a href="#6-Parcel-initState" class="headerlink" title="6. Parcel::initState()"></a>6. Parcel::initState()</h2><pre><code>void Parcel::initState()
+{
+    mError = NO_ERROR;
+    mData = 0;              // 数据的地址指针
+    mDataSize = 0;          // 数据的大小
+    mDataCapacity = 0;      // 数据的容量
+    mDataPos = 0;           // 数据的位置
+    mObjects = NULL;        // 保存对象的地址指针
+    mObjectsSize = 0;       // 对象的个数
+    mObjectsCapacity = 0;   // 对象的容量
+    mNextObjectHint = 0;
+    mHasFds = false;
+    mFdsKnown = true;
+    mAllowFds = true;
+    mOwner = NULL;
+}</code></pre><p>说明：该函数对Parcel的成员进行了初始化。</p>
+<p><a name="anchor3_7"></a></p>
+<h2 id="7-Parcel-writeInterfaceToken"><a href="#7-Parcel-writeInterfaceToken" class="headerlink" title="7. Parcel::writeInterfaceToken()"></a>7. Parcel::writeInterfaceToken()</h2><pre><code>下面看看data.writeInterfaceToken(IServiceManager::getInterfaceDescriptor())的实现。getInterfaceDescriptor()是通过宏IMPLEMENT_META_INTERFACE()实现的，该宏已经在[Android Binder机制(四) defaultServiceManager()的实现][link_binder_04_defaultServiceManager]中介绍过了；getInterfaceDescriptor()的返回值是&quot;android.os.IServiceManager&quot;。  
+即data.writeInterfaceToken(&quot;android.os.IServiceManager&quot;)。下面看看writeInterfaceToken()的实现。
+
+status_t Parcel::writeInterfaceToken(const String16&amp; interface)
+{       
+    writeInt32(IPCThreadState::self()-&gt;getStrictModePolicy() |
+               STRICT_MODE_PENALTY_GATHER);
+    // currently the interface identification token is just its name as a string
+    return writeString16(interface);
+}   </code></pre><p>说明：该函数先通过writeInt32()写入一个32位的int数到Parcel中，然后再通过writeString16()将字符串写入到Parcel中。它所写入的是数据头，ServiceManager中收到该数据之后，会先获取数据头，并根据数据头来判断数据的有效性！<br>(01) IPCThreadState::self()返回IPCThreadState对象；然后，调用IPCThreadState::getStrictModePolicy()，返回的是mStrictModePolicy，mStrictModePolicy的初始值是0。因此，writeInt32()就可以简化为writeInt32(STRICT_MODE_PENALTY_GATHER)。<br>(02) writeString16(interface)是writeString16(“android.os.IServiceManager”)。</p>
+<p><a name="anchor3_8"></a></p>
+<h2 id="8-Parcel-writeInt32"><a href="#8-Parcel-writeInt32" class="headerlink" title="8. Parcel::writeInt32()"></a>8. Parcel::writeInt32()</h2><pre><code>status_t Parcel::writeInt32(int32_t val)
+{   
+    return writeAligned(val);
+}   </code></pre><p>说明：该函数调用writeAligned()。</p>
+<p><a name="anchor3_9"></a></p>
+<h2 id="9-Parcel-writeAligned"><a href="#9-Parcel-writeAligned" class="headerlink" title="9. Parcel::writeAligned()"></a>9. Parcel::writeAligned()</h2><pre><code>template&lt;class T&gt;
+status_t Parcel::writeAligned(T val) {
+    COMPILE_TIME_ASSERT_FUNCTION_SCOPE(PAD_SIZE(sizeof(T)) == sizeof(T));
+
+    if ((mDataPos+sizeof(val)) &lt;= mDataCapacity) {
+restart_write:
+        *reinterpret_cast&lt;T*&gt;(mData+mDataPos) = val;
+        return finishWrite(sizeof(val));
+    }
+
+    status_t err = growData(sizeof(val));
+    if (err == NO_ERROR) goto restart_write;
+    return err;
+}</code></pre><p>说明：writeAligned()的作用是是写入数据，比同步相应的变量。<br>(01) mDataPos的初始值=0，sizeof(val)=4，mDataCapacity的初始值=0。因此，if((mDataPos+sizeof(val)) &lt;= mDataCapacity)为false。<br>(02) 接下来，会先调用growData(sizeof(val))来增加容量，然后再将数据写入到mData中。  </p>
+<p><a name="anchor3_10"></a></p>
+<h2 id="10-Parcel-growData"><a href="#10-Parcel-growData" class="headerlink" title="10. Parcel::growData()"></a>10. Parcel::growData()</h2><pre><code>status_t Parcel::growData(size_t len)
+{
+    size_t newSize = ((mDataSize+len)*3)/2;
+    return (newSize &lt;= mDataSize)
+            ? (status_t) NO_MEMORY
+            : continueWrite(newSize);
+}</code></pre><p>说明：Parcel增加容量时，是按1.5倍进行增长。mDataSize=0，而len=4；因此会执行continueWrite(6)。  </p>
+<p><a name="anchor3_11"></a></p>
+<h2 id="11-Parcel-continueWrite"><a href="#11-Parcel-continueWrite" class="headerlink" title="11. Parcel::continueWrite()"></a>11. Parcel::continueWrite()</h2><pre><code>status_t Parcel::continueWrite(size_t desired)
+{
+    size_t objectsSize = mObjectsSize;
+
+    ...
+
+    if (mOwner) {
+        ...
+    } else if (mData) {
+        ...
+
+        // We own the data, so we can just do a realloc().
+        if (desired &gt; mDataCapacity) {
+            uint8_t* data = (uint8_t*)realloc(mData, desired);
+            if (data) {
+                mData = data;
+                mDataCapacity = desired;
+            } else if (desired &gt; mDataCapacity) {
+                ...
+            }
+        } else {
+            ...
+        }
+
+    } else {
+        ...
+    }
+
+    return NO_ERROR;
+}</code></pre><p>说明：mObjectsSize的初始值为0，mOwner的初始值为NULL，mData非空；并且，desired=6，mDataCapacity=0。因此，会调用realloc()给mData重新分配内存大小为6字节。分配成功后，更新”数据地址mData”和”数据容量mDataCapacity=6”。  </p>
+<p>接下来，回到writeAligned()中，它会跳转到restart_write标签处。先将int32_t的整形数保存到mData中，然后再调用finishWrite()进行同步。</p>
+<p><a name="anchor3_12"></a></p>
+<h2 id="12-Parcel-finishWrite"><a href="#12-Parcel-finishWrite" class="headerlink" title="12. Parcel::finishWrite()"></a>12. Parcel::finishWrite()</h2><pre><code>status_t Parcel::finishWrite(size_t len)
+{
+    mDataPos += len;
+    if (mDataPos &gt; mDataSize) {
+        mDataSize = mDataPos;
+        ...
+    }
+    return NO_ERROR;
+}</code></pre><p>说明：前面已经将数据写入到mData中，现在就通过finishWrite()来改变数据的当前指针位置(方便下一次写入)和数据的大小。<br>(01) len是int32_t的大小，很显然是4个字节，len=4。所以，mDataPos=4。<br>(02) mDataPos=4，mDataSize=0；因此if(mDataPos&gt;mDataSize)为true，所以，mDataSize=4。  </p>
+<p>此时，就分析完了writeInterfaceToken()中的writeInt32()就分析完毕了.<br><strong>mData</strong>：它的第0~3个字节保存了int32_t类型的数据STRICT_MODE_PENALTY_GATHER。<br><strong>mDataPos</strong>：值为4，即下一个写入mData中的数据从第4个字节开始。<br><strong>mDataSize</strong>：值为4，即mData中数据的大小。<br><strong>mDataCapacity</strong>：值为6，即mData的数据容量为6字节。<br>此时，mData的数据如下图所示：</p>
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add01.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add01.jpg" alt></a></p>
+<p>接下来，看看再writeString16(“android.os.IServiceManager”)如何将字符串写入到Parcel中。</p>
+<p><a name="anchor3_13"></a></p>
+<h2 id="13-Parcel-writeString16"><a href="#13-Parcel-writeString16" class="headerlink" title="13. Parcel::writeString16()"></a>13. Parcel::writeString16()</h2><pre><code>status_t Parcel::writeString16(const String16&amp; str)
+{
+    return writeString16(str.string(), str.size());
+}
+
+status_t Parcel::writeString16(const char16_t* str, size_t len)
+{
+    if (str == NULL) return writeInt32(-1);
+
+    // 将字符串长度写入到Parcel中
+    status_t err = writeInt32(len);
+    if (err == NO_ERROR) {
+        len *= sizeof(char16_t);
+        // 在将字符串写入之前，增加mData的容量
+        uint8_t* data = (uint8_t*)writeInplace(len+sizeof(char16_t));
+        if (data) {
+            // 将字符串拷贝到mData中
+            memcpy(data, str, len);
+            // 字符串结束符
+            *reinterpret_cast&lt;char16_t*&gt;(data+len) = 0;
+            return NO_ERROR;
+        }
+        err = mError;
+    }
+    return err;
+}</code></pre><p>说明：writeString16()是重载函数。<br>(01) writeString16(str, len)中，str=”android.os.IServiceManager”；len是由str.size()得来，虽然这里的字符串是String16类型(即每个字符占2个字节)，但是str.size()是获取str中有效数据的个数(不包含字符串结束符)，因此，len=26。<br>(02) 首先调用writeInt32(len)将字符串的长度写入到Parcel中，writeInt32()在前面已经介绍过了。当再次写入int32_t类型的数据时，数据容量不够，会再次增长为12，即mDataCapacity=12；而写入int32_t类型的数据之后，mDataPos和mDataSize都增长为8。 此时，mData的数据如下图所示：</p>
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add02.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add02.jpg" alt></a></p>
+<p>在通过writeInt32(len)写入数据长度之后，再重新计算len=52；接着，通过writeInplace()写入数据。  </p>
+<p><a name="anchor3_14"></a></p>
+<h2 id="14-Parcel-writeInplace"><a href="#14-Parcel-writeInplace" class="headerlink" title="14. Parcel::writeInplace()"></a>14. Parcel::writeInplace()</h2><pre><code>#define PAD_SIZE(s) (((s)+3)&amp;~3)
+
+void* Parcel::writeInplace(size_t len)
+{   
+    // 4字节对齐
+    const size_t padded = PAD_SIZE(len);
+
+    ...
+
+    if ((mDataPos+padded) &lt;= mDataCapacity) {
+restart_write:                        
+        uint8_t* const data = mData+mDataPos;
+
+        // 如果padded!=len，则根据大端法还是小端法进行地址对齐设置。
+        if (padded != len) {
+            ...
+        }
+
+        finishWrite(padded);
+        return data;
+    }   
+
+    status_t err = growData(padded);
+    if (err == NO_ERROR) goto restart_write;
+    return NULL;
+}</code></pre><p>说明：参数len=54。<br>(01) PAD_SIZE()是4字节对齐的宏，PAD_SIZE(54)=56。<br>(02) 函数的初始值为padded=56，mDataPos=8，mDataCapacity=12。因此，会先调用growData(padded)来增加数据容量。growData()在前面已经介绍过；此时，它会将容量mDataCapacity增加至96。<br>(03) 接着会跳转到restart_write标签处，然后调用finishWrite(padded)来更新mDataPos和mDataSize。</p>
+<p>至此，writeInplace()就分析完了，它的作用就是增加mData的容量，并返回即将写入数据的地址。接着，回到writeString16()中，执行mmap(data, str, len)将数据拷贝到mData中；拷贝完毕之后，设置字符串的结束符为0。</p>
+<pre><code>status_t Parcel::writeString16(const char16_t* str, size_t len)
+{
+    if (str == NULL) return writeInt32(-1);
+
+    // 将字符串长度写入到Parcel中
+    status_t err = writeInt32(len);
+    if (err == NO_ERROR) {
+        len *= sizeof(char16_t);
+        // 在将字符串写入之前，增加mData的容量
+        uint8_t* data = (uint8_t*)writeInplace(len+sizeof(char16_t));
+        if (data) {
+            // 将字符串拷贝到mData中
+            memcpy(data, str, len);
+            // 字符串结束符
+            *reinterpret_cast&lt;char16_t*&gt;(data+len) = 0;
+            return NO_ERROR;
+        }
+        err = mError;
+    }
+    return err;
+}</code></pre><br>
+这样，data.writeInterfaceToken(IServiceManager::getInterfaceDescriptor())就分析完了。此时，mData中数据如下图所示：
+
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add03.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add03.jpg" alt></a></p>
+<p><a name="anchor3_15"></a></p>
+<h2 id="15-Parcel-writeString16"><a href="#15-Parcel-writeString16" class="headerlink" title="15. Parcel::writeString16()"></a>15. Parcel::writeString16()</h2><p>继续回到addService()中，接着会通过data.writeString16(name)将MediaPlayerService服务的名称写入到data中，此处的name=”media.player”。在前面已经详细介绍过writeString16()，这里执行完该语句后，mData中的数据如下：</p>
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add04.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add04.jpg" alt></a></p>
+<p>接着，addService()会调用data.writeStrongBinder(service)将MediaPlayerService对象写入到data中。这个数据最重要，下面分析下writeStrongBinder()的实现。  </p>
+<p><a name="anchor3_16"></a></p>
+<h2 id="16-Parcel-writeStrongBinder"><a href="#16-Parcel-writeStrongBinder" class="headerlink" title="16. Parcel::writeStrongBinder()"></a>16. Parcel::writeStrongBinder()</h2><pre><code>status_t Parcel::writeStrongBinder(const sp&lt;IBinder&gt;&amp; val)
+{
+    return flatten_binder(ProcessState::self(), val, this);
+}</code></pre><p>说明：该函数调用flatten_binder()将数据打包。</p>
+<p><a name="anchor3_17"></a></p>
+<h2 id="17-Parcel-flatten-binder"><a href="#17-Parcel-flatten-binder" class="headerlink" title="17. Parcel::flatten_binder()"></a>17. Parcel::flatten_binder()</h2><pre><code>status_t flatten_binder(const sp&lt;ProcessState&gt;&amp; proc,
+    const sp&lt;IBinder&gt;&amp; binder, Parcel* out)
+{       
+    flat_binder_object obj;
+
+    obj.flags = 0x7f | FLAT_BINDER_FLAG_ACCEPTS_FDS;
+    if (binder != NULL) {
+        IBinder *local = binder-&gt;localBinder();
+        if (!local) {
+            ...
+        } else {
+            obj.type = BINDER_TYPE_BINDER;
+            obj.binder = local-&gt;getWeakRefs();
+            obj.cookie = local;
+        }       
+    } else {
+        ...
+    }
+
+    return finish_flatten_binder(binder, obj, out);
+}</code></pre><p>说明：该函数是将MediaPlayerService对象封装到结构体flat_binder_object中。Binder驱动认识flat_binder_object结构体类型的数据，在C++层将数据发送给Binder驱动后，Binder驱动能够解析该结构体。<br>(01) 先看看参数，proc是ProcessState对象，binder是MediaPlayerService对象，out是Parcel自己。<br>(02) binder不为NULL，因此，执行if(binder!=NULL)中的语句。binder-&gt;localBinder()返回的BBinder对象，即本地Binder对象。(BBinder是MediaPlayerService的父类，localBinder()函数在frameworks/native/libs/binder/Binder.cpp中实现)。因此，local不为NULL。  </p>
+<pre><code>obj.flags = 0x7f | FLAT_BINDER_FLAG_ACCEPTS_FDS;    // 标记
+obj.type = BINDER_TYPE_BINDER;                      // 类型
+obj.binder = local-&gt;getWeakRefs();                  // MediaPlayerService的弱引用
+obj.cookie = local;                                 // MediaPlayerService自身</code></pre><p>注意：从这里就可以看出，MediaPlayerService添加服务时，发送给驱动的数据是MediaPlayerService的本地Binder对象，即BBinder实例。准确的来说，该数据是保存在obj.cookie中的，该数据的类型是BINDER_TYPE_BINDER。</p>
+<p>(03) 调用finish_flatten_binder()将数据写入到Parcel中。</p>
+<p><a name="anchor3_18"></a></p>
+<h2 id="18-Parcel-finish-flatten-binder"><a href="#18-Parcel-finish-flatten-binder" class="headerlink" title="18. Parcel::finish_flatten_binder()"></a>18. Parcel::finish_flatten_binder()</h2><pre><code>inline static status_t finish_flatten_binder(
+    const sp&lt;IBinder&gt;&amp; binder, const flat_binder_object&amp; flat, Parcel* out)
+{       
+    return out-&gt;writeObject(flat, false);
+}       </code></pre><p>说明：该函数是flat_binder_object对象写入到Parcel中。 </p>
+<p><a name="anchor3_19"></a></p>
+<h2 id="19-Parcel-writeObject"><a href="#19-Parcel-writeObject" class="headerlink" title="19. Parcel::writeObject()"></a>19. Parcel::writeObject()</h2><pre><code>status_t Parcel::writeObject(const flat_binder_object&amp; val, bool nullMetaData)
+{   
+    const bool enoughData = (mDataPos+sizeof(val)) &lt;= mDataCapacity;
+    const bool enoughObjects = mObjectsSize &lt; mObjectsCapacity;
+    if (enoughData &amp;&amp; enoughObjects) {
+restart_write:
+        *reinterpret_cast&lt;flat_binder_object*&gt;(mData+mDataPos) = val;
+
+        // val.binder非空
+        if (nullMetaData || val.binder != NULL) {
+            // 将地址偏移位置保存到mObjects[0]中
+            mObjects[mObjectsSize] = mDataPos;
+            acquire_object(ProcessState::self(), val, this);
+            // 增加mObjectsSize的值
+            mObjectsSize++;
+        }
+
+        ...
+
+        return finishWrite(sizeof(flat_binder_object));
+    }
+
+    if (!enoughData) {
+        const status_t err = growData(sizeof(val));
+        if (err != NO_ERROR) return err;
+    }
+    if (!enoughObjects) {
+        // 增加容量
+        size_t newSize = ((mObjectsSize+2)*3)/2;
+        // 分配内存
+        size_t* objects = (size_t*)realloc(mObjects, newSize*sizeof(size_t));
+        if (objects == NULL) return NO_MEMORY;
+        // 设置mObjects的内存地址起始地址
+        mObjects = objects;
+        // 设置mObjects对象的容量
+        mObjectsCapacity = newSize;
+    }
+
+    goto restart_write;
+}</code></pre><p>说明：<br>(01) 此时，mDataPos=96, sizeof(val)=32, mDataCapacity=96；因此，enoughData=false。mObjectsSize和mObjectsCapacity的初始值=0，因此，enoughObjects=false。<br>(02) 首先，执行if(!enoughData)部分，通过growData()将数据的容量增加至192。即，mDataCapacity=192。<br>(03) 接着，执行if(!enoughObjects)部分，该部分的目的是分配对象空间，并修改mObjects和mObjectsCapacity的值。增加之后的容量mObjectsCapacity=3。<br>(04) 然后，跳转到restart_write标签处。 <em>reinterpret_cast&lt;flat_binder_object</em>&gt;(mData+mDataPos) = val是保存val对象到mDataPos+mDataPos所指的地址中。<br>(04) mObjects[mObjectsSize]=mDataPos，此处的mObjectsSize=0；这里是将对象的地址偏移mDataPos保存到mObjects[0]中。随后执行mObjectsSize++增加mObjectsSize的值为1。<br>(05) 最后，调用finishWrite()更新mDataPos和mDataSize的值。</p>
+<p><br>至此，data.writeStrongBinder()就分析完了。将MediaPlayerService写入data之后，它的数据如下图所示：</p>
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add05.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add05.jpg" alt></a></p>
+<p>最后，调用data.writeInt32(allowIsolated ? 1 : 0)。allowIsolated为false，因此，data.writeInt32(0)。执行该函数之后，data的数据如下图所示：</p>
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add06.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/parcel_add06.jpg" alt></a></p>
+<p>以上就是addService()中的data的数据。接下来执行remote()-&gt;transact(ADD_SERVICE_TRANSACTION, data, &amp;reply)。前面已经说过，remote()返回的是BpBinder对象，该BpBinder对象是在<a href="/2014/09/04/Binder-defaultServiceManager/">Android Binder机制(四) defaultServiceManager()的实现</a>中调用defaultServiceManager()时初始化的。下面查看BpBinder的transact()。</p>
+<p><a name="anchor3_20"></a></p>
+<h2 id="20-BpBinder-transact"><a href="#20-BpBinder-transact" class="headerlink" title="20. BpBinder::transact()"></a>20. BpBinder::transact()</h2><pre><code>status_t BpBinder::transact(            
+    uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags)
+{
+    // mAlive的初始值为1
+    if (mAlive) {
+        status_t status = IPCThreadState::self()-&gt;transact(
+            mHandle, code, data, reply, flags);
+        if (status == DEAD_OBJECT) mAlive = 0;
+        return status;
+    }
+
+    return DEAD_OBJECT;
+}</code></pre><p>说明：该代码在frameworks/native/libs/binder/BpBinder.cpp中。由于mAlive的初始值为1，因此该函数会调用IPCThreadState::self()-&gt;transact()。我们知道，IPCThreadState::self()是获取全局IPCThreadState对象，因此最终会调用IPCThreadState::transact()。</p>
+<p><a name="anchor3_21"></a></p>
+<h2 id="21-IPCThreadState-transact"><a href="#21-IPCThreadState-transact" class="headerlink" title="21. IPCThreadState::transact()"></a>21. IPCThreadState::transact()</h2><pre><code>status_t IPCThreadState::transact(int32_t handle,
+                                  uint32_t code, const Parcel&amp; data,
+                                  Parcel* reply, uint32_t flags)
+{
+    status_t err = data.errorCheck();
+
+    flags |= TF_ACCEPT_FDS;
+
+    ...
+
+    if (err == NO_ERROR) {
+        ...
+        err = writeTransactionData(BC_TRANSACTION, flags, handle, code, data, NULL);
+    }
+
+    ...
+
+    if ((flags &amp; TF_ONE_WAY) == 0) {
+        if (reply) {
+            err = waitForResponse(reply);
+        } else {
+            ...
+        }
+    } else {
+        ...
+    }
+
+    return err;
+}</code></pre><p>说明：该代码在frameworks/native/libs/binder/IPCThreadState.cpp中。<br>(01) 先看看函数的参数。handle是BpBinder中的mHandle对象，BpBinder中的mHandle是ServiceManager的句柄，值为0。code=ADD_SERVICE_TRANSACTION。data就是在addService中设置的Parcel对象。reply是用来接收Binder驱动反馈数据的Parcel对象。flags是默认值0。<br>(02) 该函数会先通过writeTransactionData()将数据打包。<br>(03) flags的初始化为0，并且reply非空。因此，将数据打包号之后，会调用waitForResponse()将数据发送给Binder驱动，然后等待Binder驱动反馈。</p>
+<p><a name="anchor3_22"></a></p>
+<h2 id="22-IPCThreadState-writeTransactionData"><a href="#22-IPCThreadState-writeTransactionData" class="headerlink" title="22. IPCThreadState::writeTransactionData()"></a>22. IPCThreadState::writeTransactionData()</h2><pre><code>status_t IPCThreadState::writeTransactionData(int32_t cmd, uint32_t binderFlags,
+    int32_t handle, uint32_t code, const Parcel&amp; data, status_t* statusBuffer)
+{
+    binder_transaction_data tr;
+
+    tr.target.handle = handle;
+    tr.code = code;
+    tr.flags = binderFlags;
+    tr.cookie = 0;
+    tr.sender_pid = 0;
+    tr.sender_euid = 0;
+
+    const status_t err = data.errorCheck();
+    if (err == NO_ERROR) {
+        tr.data_size = data.ipcDataSize();
+        tr.data.ptr.buffer = data.ipcData();
+        tr.offsets_size = data.ipcObjectsCount()*sizeof(size_t);
+        tr.data.ptr.offsets = data.ipcObjects();
+    } else if (statusBuffer) {
+        ..
+    } else {
+        ...
+    }
+
+    mOut.writeInt32(cmd);
+    mOut.write(&amp;tr, sizeof(tr));
+
+    return NO_ERROR;
+}</code></pre><p>说明：该函数会读取Parcel中的数据，然后将其打包到binder_transaction_data结构体中。binder_transaction_data结构体是Binder驱动能够识别并对之进行解析的数据结构。<br>  ipcDataSize()是返回mDataSize，ipcData()是返回mData，ipcObjectsCount()是返回mObjectsSize，而ipcObjects则是返回mObjects。这些数据就是前面我们在addService中分析的Parcel对象的数据。下面给出初始化之后tr的值。  </p>
+<pre><code>tr.target.handle = handle;  // 0，即Service Manager的句柄
+tr.code = code;             // ADD_SERVICE_TRANSACTION
+tr.flags = binderFlags;     // TF_ACCEPT_FDS
+tr.cookie = 0;
+tr.sender_pid = 0;
+
+tr.data_size = data.ipcDataSize();      // 数据大小(对应mDataSize)
+tr.data.ptr.buffer = data.ipcData();    // 数据的起始地址(对应mData)
+tr.offsets_size = data.ipcObjectsCount()*sizeof(size_t); // data中保存的对象个数(对应mObjectsSize)
+tr.data.ptr.offsets = data.ipcObjects();                 // data中保存的对象的偏移地址数组(对应mObjects)</code></pre><p>初始化tr之后，将cmd=BC_TRANSACTION和tr重新打包到mOut中。mOut中的数据将来会被以请求的方式发送给Binder驱动。重新打包后的数据如下图所示：</p>
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/data_01.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/data_01.jpg" alt></a></p>
+<p>在上图中，mOut包含了”事务指令”+”binder_transaction_data”结构体对象。而具体的MediaPlayerService对象，则包含在binder_transaction_data的data数据区域；它是被封装在flat_binder_object结构体中的。</p>
+<p><a name="anchor3_23"></a></p>
+<h2 id="23-IPCThreadState-waitForResponse"><a href="#23-IPCThreadState-waitForResponse" class="headerlink" title="23. IPCThreadState::waitForResponse()"></a>23. IPCThreadState::waitForResponse()</h2><p>writeTransactionData()分析完毕之后，再看看waitForResponse()的代码。</p>
+<pre><code>status_t IPCThreadState::waitForResponse(Parcel *reply, status_t *acquireResult)
+{
+    int32_t cmd;
+    int32_t err;
+
+    while (1) {
+        // 先通过talkWithDriver()和Binder驱动交互
+        if ((err=talkWithDriver()) &lt; NO_ERROR) break;
+        ...
+        if (mIn.dataAvail() == 0) continue;
+
+        // 然后读取返回结果，再根据结果进行处理
+        cmd = mIn.readInt32();
+
+        switch (cmd) {
+        case BR_TRANSACTION_COMPLETE:
+            ...
+        case BR_DEAD_REPLY:
+            ...
+        case BR_FAILED_REPLY:
+            ...
+        case BR_ACQUIRE_RESULT:
+            ...
+        case BR_REPLY:
+            ...
+        default:
+            err = executeCommand(cmd);
+            if (err != NO_ERROR) goto finish;
+            break;
+        }
+    }
+
+finish:
+    ...
+
+    return err;
+}</code></pre><p>说明：waitForResponse()会先调用talkWithDriver()和Binder驱动交互，然后根据反馈结果来进行处理。</p>
+<p><a name="anchor3_24"></a></p>
+<h2 id="24-IPCThreadState-talkWithDriver"><a href="#24-IPCThreadState-talkWithDriver" class="headerlink" title="24. IPCThreadState::talkWithDriver()"></a>24. IPCThreadState::talkWithDriver()</h2><pre><code>status_t IPCThreadState::talkWithDriver(bool doReceive)
+{
+    ...
+    binder_write_read bwr;
+
+    // Is the read buffer empty?
+    const bool needRead = mIn.dataPosition() &gt;= mIn.dataSize();
+    const size_t outAvail = (!doReceive || needRead) ? mOut.dataSize() : 0;
+
+    bwr.write_size = outAvail;
+    bwr.write_buffer = (long unsigned int)mOut.data();
+
+    // This is what we&apos;ll read.
+    if (doReceive &amp;&amp; needRead) {
+        bwr.read_size = mIn.dataCapacity();
+        bwr.read_buffer = (long unsigned int)mIn.data();
+    } else {
+        bwr.read_size = 0;
+        bwr.read_buffer = 0;
+    }
+
+    ...
+    if ((bwr.write_size == 0) &amp;&amp; (bwr.read_size == 0)) return NO_ERROR;
+
+    bwr.write_consumed = 0;
+    bwr.read_consumed = 0;
+    status_t err;
+    do {
+        ...
+        if (ioctl(mProcess-&gt;mDriverFD, BINDER_WRITE_READ, &amp;bwr) &gt;= 0)
+            err = NO_ERROR;
+        else
+            ...
+        ...
+    } while (err == -EINTR);
+
+    ...
+
+    if (err &gt;= NO_ERROR) {
+        // 清空已写的数据
+        if (bwr.write_consumed &gt; 0) {
+            if (bwr.write_consumed &lt; (ssize_t)mOut.dataSize())
+                mOut.remove(0, bwr.write_consumed);
+            else
+                mOut.setDataSize(0);
+        }
+        // 设置已读数据
+        if (bwr.read_consumed &gt; 0) {
+            mIn.setDataSize(bwr.read_consumed);
+            mIn.setDataPosition(0);
+        }
+        ...
+        return NO_ERROR;
+    }
+
+    return err;
+}</code></pre><p>说明：talkWithDriver()会先初始化bwr(binder_write_read类型的变量)，然后将bwr变量通过ioctl()发送给Binder驱动。该函数的参数doReceive的默认值为true。<br>(01) 现在，mIn中还没有被写入数据，因此它的值都是初始值。那么，mIn.dataPosition()返回mDataPos，它的值为0；mIn.dataSize()返回mDataSize，它的初始值也为0。因此，needRead=true。<br>(02) doReceive=true，但是needRead=true；因此，outAvail=mOut.dataSize，outAvail不为0。接下来，就对bwr进行初始化，关于bwr的介绍，请参考<a href="/2014/09/02/Binder-Datastruct/">Android Binder机制(二) Binder中的数据结构</a>。bwr初始化完毕之后，各个成员的值如下：  </p>
+<pre><code>bwr.write_size = outAvail;                          // mOut中数据大小，大于0
+bwr.write_buffer = (long unsigned int)mOut.data();  // mOut中数据的地址
+bwr.write_consumed = 0;
+bwr.read_size = mIn.dataCapacity();                 // 256
+bwr.read_buffer = (long unsigned int)mIn.data();    // mIn.mData，实际上为空
+bwr.read_consumed = 0;</code></pre><p>(03) bwr初始化完成之后，调用ioctl(,BINDER_WRITE_READ,)和Binder驱动进行交互。</p>
+<p>通过binder_write_read再次打包后的数据如下图所示：</p>
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/data_02.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/data_02.jpg" alt></a></p>
+<p>如上图所示，ioctl()传输的数据包含”BINDER_WRITE_READ”+”binder_write_read结构体对象”。在binder_write_read的write_buffer中包含了事务数据；而在数据数据的data中又包含了flat_binder_object等数据。在flat_binder_object中就包含了需要传输的MediaPlayerService对象。<br>总体来看，数据经过了三次封装。下面看看在Binder驱动中是如何一层层将它们剖析开来的。</p>
+<p><a name="anchor3_25"></a></p>
+<h2 id="25-Binder驱动中binder-ioctl-的BINDER-WRITE-READ相关部分的源码"><a href="#25-Binder驱动中binder-ioctl-的BINDER-WRITE-READ相关部分的源码" class="headerlink" title="25. Binder驱动中binder_ioctl()的BINDER_WRITE_READ相关部分的源码"></a>25. Binder驱动中binder_ioctl()的BINDER_WRITE_READ相关部分的源码</h2><pre><code>static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+{
+  int ret;
+  struct binder_proc *proc = filp-&gt;private_data;
+  struct binder_thread *thread;
+  unsigned int size = _IOC_SIZE(cmd);
+  void __user *ubuf = (void __user *)arg;
+
+  // 中断等待函数。
+  // 1. 当binder_stop_on_user_error &lt; 2为true时；不会进入等待状态；直接跳过。
+  // 2. 当binder_stop_on_user_error &lt; 2为false时，进入等待状态。
+  //    当有其他进程通过wake_up_interruptible来唤醒binder_user_error_wait队列，并且binder_stop_on_user_error &lt; 2为true时；
+  //    则继续执行；否则，再进入等待状态。
+  ret = wait_event_interruptible(binder_user_error_wait, binder_stop_on_user_error &lt; 2);
+
+  binder_lock(__func__);
+  // 在proc进程中查找该线程对应的binder_thread；若查找失败，则新建一个binder_thread，并添加到proc-&gt;threads中。
+  thread = binder_get_thread(proc);
+  ...
+
+  switch (cmd) {
+  case BINDER_WRITE_READ: {
+      struct binder_write_read bwr;
+      ...
+
+      // 将binder_write_read从&quot;用户空间&quot; 拷贝到 &quot;内核空间&quot;
+      if (copy_from_user(&amp;bwr, ubuf, sizeof(bwr))) {
+          ...
+      }
+
+      // 如果write_size&gt;0，则进行写操作
+      if (bwr.write_size &gt; 0) {
+          ret = binder_thread_write(proc, thread, (void __user *)bwr.write_buffer, bwr.write_size, &amp;bwr.write_consumed);
+          ...
+      }
+
+      // 如果read_size&gt;0，则进行读操作
+      if (bwr.read_size &gt; 0) {
+          ret = binder_thread_read(proc, thread, (void __user *)bwr.read_buffer, bwr.read_size, &amp;bwr.read_consumed, filp-&gt;f_flags   &amp; O_NONBLOCK);
+          ...
+      }
+      ...
+
+      if (copy_to_user(ubuf, &amp;bwr, sizeof(bwr))) {
+          ret = -EFAULT;
+          goto err;
+      }
+      break;
+  }
+  ...
+  }
+  ret = 0;
+
+  ...
+  return ret;
+}</code></pre><p>说明：关于该函数在<a href="/2014/09/03/Binder-ServiceManager-Daemon/">Android Binder机制(三) ServiceManager守护进程</a>中已经介绍过了。这里将binder_write_read从用户空间拷贝到内核空间之后，读取bwr.write_size和bwr.read_size都&gt;0，因此先写后读。</p>
+<p><a name="anchor3_26"></a></p>
+<h2 id="26-Binder驱动中binder-thread-write-的源码"><a href="#26-Binder驱动中binder-thread-write-的源码" class="headerlink" title="26. Binder驱动中binder_thread_write()的源码"></a>26. Binder驱动中binder_thread_write()的源码</h2><pre><code>int binder_thread_write(struct binder_proc *proc, struct binder_thread *thread,
+          void __user *buffer, int size, signed long *consumed)
+{
+  uint32_t cmd;
+  void __user *ptr = buffer + *consumed;
+  void __user *end = buffer + size;
+
+  // 读取binder_write_read.write_buffer中的内容。
+  // 每次读取32bit(即4个字节)
+  while (ptr &lt; end &amp;&amp; thread-&gt;return_error == BR_OK) {
+      // 从用户空间读取32bit到内核中，并赋值给cmd。
+      if (get_user(cmd, (uint32_t __user *)ptr))
+          return -EFAULT;
+
+      ptr += sizeof(uint32_t);
+      ...
+      switch (cmd) {
+      ...
+        case BC_TRANSACTION:
+        case BC_REPLY: {
+            struct binder_transaction_data tr;
+
+            if (copy_from_user(&amp;tr, ptr, sizeof(tr)))
+                return -EFAULT;
+            ptr += sizeof(tr);
+            binder_transaction(proc, thread, &amp;tr, cmd == BC_REPLY);
+            break;
+        }
+      ...
+      }
+      // 更新bwr.write_consumed的值
+      *consumed = ptr - buffer;
+  }
+  return 0;
+}</code></pre><p>说明：读取出来的交易码是BC_TRANSACTION。在通过copy_from_user()将数据拷贝从用户空间拷贝到内核空间之后，就调用binder_transaction()进行处理。  </p>
+<p><a name="anchor3_27"></a></p>
+<h2 id="27-Binder驱动中binder-transaction-的源码"><a href="#27-Binder驱动中binder-transaction-的源码" class="headerlink" title="27. Binder驱动中binder_transaction()的源码"></a>27. Binder驱动中binder_transaction()的源码</h2><pre><code>static void binder_transaction(struct binder_proc *proc,
+                   struct binder_thread *thread,
+                   struct binder_transaction_data *tr, int reply)
+{
+    struct binder_transaction *t;
+    struct binder_work *tcomplete;
+    size_t *offp, *off_end;
+    struct binder_proc *target_proc;
+    struct binder_thread *target_thread = NULL;
+    struct binder_node *target_node = NULL;
+    struct list_head *target_list;
+    wait_queue_head_t *target_wait;
+    struct binder_transaction *in_reply_to = NULL;
+    struct binder_transaction_log_entry *e;
+    uint32_t return_error;
+
+    ...
+
+    if (reply) {
+        ...
+    } else {
+        if (tr-&gt;target.handle) {
+            ...
+        } else {
+            // 事务目标对象是ServiceManager的binder实体
+            // 即，该事务是交给Service Manager来处理的。
+            target_node = binder_context_mgr_node;
+            ...
+        }
+        ...
+        // 设置处理事务的目标进程
+        target_proc = target_node-&gt;proc;
+        ...
+    }
+
+    if (target_thread) {
+        ...
+    } else {
+        target_list = &amp;target_proc-&gt;todo;
+        target_wait = &amp;target_proc-&gt;wait;
+    }
+    ...
+
+    // 分配一个待处理的事务t，t是binder事务(binder_transaction对象)
+    t = kzalloc(sizeof(*t), GFP_KERNEL);
+    ...
+
+    // 分配一个待完成的工作tcomplete，tcomplete是binder_work对象。
+    tcomplete = kzalloc(sizeof(*tcomplete), GFP_KERNEL);
+    ...
+
+    t-&gt;debug_id = ++binder_last_id;
+    ...
+
+    // 设置from，表示该事务是MediaPlayerService发起的
+    if (!reply &amp;&amp; !(tr-&gt;flags &amp; TF_ONE_WAY))
+        t-&gt;from = thread;
+    else
+        t-&gt;from = NULL;
+    // 下面的一些赋值是初始化事务t
+    t-&gt;sender_euid = proc-&gt;tsk-&gt;cred-&gt;euid;
+    // 事务将交给target_proc进程进行处理
+    t-&gt;to_proc = target_proc;
+    // 事务将交给target_thread线程进行处理
+    t-&gt;to_thread = target_thread;
+    // 事务编码
+    t-&gt;code = tr-&gt;code;
+    // 事务标志
+    t-&gt;flags = tr-&gt;flags;
+    // 事务优先级
+    t-&gt;priority = task_nice(current);
+
+    ...
+
+    // 分配空间
+    t-&gt;buffer = binder_alloc_buf(target_proc, tr-&gt;data_size,
+        tr-&gt;offsets_size, !reply &amp;&amp; (t-&gt;flags &amp; TF_ONE_WAY));
+    ...
+    t-&gt;buffer-&gt;allow_user_free = 0;
+    t-&gt;buffer-&gt;debug_id = t-&gt;debug_id;
+    // 保存事务
+    t-&gt;buffer-&gt;transaction = t;
+    // 保存事务的目标对象(即处理该事务的binder对象)
+    t-&gt;buffer-&gt;target_node = target_node;
+    trace_binder_transaction_alloc_buf(t-&gt;buffer);
+    if (target_node)
+        binder_inc_node(target_node, 1, 0, NULL);
+
+    offp = (size_t *)(t-&gt;buffer-&gt;data + ALIGN(tr-&gt;data_size, sizeof(void *)));
+
+    // 将&quot;用户空间的数据&quot;拷贝到内核中
+    // tr-&gt;data.ptr.buffer就是用户空间数据的起始地址，tr-&gt;data_size就是数据大小
+    if (copy_from_user(t-&gt;buffer-&gt;data, tr-&gt;data.ptr.buffer, tr-&gt;data_size)) {
+        ...
+    }
+    // 将&quot;用户空间的数据中所含对象的偏移地址&quot;拷贝到内核中
+    // tr-&gt;data.ptr.offsets就是数据中的对象偏移地址数组，tr-&gt;offsets_size就数据中的对象个数
+    // 拷贝之后，offp就是flat_binder_object对象数组在内核空间的偏移数组的起始地址
+    if (copy_from_user(offp, tr-&gt;data.ptr.offsets, tr-&gt;offsets_size)) {
+        ...
+    }
+    ...
+    // off_end就是flat_binder_object对象数组在内核空间的偏移地址的结束地址
+    off_end = (void *)offp + tr-&gt;offsets_size;
+    // 将所有的flat_binder_object对象读取出来
+    // 对MediaPlayerService而言，只有一个flat_binder_object对象。
+    for (; offp &lt; off_end; offp++) {
+        struct flat_binder_object *fp;
+        ...
+        fp = (struct flat_binder_object *)(t-&gt;buffer-&gt;data + *offp);
+
+        switch (fp-&gt;type) {
+        case BINDER_TYPE_BINDER:
+        case BINDER_TYPE_WEAK_BINDER: {
+            struct binder_ref *ref;
+            // 在proc中查找binder实体对应的binder_node
+            struct binder_node *node = binder_get_node(proc, fp-&gt;binder);
+            // 若找不到，则新建一个binder_node；下次就可以直接使用了。
+            if (node == NULL) {
+                node = binder_new_node(proc, fp-&gt;binder, fp-&gt;cookie);
+                if (node == NULL) {
+                    ...
+                }
+                node-&gt;min_priority = fp-&gt;flags &amp; FLAT_BINDER_FLAG_PRIORITY_MASK;
+                node-&gt;accept_fds = !!(fp-&gt;flags &amp; FLAT_BINDER_FLAG_ACCEPTS_FDS);
+            }
+            ...
+            // 在target_proc(即，ServiceManager的进程上下文)中查找是否包行&quot;该Binder实体的引用&quot;，
+            // 如果没有找到的话，则将&quot;该binder实体的引用&quot;添加到target_proc-&gt;refs_by_node红黑树中。这样，就可以通过Service Manager对该
+Binder实体进行管理了。
+            ref = binder_get_ref_for_node(target_proc, node);
+            if (ref == NULL) {
+                ...
+            }
+            // 修改type
+            if (fp-&gt;type == BINDER_TYPE_BINDER)
+                fp-&gt;type = BINDER_TYPE_HANDLE;
+            else
+                fp-&gt;type = BINDER_TYPE_WEAK_HANDLE;
+            // 修改handle。handle和binder是联合体，这里将handle设为引用的描述。
+            // 根据该handle可以找到&quot;该binder实体在target_proc中的binder引用&quot;；
+            // 即，可以根据该handle，可以从Service Manager找到对应的Binder实体的引用，从而获取Binder实体。
+            fp-&gt;handle = ref-&gt;desc;
+            // 增加引用计数，防止&quot;该binder实体&quot;在使用过程中被销毁。
+            binder_inc_ref(ref, fp-&gt;type == BINDER_TYPE_HANDLE,
+                       &amp;thread-&gt;todo);
+
+            trace_binder_transaction_node_to_ref(t, node, ref);
+            ...
+        } break;
+        ...
+        }
+    }
+    if (reply) {
+        ..
+    } else if (!(t-&gt;flags &amp; TF_ONE_WAY)) {
+        BUG_ON(t-&gt;buffer-&gt;async_transaction != 0);
+        t-&gt;need_reply = 1;
+        t-&gt;from_parent = thread-&gt;transaction_stack;
+        // 将当前事务添加到当前线程的事务栈中
+        thread-&gt;transaction_stack = t;
+    } else {
+        ...
+    }
+    // 设置事务的类型为BINDER_WORK_TRANSACTION
+    t-&gt;work.type = BINDER_WORK_TRANSACTION;
+    // 将事务添加到target_list队列中，即target_list的待处理事务中
+    list_add_tail(&amp;t-&gt;work.entry, target_list);
+    // 设置待完成工作的类型为BINDER_WORK_TRANSACTION_COMPLETE
+    tcomplete-&gt;type = BINDER_WORK_TRANSACTION_COMPLETE;
+    // 将待完成工作添加到thread-&gt;todo队列中，即当前线程的待完成工作中。
+    list_add_tail(&amp;tcomplete-&gt;entry, &amp;thread-&gt;todo);
+    // 唤醒目标进程
+    if (target_wait)
+        wake_up_interruptible(target_wait);
+    return;
+
+    ...
+}</code></pre><p>说明：这里的tr-&gt;target.handle=0，因此，会设置target_node为ServiceManager对应的Binder实体。下面是target_node,target_proc等值初始化之后的值。  </p>
+<pre><code>target_node = binder_context_mgr_node; // 目标节点为Service Manager对应的Binder实体
+target_proc = target_node-&gt;proc;       // 目标进程为Service Manager对应的binder_proc进程上下文信息
+target_list = &amp;target_thread-&gt;todo;    // 待处理事务队列
+target_wait = &amp;target_thread-&gt;wait;    // 等待队列</code></pre><p>目标节点是Service Manager对应的Binder实体。这是指MediaPlayerService的addService()这个指令是来提交给Service Manager进行处理的，它最终会发送给Service Manager进行处理。。</p>
+<p>在初始化完target_node等目标节点之后，会新建一个待处理事务t和待完成的工作tcomplete，并对它们进行初始化。待处理事务t会被提交给目标(即ServiceManager对应的Binder实体)进行处理；而待完成的工作tcomplete则是为了反馈给MediaPlayerService服务，告诉MediaPlayerService它的请求Binder驱动已经收到了。注意，这里仅仅是告诉MediaPlayerService该请求已经被收到，而不是处理完毕！待ServiceManager处理完毕该请求之后，Binder驱动会再次反馈相应的消息给MediaPlayerService。</p>
+<pre><code>// 分配一个待处理的事务t，t是binder事务(binder_transaction对象)
+t = kzalloc(sizeof(*t), GFP_KERNEL);
+...
+
+// 分配一个待完成的工作tcomplete，tcomplete是binder_work对象。
+tcomplete = kzalloc(sizeof(*tcomplete), GFP_KERNEL);
+...
+
+t-&gt;debug_id = ++binder_last_id;
+...
+
+if (!reply &amp;&amp; !(tr-&gt;flags &amp; TF_ONE_WAY))
+    t-&gt;from = thread;
+else
+    t-&gt;from = NULL;
+// 下面的一些赋值是初始化事务t
+t-&gt;sender_euid = proc-&gt;tsk-&gt;cred-&gt;euid;
+// 事务将交给target_proc进程进行处理
+t-&gt;to_proc = target_proc;
+// 事务将交给target_thread线程进行处理
+t-&gt;to_thread = target_thread;
+// 事务编码
+t-&gt;code = tr-&gt;code;
+// 事务标志
+t-&gt;flags = tr-&gt;flags;
+// 事务优先级
+t-&gt;priority = task_nice(current);
+
+...
+
+// 分配空间
+t-&gt;buffer = binder_alloc_buf(target_proc, tr-&gt;data_size,
+    tr-&gt;offsets_size, !reply &amp;&amp; (t-&gt;flags &amp; TF_ONE_WAY));
+...
+t-&gt;buffer-&gt;allow_user_free = 0;
+t-&gt;buffer-&gt;debug_id = t-&gt;debug_id;
+// 保存事务
+t-&gt;buffer-&gt;transaction = t;
+// 保存事务的目标对象(即处理该事务的binder对象)
+t-&gt;buffer-&gt;target_node = target_node;
+trace_binder_transaction_alloc_buf(t-&gt;buffer);
+if (target_node)
+    binder_inc_node(target_node, 1, 0, NULL);</code></pre><p>在初始化完待处理事务t之后，接着将MediaPlayerService请求的数据拷贝到内核空间并解析出来。从数据中解析出MediaPlayerService请求数据中的flat_binder_object对象，只有一个flat_binder_object对象。该flat_binder_object对象的类型是BINDER_TYPE_BINDER，然后调用binder_get_node()在当前进程的上下文环境proc中查找fp-&gt;binder对应的Binder实体，fp-&gt;binder是Android的flatten_binder()中赋值的，它是MediaPlayerService对象的本地引用的描述(即MediaPlayerService对应的BBinder对象的描述)；此外，在MediaPlayerService是初次与Binder驱动通信，因此肯定找不到该对象fp-&gt;binder对应的Binder实体；因此node=NULL。  接下来，就调用binder_new_node()新建fp-&gt;binder对应的Binder实体，这也就是MediaPlayerService对应的Binder实体。然后，调用binder_get_ref_for_node(target_proc, node)获取该Binder实体在target_proc(即ServiceManager的进程上下文环境)中的Binder引用，此时，在target_proc中肯定也找不到该Binder实体对应的引用；那么，就新建Binder实体的引用，并将其添加到target_proc-&gt;refs_by_node红黑树 和 target_proc-&gt;refs_by_desc红黑树中。 这样，Service Manager的进程上下文中就存在MediaPlayerService的Binder引用，Service Manager也就可以对MediaPlayerService进行管理了！<br>  然后，修改fp-&gt;type=BINDER_TYPE_HANDLE，并使fp-&gt;handle = ref-&gt;desc。</p>
+<p>这样，就将MediaPlayerService的请求数据解析出来，并且在Binder驱动中创建了MediaPlayerService对应的Binder实体，而且将该Binder实体添加到MediaPlayerService的进程上下文proc中。更重要的是，在ServiceManager的refs_by_node和refs_by_desc这两颗红黑树中创建了”MediaPlayerService对应的Binder实体的Binder引用”。这意味着，在Binder驱动中，已经能在ServiceManager的进程上下文中找到MediaPlayerService。</p>
+<pre><code>    // 将&quot;用户空间的数据&quot;拷贝到内核中
+    // tr-&gt;data.ptr.buffer就是用户空间数据的起始地址，tr-&gt;data_size就是数据大小
+    if (copy_from_user(t-&gt;buffer-&gt;data, tr-&gt;data.ptr.buffer, tr-&gt;data_size)) {
+        ...
+    }
+    // 将&quot;用户空间的数据中所含对象的偏移地址&quot;拷贝到内核中
+    // tr-&gt;data.ptr.offsets就是数据中的对象偏移地址数组，tr-&gt;offsets_size就数据中的对象个数
+    // 拷贝之后，offp就是flat_binder_object对象数组在内核空间的起始地址
+    if (copy_from_user(offp, tr-&gt;data.ptr.offsets, tr-&gt;offsets_size)) {
+        ...
+    }
+    ...
+    // off_end就是flat_binder_object对象数组在内核空间的结束地址
+    off_end = (void *)offp + tr-&gt;offsets_size;
+    // 将所有的flat_binder_object对象读取出来
+    // 对MediaPlayerService而言，只有一个flat_binder_object对象。
+    for (; offp &lt; off_end; offp++) {
+        struct flat_binder_object *fp;
+        ...
+        fp = (struct flat_binder_object *)(t-&gt;buffer-&gt;data + *offp);
+
+        switch (fp-&gt;type) {
+        case BINDER_TYPE_BINDER:
+        case BINDER_TYPE_WEAK_BINDER: {
+            struct binder_ref *ref;
+            // 在proc中查找binder实体对应的binder_node
+            struct binder_node *node = binder_get_node(proc, fp-&gt;binder);
+            // 若找不到，则新建一个binder_node；下次就可以直接使用了。
+            if (node == NULL) {
+                node = binder_new_node(proc, fp-&gt;binder, fp-&gt;cookie);
+                if (node == NULL) {
+                    ...
+                }
+                node-&gt;min_priority = fp-&gt;flags &amp; FLAT_BINDER_FLAG_PRIORITY_MASK;
+                node-&gt;accept_fds = !!(fp-&gt;flags &amp; FLAT_BINDER_FLAG_ACCEPTS_FDS);
+            }
+            ...
+            // 在target_proc(即，Service Manager的进程上下文)中查找是否包行&quot;该binder实体的引用&quot;，
+            // 如果没有找到的话，则将&quot;该binder实体的引用&quot;添加到target_proc-&gt;refs_by_node红黑树中。这样，就可以通过Service Manager对该
+Binder实体进行管理了。
+            ref = binder_get_ref_for_node(target_proc, node);
+            if (ref == NULL) {
+                ...
+            }
+            // 修改type
+            if (fp-&gt;type == BINDER_TYPE_BINDER)
+                fp-&gt;type = BINDER_TYPE_HANDLE;
+            else
+                fp-&gt;type = BINDER_TYPE_WEAK_HANDLE;
+            // 修改handle。handle和binder是联合体，这里将handle设为引用的描述。
+            // 根据该handle可以找到&quot;该binder实体在target_proc中的binder引用&quot;；
+            // 即，可以根据该handle，可以从Service Manager找到对应的binder实体的引用，从而获取binder实体。
+            fp-&gt;handle = ref-&gt;desc;
+            // 增加引用计数，防止&quot;该binder实体&quot;在使用过程中被销毁。
+            binder_inc_ref(ref, fp-&gt;type == BINDER_TYPE_HANDLE,
+                       &amp;thread-&gt;todo);
+
+            trace_binder_transaction_node_to_ref(t, node, ref);
+            ...
+        } break;
+        ...
+        }
+    }</code></pre><p>然后，设置待处理事务的类型为BINDER_WORK_TRANSACTION，并将其添加到target_list中。即，添加事务到Service Manager对应的待处理事务队列中。<br>设置待完成工作的类型为BINDER_WORK_TRANSACTION_COMPLETE，并将其添加到当前线程的待完成工作中。此时，Binder驱动已经收到了MediaPlayerService的请求，这个所谓的待完成工作，就是用来让Binder驱动告诉MediaPlayerService，它的请求已经被处理了。<br>最后，target_wait是ServiceManager的等待队列，肯定不为空(因为前面刚刚将BINDER_WORK_TRANSACTION事务添加到待处理事务中)。因此，便会执行wake_up_interruptible(target_wait)唤醒Service Manager进程。<br><strong>注意</strong>，此时都是运行在MediaPlayerService的进程中的！</p>
+<pre><code>// 设置事务的类型为BINDER_WORK_TRANSACTION
+t-&gt;work.type = BINDER_WORK_TRANSACTION;
+// 将事务添加到target_list队列中，即target_list的待处理事务中
+list_add_tail(&amp;t-&gt;work.entry, target_list);
+// 设置待完成工作的类型为BINDER_WORK_TRANSACTION_COMPLETE
+tcomplete-&gt;type = BINDER_WORK_TRANSACTION_COMPLETE;
+// 将待完成工作添加到thread-&gt;todo队列中，即当前线程的待完成工作中。
+list_add_tail(&amp;tcomplete-&gt;entry, &amp;thread-&gt;todo);
+// 唤醒目标进程
+if (target_wait)
+    wake_up_interruptible(target_wait);
+return;</code></pre><p>此时，MediaPlayerService进程还会继续运行，而且它也通过wake_up_interruptible()唤醒了ServiceManager进程。ServiceManager被唤醒后，所做的工作就是将MediaPlayerService注册到它的服务队列中进行管理；它的具体流程稍候再分析，现在还是先分析完MediaPlayerService进程。</p>
+<p>至此，binder_transaction()就分析完了。在binder_transaction()中，我们主要进行了以下工作：<br>(01) 解析出来MediaPlayerService的请求数据。<br>(02) 新建MediaPlayerService对应的Binder实体和Binder引用，并将ServiceManager的进程上下文中存在MediaPlayerService的Binder引用。<br>(03) 新建了待处理事务，并将该事务添加到了ServiceManager的待处理事务队列中。然后，唤醒ServiceManager来处理该事务。<br>(04) 新建了待完成工作，并将待完成工作添加到了当前线程的待完成工作队列中。  </p>
+<p><a name="anchor3_28"></a></p>
+<h2 id="28-Binder驱动中binder-thread-write-的源码"><a href="#28-Binder驱动中binder-thread-write-的源码" class="headerlink" title="28. Binder驱动中binder_thread_write()的源码"></a>28. Binder驱动中binder_thread_write()的源码</h2><p>接着分析MediaPlayerService进程的工作。binder_thread_write()中执行binder_transaction()后，会更新*consumed的值，即bwr.write_consumed的值。意味着，Binder驱动已经驱动完成MediaPlayerService的请求数据。</p>
+<pre><code>int binder_thread_write(struct binder_proc *proc, struct binder_thread *thread,
+          void __user *buffer, int size, signed long *consumed)
+{
+  uint32_t cmd;
+  void __user *ptr = buffer + *consumed;
+  void __user *end = buffer + size;
+
+  // 读取binder_write_read.write_buffer中的内容。
+  // 每次读取32bit(即4个字节)
+  while (ptr &lt; end &amp;&amp; thread-&gt;return_error == BR_OK) {
+      // 从用户空间读取32bit到内核中，并赋值给cmd。
+      if (get_user(cmd, (uint32_t __user *)ptr))
+          return -EFAULT;
+
+      ptr += sizeof(uint32_t);
+      ...
+      switch (cmd) {
+      ...
+        case BC_TRANSACTION:
+        case BC_REPLY: {
+            struct binder_transaction_data tr;
+
+            if (copy_from_user(&amp;tr, ptr, sizeof(tr)))
+                return -EFAULT;
+            ptr += sizeof(tr);
+            binder_transaction(proc, thread, &amp;tr, cmd == BC_REPLY);
+            break;
+        }
+      ...
+      }
+      // 更新bwr.write_consumed的值
+      *consumed = ptr - buffer;
+  }
+  return 0;
+}</code></pre><p><a name="anchor3_29"></a></p>
+<h2 id="29-Binder驱动中binder-thread-read-的源码"><a href="#29-Binder驱动中binder-thread-read-的源码" class="headerlink" title="29. Binder驱动中binder_thread_read()的源码"></a>29. Binder驱动中binder_thread_read()的源码</h2><p>接下来，ioctl()会执行binder_thread_read()来设置反馈数据给MediaPlayerService进程。  </p>
+<pre><code>static int binder_thread_read(struct binder_proc *proc,
+                  struct binder_thread *thread,
+                  void  __user *buffer, int size,
+                  signed long *consumed, int non_block)
+{
+    void __user *ptr = buffer + *consumed;
+    void __user *end = buffer + size;
+
+    int ret = 0;
+    int wait_for_proc_work;
+
+    // 如果*consumed=0，则写入BR_NOOP到用户传进来的bwr.read_buffer缓存区
+    if (*consumed == 0) {
+        if (put_user(BR_NOOP, (uint32_t __user *)ptr))
+            return -EFAULT;
+        ptr += sizeof(uint32_t);
+    }
+
+retry:
+    // 等待proc进程的事务标记。
+    // 当线程的事务栈为空 并且 待处理事务队列为空时，该标记位true。
+    wait_for_proc_work = thread-&gt;transaction_stack == NULL &amp;&amp;
+                list_empty(&amp;thread-&gt;todo);
+
+    ...
+
+    if (wait_for_proc_work) {
+        ...
+    } else {
+        if (non_block) {
+            ...
+        } else
+            ret = wait_event_interruptible(thread-&gt;wait, binder_has_thread_work(thread));
+    }
+
+    ...
+
+    while (1) {
+        uint32_t cmd;
+        struct binder_transaction_data tr;
+        struct binder_work *w;
+        struct binder_transaction *t = NULL;
+
+        // 如果当前线程的&quot;待完成工作&quot;不为空，则取出待完成工作。
+        if (!list_empty(&amp;thread-&gt;todo))
+            w = list_first_entry(&amp;thread-&gt;todo, struct binder_work, entry);
+        else if (!list_empty(&amp;proc-&gt;todo) &amp;&amp; wait_for_proc_work)
+            ...
+        else {
+            if (ptr - buffer == 4 &amp;&amp; !(thread-&gt;looper &amp; BINDER_LOOPER_STATE_NEED_RETURN)) /* no data added */
+                goto retry;
+            break;
+        }
+
+        ...
+
+        switch (w-&gt;type) {
+        ...
+        case BINDER_WORK_TRANSACTION_COMPLETE: {
+            cmd = BR_TRANSACTION_COMPLETE;
+            // 将BR_TRANSACTION_COMPLETE写入到用户缓冲空间中
+            if (put_user(cmd, (uint32_t __user *)ptr))
+                return -EFAULT;
+            ptr += sizeof(uint32_t);
+
+            binder_stat_br(proc, thread, cmd);
+            ...
+
+            // 待完成事务已经处理完毕，将其从待完成事务队列中删除。
+            list_del(&amp;w-&gt;entry);
+            kfree(w);
+            binder_stats_deleted(BINDER_STAT_TRANSACTION_COMPLETE);
+        } break;
+        ...
+        }
+
+        if (!t)
+            continue;
+
+        ...
+    }
+
+    ...
+    // 更新bwr.read_consumed的值
+    *consumed = ptr - buffer;
+
+    ...
+    return 0;
+}</code></pre><p>说明：<br>(01) 先看看函数的参数，buffer是bwr.read_buffer，是反馈数据缓冲区。size是bwr.read_size，是缓冲区大小，为256字节；而consumed是指向bwr.read_consumed的，它的值是0，表示反馈数据还没有被MediaPlayerService读取过。non_block为0。<br>(02) <em>consumed=0，因此会先将BR_NOOP从内核空间拷贝到用户空间，即拷贝到bwr.read_buffer中。<br>(03) 在binder_transaction()中，我们有添加待完成工作到thread的待完成工作队列中。因此，wait_for_proc_work是false。<br>(04) binder_has_thread_work(thread)为ture，因此wait_event_interruptible()不会进入中断等待状态，而是继续往下运行。<br>(05) 接着，进入while循环。list_empty(&amp;thread-&gt;todo)为flase，执行list_first_entry(&amp;thread-&gt;todo, struct binder_work, entry)从thread的待完成工作队列中取出待完成的工作t。<br>(06) 根据binder_transaction()中的分析可知，t-&gt;type的值为BINDER_WORK_TRANSACTION_COMPLETE。执行对应的case分支，会将数据cmd=BR_TRANSACTION_COMPLETE拷贝到用户空间，即bwr.read_buffer中。拷贝之后，即代表该工作已完成，然后从当前线程的工作队列中将该工作删除，并释放所分配的空间。<br>(07) 由于t=null，因此，会再次从头开始执行while循环。而此时，list_empty(&amp;thread-&gt;todo)为true，并且list_empty(&amp;proc-&gt;todo)也为true；因此会执行break跳出while循环。<br>(08) 在跳出while循环之后，会更新</em>consumed的值。即，更新bwr.read_consumed的值。此时，由于写入了BR_NOOP和BR_TRANSACTION_COMPLETE两个指令，bwr.read_consumed=8。</p>
+<br>
+接下来，回到binder_ioctl()中。将bwr数据拷贝到用户空间后返回。此时，bwr中各个参数的值如下：
+
+<pre><code>bwr.write_size = outAvail;                          
+bwr.write_buffer = (long unsigned int)mOut.data();
+bwr.write_consumed = outAvail;                      // 等于write_size
+bwr.read_size = mIn.dataCapacity();
+bwr.read_buffer = (long unsigned int)mIn.data();    // 存储了BR_NOOP和BR_TRANSACTION_COMPLETE两个返回指令
+bwr.read_consumed = 8;                              // 等于write_size</code></pre><p>bwr中的write_<em>参数是保存”MediaPlayerService发送给Binder驱动的请求内容的”，而read_</em>则是保存”Binder驱动反馈给MediaPlayerService的内容的”。此时，write_consumed和write_size相同，意味着”Binder驱动已经将请求的内容都处理完毕了”；而read_consumed&gt;0，则意味着”Binder驱动有反馈内容给MediaPlayerService”。<br>回到talkWithDriver()中，看看ioctl()之后做了些什么？</p>
+<p><a name="anchor3_30"></a></p>
+<h2 id="30-IPCThreadState-talkWithDriver"><a href="#30-IPCThreadState-talkWithDriver" class="headerlink" title="30. IPCThreadState::talkWithDriver()"></a>30. IPCThreadState::talkWithDriver()</h2><pre><code>status_t IPCThreadState::talkWithDriver(bool doReceive)
+{
+    ...
+    do {
+        ...
+        if (ioctl(mProcess-&gt;mDriverFD, BINDER_WRITE_READ, &amp;bwr) &gt;= 0)
+            err = NO_ERROR;
+        else
+            ...
+        ...
+    } while (err == -EINTR);
+
+    ...
+
+    if (err &gt;= NO_ERROR) {
+        // 清空已写的数据
+        if (bwr.write_consumed &gt; 0) {
+            if (bwr.write_consumed &lt; (ssize_t)mOut.dataSize())
+                ...
+            else
+                mOut.setDataSize(0);
+        }
+        // 设置已读数据
+        if (bwr.read_consumed &gt; 0) {
+            mIn.setDataSize(bwr.read_consumed);
+            mIn.setDataPosition(0);
+        }
+        ...
+        return NO_ERROR;
+    }
+
+    return err;
+}</code></pre><p>说明：ioctl()返回值为0，err=NO_ERROR，退出while循环。<br>(01) bwr.write_consumed&gt;0，并且bwr.write_consumed=mOut.dataSize。因此，调用mOut.setDataSize(0)将释放mOut的内存，并且将mOut的mDataSize和mObjectsSize设为0。<br>(02) bwr.read_consumed&gt;0，因此调用mIn.setDataSize()为mIn分配空间，并将mIn的mDataSize设为=bwr.read_consumed。然后，将位置mDataPos初始化为0。<br>之后，跳出talkWithDriver()，返回到waitForResponse()中。</p>
+<p><a name="anchor3_31"></a></p>
+<h2 id="31-IPCThreadState-waitForResponse"><a href="#31-IPCThreadState-waitForResponse" class="headerlink" title="31. IPCThreadState::waitForResponse()"></a>31. IPCThreadState::waitForResponse()</h2><pre><code>status_t IPCThreadState::waitForResponse(Parcel *reply, status_t *acquireResult)
+{       
+    int32_t cmd;
+    int32_t err;
+
+    while (1) {
+        // 先通过talkWithDriver()和Binder驱动交互
+        if ((err=talkWithDriver()) &lt; NO_ERROR) break;
+        err = mIn.errorCheck();
+        if (err &lt; NO_ERROR) break;
+        if (mIn.dataAvail() == 0) continue;
+
+        // 然后读取返回结果，再根据结果进行处理
+        cmd = mIn.readInt32();
+
+        switch (cmd) {
+        case BR_TRANSACTION_COMPLETE:
+            ...
+        case BR_DEAD_REPLY:
+            ...
+        case BR_FAILED_REPLY:
+            ...
+        case BR_ACQUIRE_RESULT:
+            ...
+        case BR_REPLY:
+            ...
+        default:
+            err = executeCommand(cmd);
+            if (err != NO_ERROR) goto finish;
+            break;
+        }
+    }
+
+finish:
+    ...
+
+    return err;
+}</code></pre><p>说明：从talkWithDriver()正常返回之后，会读取mIn中的数据。而mIn中的数据就是Binder驱动返回的”BR_NOOP和BR_TRANSACTION_COMPLETE两个指令”。先读出的指令是BR_NOOP，因此这里执行executeCommand(cmd)。</p>
+<p><a name="anchor3_32"></a></p>
+<h2 id="32-IPCThreadState-executeCommand"><a href="#32-IPCThreadState-executeCommand" class="headerlink" title="32. IPCThreadState::executeCommand()"></a>32. IPCThreadState::executeCommand()</h2><pre><code>status_t IPCThreadState::executeCommand(int32_t cmd)
+{
+    BBinder* obj;
+    RefBase::weakref_type* refs;
+    status_t result = NO_ERROR;
+
+    switch (cmd) {
+    case BR_ERROR:
+        ...
+    case BR_OK:
+        ...
+    case BR_NOOP:
+        break;
+    default:
+        ...
+    }
+
+    if (result != NO_ERROR) {
+        mLastError = result;
+    }
+
+    return result;
+}</code></pre><p>说明：BR_NOOP没有进行任何操作，直接返回。继续回到waitForResponse()中，重新开始while循环，执行talkWithDriver()。</p>
+<p><a name="anchor3_33"></a></p>
+<h2 id="33-IPCThreadState-talkWithDriver"><a href="#33-IPCThreadState-talkWithDriver" class="headerlink" title="33. IPCThreadState::talkWithDriver()"></a>33. IPCThreadState::talkWithDriver()</h2><pre><code>status_t IPCThreadState::talkWithDriver(bool doReceive)
+{
+    ...
+    binder_write_read bwr;
+
+    // Is the read buffer empty?
+    const bool needRead = mIn.dataPosition() &gt;= mIn.dataSize();
+    const size_t outAvail = (!doReceive || needRead) ? mOut.dataSize() : 0;
+
+    bwr.write_size = outAvail;
+    bwr.write_buffer = (long unsigned int)mOut.data();
+
+    // This is what we&apos;ll read.
+    if (doReceive &amp;&amp; needRead) {
+        bwr.read_size = mIn.dataCapacity();
+        bwr.read_buffer = (long unsigned int)mIn.data();
+    } else {
+        bwr.read_size = 0;
+        bwr.read_buffer = 0;
+    }
+
+    ...
+    if ((bwr.write_size == 0) &amp;&amp; (bwr.read_size == 0)) return NO_ERROR;
+
+    bwr.write_consumed = 0;
+    bwr.read_consumed = 0;
+    status_t err;
+    do {
+        ...
+        if (ioctl(mProcess-&gt;mDriverFD, BINDER_WRITE_READ, &amp;bwr) &gt;= 0)
+            err = NO_ERROR;
+        else
+            ...
+        ...
+    } while (err == -EINTR);
+
+    ...
+
+    if (err &gt;= NO_ERROR) {
+        // 清空已写的数据
+        if (bwr.write_consumed &gt; 0) {
+            if (bwr.write_consumed &lt; (ssize_t)mOut.dataSize())
+                mOut.remove(0, bwr.write_consumed);
+            else
+                mOut.setDataSize(0);
+        }
+        // 设置已读数据
+        if (bwr.read_consumed &gt; 0) {
+            mIn.setDataSize(bwr.read_consumed);
+            mIn.setDataPosition(0);
+        }
+        ...
+        return NO_ERROR;
+    }
+
+    return err;
+}</code></pre><p>说明：<br>(01) 此时，因为在waitForResponse()中已经通过mIn.readInt32()读取了4个字节，因此mIn.dataPosition()=4，而mIn.dataSize()=8；因此，needRead=false。<br>(02) needRead=false，而doReceive=true；因此，outAvail=0。<br>最终，由于 bwr.write_size和bwr.read_size都为0，因此直接返回NO_ERROR。</p>
+<p>再次回到waitForResponse()中，此时读出的cmd为BR_TRANSACTION_COMPLETE。此时，由于reply不为NULL，因此再次重新执行while循环，调用talkWithDriver()。</p>
+<p>(01) 此时，已经读取了mIn中的全部数据，因此mIn.dataPosition()=8，而mIn.dataSize()=8；因此，needRead=true。<br>(02) outAvail=mOut.dataSize()，前面已经将mOut清空，因此outAvail=0。bwr初始化完毕之后，各个成员的值如下：</p>
+<pre><code>bwr.write_size = 0;
+bwr.write_buffer = (long unsigned int)mOut.data();
+bwr.write_consumed = 0;
+bwr.read_size = mIn.dataCapacity();                 // 256字节
+bwr.read_buffer = (long unsigned int)mIn.data();
+bwr.read_consumed = 0;</code></pre><p>其实，此时MediaPlayerService已经处理完”addService()这个请求，包括已经处理完了该请求的反馈”。对MediaPlayerService而言，它已经成功的注册到Service Manager中；接下来，就是等待Client的请求了。<br>那么如何去等待Client的请求呢？这和前面分析Service Manager服务启动之后等待Client的请求类似。MediaPlayerService服务，会通过ioctl()给Binder驱动发送读写请求，而此时的bwr.write_size=0，意味着不会进行写；bwr.read_size&gt;0，意味着会进行读。这样，Binder驱动就会执行读取动作，进而去查看”MediaPlayerService在Binder驱动中的待处理事务队列”是否有事务需要处理，有的话，就进行事务处理；否则，就进入中断等待状态，等待Client的请求。</p>
+<p>下面，看看它到底是如何做到的。</p>
+<pre><code>static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+{
+  int ret;
+  struct binder_proc *proc = filp-&gt;private_data;
+  struct binder_thread *thread;
+  unsigned int size = _IOC_SIZE(cmd);
+  void __user *ubuf = (void __user *)arg;
+
+  ...
+
+  switch (cmd) {
+  case BINDER_WRITE_READ: {
+      struct binder_write_read bwr;
+      ...
+
+      // 将binder_write_read从&quot;用户空间&quot; 拷贝到 &quot;内核空间&quot;
+      if (copy_from_user(&amp;bwr, ubuf, sizeof(bwr))) {
+          ...
+      }
+
+      // 如果write_size&gt;0，则进行写操作
+      if (bwr.write_size &gt; 0) {
+          ret = binder_thread_write(proc, thread, (void __user *)bwr.write_buffer, bwr.write_size, &amp;bwr.write_consumed);
+          ...
+      }
+
+      // 如果read_size&gt;0，则进行读操作
+      if (bwr.read_size &gt; 0) {
+          ret = binder_thread_read(proc, thread, (void __user *)bwr.read_buffer, bwr.read_size, &amp;bwr.read_consumed, filp-&gt;f_flags   &amp; O_NONBLOCK);
+          ...
+      }
+      ...
+
+      if (copy_to_user(ubuf, &amp;bwr, sizeof(bwr))) {
+          ret = -EFAULT;
+          goto err;
+      }
+      break;
+  }
+  ...
+  }
+  ret = 0;
+
+  ...
+  return ret;
+}</code></pre><p>此时，bwr.write_size=0，因此不会执行binder_thread_write()。而bwr.read_size&gt;0，因此会调用binder_thread_read()进行读取动作。</p>
+<p><a name="anchor3_34"></a></p>
+<h2 id="34-Binder驱动中binder-thread-read-的源码"><a href="#34-Binder驱动中binder-thread-read-的源码" class="headerlink" title="34. Binder驱动中binder_thread_read()的源码"></a>34. Binder驱动中binder_thread_read()的源码</h2><pre><code>static int binder_thread_read(struct binder_proc *proc,
+                struct binder_thread *thread,
+                void  __user *buffer, int size,
+                signed long *consumed, int non_block)
+{
+  void __user *ptr = buffer + *consumed;
+  void __user *end = buffer + size;
+
+  int ret = 0;
+  int wait_for_proc_work;
+
+  // 如果*consumed=0，则写入BR_NOOP到用户传进来的bwr.read_buffer缓存区
+  if (*consumed == 0) {
+      if (put_user(BR_NOOP, (uint32_t __user *)ptr))
+          return -EFAULT;
+      // 修改指针位置
+      ptr += sizeof(uint32_t);
+  }
+
+retry:
+  // 等待proc进程的事务标记。
+  // 当线程的事务栈为空 并且 待处理事务队列为空时，该标记位true。
+  wait_for_proc_work = thread-&gt;transaction_stack == NULL &amp;&amp;
+              list_empty(&amp;thread-&gt;todo);
+
+  ...
+  if (wait_for_proc_work) {
+      ...
+      // 设置当前线程的优先级=proc-&gt;default_priority。
+      // 即，当前线程要处理proc的事务，所以设置优先级和proc一样。
+      binder_set_nice(proc-&gt;default_priority);
+      if (non_block) {
+          ...
+      } else
+          // 阻塞式的读取，则阻塞等待事务的发生。
+          ret = wait_event_interruptible_exclusive(proc-&gt;wait, binder_has_proc_work(proc, thread));
+  } else {
+      ...
+  }
+  ...
+}</code></pre><p>(01) 此时，bwr.read_consumed=0，意味着*consumed=0。因此，还是会先将BR_NOOP写入到bwr.read_buffer中。<br>(02) 此时，当前线程的事务栈和待处理事务队列都是空，因此wait_for_proc_work=true。<br>(03) 在调用binder_set_nice()设置当前线程的优先级之后，就会调用wait_event_interruptible()。而此时binder_has_proc_work()为false，因此当前线程会进入中断等待状态。当Service Manager处理完MediaPlayerService的请求之后，就会将其唤醒。</p>
+<br>
+至此，MediaPlayerService进程的addService的请求发送部分就讲解完了。在继续了解请求的处理之前，先回顾一下本部分的内容。
+
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/addService01_send.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/os/pic/binder/addService01_send.jpg" alt></a></p>
+<p>如上图所示，MediaPlayerService发送一个BC_TRANSACTION事务给Binder驱动。Binder驱动收到该事务之后，对请求数据进行解析，在Kernel中新建了MediaPlayerService对应的Binder实体，并将在ServiceManager的进程上下文中添加了该Binder实体的Binder引用。解析完数据之后，新增一个待处理事务并提交到ServiceManager的待处理事务列表中；接着，就唤醒了ServiceManager。与此同时，Binder驱动还反馈了一个BR_TRANSACTION_COMPLETE给MediaPlayerService，告诉MediaPlayerService它的addService请求已经发送成功；MediaPlayerService在解析完BR_TRANSACTION_COMPLETE之后，就进入等待状态，等待ServiceManager的处理完请求之后反馈结果给它。</p>
+<p>下面一篇文章，就看看ServiceManager被唤醒之后，具体都做了些什么工作！</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/page/21/">Prev</a>
+    </div>
+    <div class="pagination-next">
+        <a href="/page/23/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/">1</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/21/">21</a></li>
+        
+        <li><a class="pagination-link is-current" href="/page/22/">22</a></li>
+        
+        <li><a class="pagination-link" href="/page/23/">23</a></li>
+        
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        
+        <li><a class="pagination-link" href="/page/95/">95</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

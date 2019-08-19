@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Android之AsyncTask介绍 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="android training">
+
+
+
+
+
+    <meta name="description" content="android training">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android之AsyncTask介绍">
+<meta property="og:url" content="https://apppills.com/2014/06/25/android/api_guide/tasks/2014-06-25-AsyncTask/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="android training">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android之AsyncTask介绍">
+<meta name="twitter:description" content="android training">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#AsyncTask介绍">1&nbsp;&nbsp;<b>AsyncTask介绍</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-doInBackground">1.1&nbsp;&nbsp;1. doInBackground()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-onPreExecute">1.2&nbsp;&nbsp;2. onPreExecute()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#3-onPostExecute">1.3&nbsp;&nbsp;3. onPostExecute()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#4-onProgressUpdate">1.4&nbsp;&nbsp;4. onProgressUpdate()</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#5-onCancelled">1.5&nbsp;&nbsp;5. onCancelled()</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#AsyncTask使用和示例">2&nbsp;&nbsp;<b>AsyncTask使用和示例</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#AsyncTask原理">3&nbsp;&nbsp;<b>AsyncTask原理</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-AsyncTask构造函数">3.1&nbsp;&nbsp;1. AsyncTask构造函数</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#2-execute">3.2&nbsp;&nbsp;2. execute</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Android之AsyncTask介绍
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-25T01:11:00.000Z" itemprop="datePublished">6月 25 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            12 分钟 read (About 1840 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文介绍AsyncTask，它通常用于执行异步任务。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">AsyncTask介绍</a><br><strong>2</strong>. <a href="#anchor2">AsyncTask使用和示例</a><br><strong>3</strong>. <a href="#anchor3">AsyncTask原理</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="AsyncTask介绍"><a href="#AsyncTask介绍" class="headerlink" title="AsyncTask介绍"></a>AsyncTask介绍</h1><p>AsyncTask比Handler更轻量级一些，适用于简单的异步处理。</p>
+<p>使用AsyncTask时，注意重写以下几个方法：</p>
+<h2 id="1-doInBackground"><a href="#1-doInBackground" class="headerlink" title="1. doInBackground()"></a>1. doInBackground()</h2><p><strong>作用</strong>：执行后台任务。<br><strong>要求</strong>：必须重写！<br><strong>注意</strong>：在doInBackground()中不能进行UI操作！  </p>
+<h2 id="2-onPreExecute"><a href="#2-onPreExecute" class="headerlink" title="2. onPreExecute()"></a>2. onPreExecute()</h2><p><strong>作用</strong>：通常用于执行后台任务开始前的准备动作。在用户调用execute()后，并且在AsyncTask主动执行doInBackground()之前被调用。<br><strong>要求</strong>：选择性重写。如果不重写该函数，默认不执行任何动作  </p>
+<h2 id="3-onPostExecute"><a href="#3-onPostExecute" class="headerlink" title="3. onPostExecute()"></a>3. onPostExecute()</h2><p><strong>作用</strong>：通常用于处理后台动作的返回结果。在AsyncTask主动执行doInBackground()之前被调用。<br><strong>要求</strong>：选择性重写。如果不重写该函数，默认不执行任何动作  </p>
+<h2 id="4-onProgressUpdate"><a href="#4-onProgressUpdate" class="headerlink" title="4. onProgressUpdate()"></a>4. onProgressUpdate()</h2><p><strong>作用</strong>：通常用于执行后台任务执行期间的进度更新。因为doInBackground()中不能操作UI，假如我们想在后台任务处理时显示进度，可以在doInBackground()中调用publishProgress()，而publicProgress()会调用onProgressUpdate()；在onProgressUpdate()中进行UI操作即可。<br><strong>要求</strong>：选择性重写。如果不重写该函数，默认不执行任何动作  </p>
+<h2 id="5-onCancelled"><a href="#5-onCancelled" class="headerlink" title="5. onCancelled()"></a>5. onCancelled()</h2><p><strong>作用</strong>：通常用于执行取消AsyncTask任务时的相关动作。如果客户主动调用cancel()，则会执行onCancelled()；否则(AsyncTask执行完之后正常停止)，则不会调用onCancelled()。<br><strong>要求</strong>：选择性重写。如果不重写该函数，默认不执行任何动作  </p>
+<p><a name="anchor2"></a></p>
+<h1 id="AsyncTask使用和示例"><a href="#AsyncTask使用和示例" class="headerlink" title="AsyncTask使用和示例"></a>AsyncTask使用和示例</h1><p>下面是一个自定义的AsyncTask。</p>
+<pre><code>private class MyTask extends AsyncTask&lt;String, Integer, String&gt; {
+    //onPreExecute方法用于在执行后台任务前做一些UI操作
+    @Override
+    protected void onPreExecute() {
+        Log.i(TAG, &quot;onPreExecute&quot;);
+        textView.setText(&quot;loading...&quot;);
+    }
+
+    //doInBackground方法内部执行后台任务,不可在此方法内修改UI
+    @Override
+    protected String doInBackground(String... params) {
+        Log.i(TAG, &quot;doInBackground&quot;);
+        try {
+            for (int i=0; i&lt;6; i++) {
+                Log.d(TAG, &quot;doInBackground: publishProgress=&quot;+i);
+                publishProgress(20*i);
+                Thread.sleep(500);
+            }
+
+            Log.d(TAG, &quot;doInBackground: return OK!&quot;);
+            return &quot;OK&quot;;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Log.d(TAG, &quot;doInBackground: return FAIL!&quot;);
+        return &quot;FAIL&quot;;
+    }
+
+    //onProgressUpdate方法用于更新进度信息
+    @Override
+    protected void onProgressUpdate(Integer... progresses) {
+        Log.i(TAG, &quot;onProgressUpdate&quot;);
+        progressBar.setProgress(progresses[0]);
+        textView.setText(&quot;loading...&quot; + progresses[0] + &quot;%&quot;);
+    }
+
+    //onPostExecute方法用于在执行完后台任务后更新UI,显示结果
+    @Override
+    protected void onPostExecute(String result) {
+        Log.i(TAG, &quot;onPostExecute&quot;);
+        textView.setText(result);
+
+        execute.setEnabled(true);
+        cancel.setEnabled(false);
+    }
+
+    //onCancelled方法用于在取消执行中的任务时更改UI
+    @Override
+    protected void onCancelled() {
+        Log.i(TAG, &quot;onCancelled&quot;);
+        textView.setText(&quot;cancelled&quot;);
+        progressBar.setProgress(0);
+
+        execute.setEnabled(true);
+        cancel.setEnabled(false);
+    }
+}</code></pre><p>说明：<br>(01) textView是一个TextView对象，cancel和execute分别是两个Button按钮，而progressBar则是进度条。<br>(02) 在任务开始时会通过onPreExecute()更新TextView的显示内容。<br>(03) 在任务结束时通过onPreExecute()更新TextView的显示内容。<br>(04) 任务执行过程中会通过publishProgress()更新进度条。<br>(05) 如果任务被强制取消的话，会将进度条重置为0。 </p>
+<p>创建并执行AsyncTask的接口如下：</p>
+<pre><code>mTask = new MyTask();
+mTask.execute(&quot;http://www.baidu.com&quot;);</code></pre><p>取消AsyncTask的接口如下：</p>
+<pre><code>mTask.cancel();</code></pre><p>点击查看：<a href="TODO">AsyncTask示例完整原理</a></p>
+<p><a name="anchor3"></a></p>
+<h1 id="AsyncTask原理"><a href="#AsyncTask原理" class="headerlink" title="AsyncTask原理"></a>AsyncTask原理</h1><p>下面通过Android4.4.2的AsyncTask源码来对AsyncTask原理进行介绍。</p>
+<h2 id="1-AsyncTask构造函数"><a href="#1-AsyncTask构造函数" class="headerlink" title="1. AsyncTask构造函数"></a>1. AsyncTask构造函数</h2><pre><code>public AsyncTask() {
+    mWorker = new WorkerRunnable&lt;Params, Result&gt;() {
+        public Result call() throws Exception {
+            mTaskInvoked.set(true);
+
+            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            //noinspection unchecked
+            return postResult(doInBackground(mParams));
+        }
+    };
+
+    mFuture = new FutureTask&lt;Result&gt;(mWorker) {
+        @Override
+        protected void done() {
+            try {
+                postResultIfNotInvoked(get());
+            } catch (InterruptedException e) {
+                android.util.Log.w(LOG_TAG, e);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(&quot;An error occured while executing doInBackground()&quot;,
+                        e.getCause());
+            } catch (CancellationException e) {
+                postResultIfNotInvoked(null);
+            }
+        }
+    };
+}</code></pre><p>说明：</p>
+<p>(01) mWorker是个WorkerRunnable对象，而WorkerRunnable是Callable的实现类。而在”<a href="http://www.cnblogs.com/skywang12345/p/3544116.html" target="_blank" rel="noopener">线程池中关于Callable的介绍</a>“时，我们说过，Callable类似于Runnable接口，不同之处主要在于Callable能和Future配合使用获取任务的结果，而Runnable不能获取结果！<br>(02) mFuture是FutureTask对象，而FutureTask洽洽是Future的实现类。 mWorker和mFuture配合使用，能获取后台任务的结果！  </p>
+<h2 id="2-execute"><a href="#2-execute" class="headerlink" title="2. execute"></a>2. execute</h2><p>execute()的源码如下：</p>
+<pre><code>public final AsyncTask&lt;Params, Progress, Result&gt; execute(Params... params) {
+    return executeOnExecutor(sDefaultExecutor, params);
+}</code></pre><p>说明：sDefaultExecutor是线程池对象，而executeOnExecutor()是真正执行后台动作的地方。</p>
+<p>下面是线程池相关的代码：</p>
+<pre><code>private static final int CORE_POOL_SIZE = CPU_COUNT + 1;
+private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;
+private static final int KEEP_ALIVE = 1;
+
+public static final Executor THREAD_POOL_EXECUTOR
+        = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
+                TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory);
+
+...
+
+public static final Executor SERIAL_EXECUTOR = new SerialExecutor();
+private static volatile Executor sDefaultExecutor = SERIAL_EXECUTOR;
+
+private static class SerialExecutor implements Executor {
+    final ArrayDeque&lt;Runnable&gt; mTasks = new ArrayDeque&lt;Runnable&gt;();
+    Runnable mActive;
+
+    public synchronized void execute(final Runnable r) {
+        mTasks.offer(new Runnable() {
+            public void run() {
+                try {
+                    r.run();
+                } finally {
+                    scheduleNext();
+                }
+            }
+        });
+        if (mActive == null) {
+            scheduleNext();
+        }
+    }
+
+    protected synchronized void scheduleNext() {
+        if ((mActive = mTasks.poll()) != null) {
+            THREAD_POOL_EXECUTOR.execute(mActive);
+        }
+    }
+}</code></pre><p>说明：该线程池是”通过双向队列实现的串行线程池”。scheduleNext()每次只会执行一个任务。</p>
+<p>下面看看executeOnExecutor()的代码：</p>
+<pre><code>public final AsyncTask&lt;Params, Progress, Result&gt; executeOnExecutor(Executor exec,
+        Params... params) {
+    if (mStatus != Status.PENDING) {
+        switch (mStatus) {
+            case RUNNING:
+                throw new IllegalStateException(&quot;Cannot execute task:&quot;
+                        + &quot; the task is already running.&quot;);
+            case FINISHED:
+                throw new IllegalStateException(&quot;Cannot execute task:&quot;
+                        + &quot; the task has already been executed &quot;
+                        + &quot;(a task can be executed only once)&quot;);
+        }
+    }
+
+    mStatus = Status.RUNNING;
+
+    onPreExecute();
+
+    mWorker.mParams = params;
+    exec.execute(mFuture);
+
+    return this;
+}</code></pre><p>说明：<br>(01) executeOnExecutor()首先会对任务的状态进行处理。任务共三种姿态：  </p>
+<blockquote>
+<p>PENDING: 挂起状态。当AsyncTask被创建时，就进入了PENDING状态。<br>RUNNING: 运行状态。当AsyncTask被执行时，就进入了RUNNING状态。<br>FINISHED: 完成状态。当AsyncTask完成(被客户cancel()或正常运行完毕)时，就进入了FINISHED状态。  </p>
+</blockquote>
+<p>当任务是RUNNING或PENDING状态时，会抛出异常。这就决定了，一个AsyncTask只能被执行一次，即只能对一个AsyncTask调用一次execute()；如果要重新执行任务，则需要新建AsyncTask后再调用execute()。<br>(02) 接着，调用onPreExecute()。这也就是任务执行前的准备动作！<br>(03) 然后，调用exec.execute(mFuture)。作用是将任务提交到线程池中进行执行。线程池的代码前面已经给出，SerialExecutor中的execute()会执行r.run()任务。r.run()实际上是调用FutureTask中run()方法，而FutureTask的run()方法，则会执行Callable的call()函数，即会执行到mWorker的call()方法。而观察前面mWorker的run()方法，我们会发现它会调用doInBackground()接口，并通过postResult()返回任务执行结果。而postResult()的内容如下：   </p>
+<pre><code>private static final InternalHandler sHandler = new InternalHandler();
+
+private Result postResult(Result result) {
+    @SuppressWarnings(&quot;unchecked&quot;)
+    Message message = sHandler.obtainMessage(MESSAGE_POST_RESULT,
+            new AsyncTaskResult&lt;Result&gt;(this, result));
+    message.sendToTarget();
+    return result;
+}
+
+private static class InternalHandler extends Handler {
+    @SuppressWarnings({&quot;unchecked&quot;, &quot;RawUseOfParameterizedType&quot;})
+    @Override
+    public void handleMessage(Message msg) {
+        AsyncTaskResult result = (AsyncTaskResult) msg.obj;
+        switch (msg.what) {
+            case MESSAGE_POST_RESULT:
+                // There is only one result
+                result.mTask.finish(result.mData[0]);
+                break;
+            case MESSAGE_POST_PROGRESS:
+                result.mTask.onProgressUpdate(result.mData);
+                break;
+        }
+    }
+}</code></pre><p>说明：postResult()会发送MESSAGE_POST_RESULT给sHandler，而sHandler中会将任务执行结果传递给finish()。以下是finish()的代码：</p>
+<pre><code>private void finish(Result result) {
+    if (isCancelled()) {
+        onCancelled(result);
+    } else {
+        onPostExecute(result);
+    }
+    mStatus = Status.FINISHED;
+}</code></pre><p>说明：如果是正常执行结束，则调用onPostExecute()方法；否则(异常结束)，则调用onCancelled()方法。</p>
+<p>至此，AsyncTask的原理结果完毕！总的来说，就是通过线程池来实现的，AsyncTask的任务会提交到线程池中，执行完后，线程池再返回结果。</p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/android/">#android</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2014/06/25/android/api_guide/tasks/2014-06-25-Loader/">Android之Loader介绍</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2014/06/23/android/api_guide/app_component/fragment/2014-06-23-DialogFragment/">Android组件--Fragment(五)之 DialogFragment</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

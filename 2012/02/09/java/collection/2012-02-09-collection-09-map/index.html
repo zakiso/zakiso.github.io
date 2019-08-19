@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Java 集合系列09之 Map架构 - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+<meta name="description" content="java collection">
+
+
+
+
+
+    <meta name="description" content="java collection">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 集合系列09之 Map架构">
+<meta property="og:url" content="https://apppills.com/2012/02/09/java/collection/2012-02-09-collection-09-map/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:description" content="java collection">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://apppills.com/media/pic/java/collection/collection09.jpg">
+<meta property="og:updated_time" content="2017-04-21T11:54:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 集合系列09之 Map架构">
+<meta name="twitter:description" content="java collection">
+<meta name="twitter:image" content="https://apppills.com/media/pic/java/collection/collection09.jpg">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    <i class="fa fa-list"></i>
+                </a>
+                <div class="navbar-dropdown is-right">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#1-Map">1&nbsp;&nbsp;<b>1. Map</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#2-Map-Entry">2&nbsp;&nbsp;<b>2. Map.Entry</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#3-AbstractMap">3&nbsp;&nbsp;<b>3. AbstractMap</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#4-SortedMap">4&nbsp;&nbsp;<b>4. SortedMap</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#5-NavigableMap">5&nbsp;&nbsp;<b>5 NavigableMap</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#6-Dictionary">6&nbsp;&nbsp;<b>6. Dictionary</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#更多内容">7&nbsp;&nbsp;<b>更多内容</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Java 集合系列09之 Map架构
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2012-02-09T01:01:00.000Z" itemprop="datePublished">2月 9 2012</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/java/">java</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            18 分钟 read (About 2735 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>前面，我们已经系统的对List进行了学习。接下来，我们先学习Map，然后再学习Set；因为Set的实现类都是基于Map来实现的(如，HashSet是通过HashMap实现的，TreeSet是通过TreeMap实现的)。</p>
+</blockquote>
+<p>首先，我们看看Map架构。</p>
+<p><img src="/media/pic/java/collection/collection09.jpg" alt="img"></p>
+<p>如上图：</p>
+<p>(01) Map 是映射接口，Map中存储的内容是键值对(key-value)。<br>(02) AbstractMap 是继承于Map的抽象类，它实现了Map中的大部分API。其它Map的实现类可以通过继承AbstractMap来减少重复编码。<br>(03) SortedMap 是继承于Map的接口。SortedMap中的内容是排序的键值对，排序的方法是通过比较器(Comparator)。<br>(04) NavigableMap 是继承于SortedMap的接口。相比于SortedMap，NavigableMap有一系列的导航方法；如”获取大于/等于某对象的键值对”、“获取小于/等于某对象的键值对”等等。<br>(05) TreeMap 继承于AbstractMap，且实现了NavigableMap接口；因此，TreeMap中的内容是“有序的键值对”！<br>(06) HashMap 继承于AbstractMap，但没实现NavigableMap接口；因此，HashMap的内容是“键值对，但不保证次序”！<br>(07) Hashtable 虽然不是继承于AbstractMap，但它继承于Dictionary(Dictionary也是键值对的接口)，而且也实现Map接口；因此，Hashtable的内容也是“键值对，也不保证次序”。但和HashMap相比，Hashtable是线程安全的，而且它支持通过Enumeration去遍历。<br>(08) WeakHashMap 继承于AbstractMap。它和HashMap的键类型不同，WeakHashMap的键是“弱键”。  </p>
+<p>在对各个实现类进行详细之前，先来看看各个接口和抽象类的大致介绍。内容包括：  </p>
+<blockquote>
+<p><a href="#anchor1">1 Map</a><br><a href="#anchor2">2 Map.Entry</a><br><a href="#anchor3">3 AbstractMap</a><br><a href="#anchor4">4 SortedMap</a><br><a href="#anchor5">5 NavigableMap</a><br><a href="#anchor6">6 Dictionary</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-Map"><a href="#1-Map" class="headerlink" title="1. Map"></a>1. Map</h1><p>Map的定义如下：</p>
+<pre><code>public interface Map&lt;K,V&gt; { }</code></pre><p>Map 是一个键值对(key-value)映射接口。Map映射中不能包含重复的键；每个键最多只能映射到一个值。<br>Map 接口提供三种collection 视图，允许以键集、值集或键-值映射关系集的形式查看某个映射的内容。<br>Map 映射顺序。有些实现类，可以明确保证其顺序，如 TreeMap；另一些映射实现则不保证顺序，如 HashMap 类。<br>Map 的实现类应该提供2个“标准的”构造方法：第一个，void（无参数）构造方法，用于创建空映射；第二个，带有单个 Map 类型参数的构造方法，用于创建一个与其参数具有相同键-值映射关系的新映射。实际上，后一个构造方法允许用户复制任意映射，生成所需类的一个等价映射。尽管无法强制执行此建议（因为接口不能包含构造方法），但是 JDK 中所有通用的映射实现都遵从它。</p>
+<p><strong>Map的API</strong></p>
+<pre><code>abstract void                 clear()
+abstract boolean              containsKey(Object key)
+abstract boolean              containsValue(Object value)
+abstract Set&lt;Entry&lt;K, V&gt;&gt;     entrySet()
+abstract boolean              equals(Object object)
+abstract V                    get(Object key)
+abstract int                  hashCode()
+abstract boolean              isEmpty()
+abstract Set&lt;K&gt;               keySet()
+abstract V                    put(K key, V value)
+abstract void                 putAll(Map&lt;? extends K, ? extends V&gt; map)
+abstract V                    remove(Object key)
+abstract int                  size()
+abstract Collection&lt;V&gt;        values()</code></pre><p>说明：<br>(01) Map提供接口分别用于返回 键集、值集或键-值映射关系集。  </p>
+<blockquote>
+<p>entrySet()用于返回键-值集的Set集合<br>keySet()用于返回键集的Set集合<br>values()用户返回值集的Collection集合<br>因为Map中不能包含重复的键；每个键最多只能映射到一个值。所以，键-值集、键集都是Set，值集时Collection。</p>
+</blockquote>
+<p>(02) Map提供了“键-值对”、“根据键获取值”、“删除键”、“获取容量大小”等方法。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-Map-Entry"><a href="#2-Map-Entry" class="headerlink" title="2. Map.Entry"></a>2. Map.Entry</h1><p>Map.Entry的定义如下：</p>
+<pre><code>interface Entry&lt;K,V&gt; { }</code></pre><p>Map.Entry是Map中内部的一个接口，Map.Entry是键值对，Map通过 entrySet() 获取Map.Entry的键值对集合，从而通过该集合实现对键值对的操作。</p>
+<p><strong>Map.Entry的API</strong></p>
+<pre><code>abstract boolean     equals(Object object)
+abstract K             getKey()
+abstract V             getValue()
+abstract int         hashCode()
+abstract V             setValue(V object)</code></pre><p><a name="anchor3"></a></p>
+<h1 id="3-AbstractMap"><a href="#3-AbstractMap" class="headerlink" title="3. AbstractMap"></a>3. AbstractMap</h1><p>AbstractMap的定义如下：</p>
+<pre><code>public abstract class AbstractMap&lt;K,V&gt; implements Map&lt;K,V&gt; {}</code></pre><p>AbstractMap类提供 Map 接口的骨干实现，以最大限度地减少实现此接口所需的工作。<br>要实现不可修改的映射，编程人员只需扩展此类并提供 entrySet 方法的实现即可，该方法将返回映射的映射关系 set 视图。通常，返回的 set 将依次在 AbstractSet 上实现。此 set 不支持 add() 或 remove() 方法，其迭代器也不支持 remove() 方法。</p>
+<p>要实现可修改的映射，编程人员必须另外重写此类的 put 方法（否则将抛出 UnsupportedOperationException），entrySet().iterator() 返回的迭代器也必须另外实现其 remove 方法。</p>
+<p><strong>AbstractMap的API</strong></p>
+<pre><code>abstract Set&lt;Entry&lt;K, V&gt;&gt;     entrySet()
+         void                 clear()
+         boolean              containsKey(Object key)
+         boolean              containsValue(Object value)
+         boolean              equals(Object object)
+         V                    get(Object key)
+         int                  hashCode()
+         boolean              isEmpty()
+         Set&lt;K&gt;               keySet()
+         V                    put(K key, V value)
+         void                 putAll(Map&lt;? extends K, ? extends V&gt; map)
+         V                    remove(Object key)
+         int                  size()
+         String               toString()
+         Collection&lt;V&gt;        values()
+         Object               clone()</code></pre><p><a name="anchor4"></a></p>
+<h1 id="4-SortedMap"><a href="#4-SortedMap" class="headerlink" title="4. SortedMap"></a>4. SortedMap</h1><p>SortedMap的定义如下：</p>
+<pre><code>public interface SortedMap&lt;K,V&gt; extends Map&lt;K,V&gt; { }</code></pre><p>SortedMap是一个继承于Map接口的接口。它是一个有序的SortedMap键值映射。<br>SortedMap的排序方式有两种：自然排序 或者 用户指定比较器。 插入有序 SortedMap 的所有元素都必须实现 Comparable 接口（或者被指定的比较器所接受）。</p>
+<p>另外，所有SortedMap 实现类都应该提供 4 个“标准”构造方法：<br>(01) void（无参数）构造方法，它创建一个空的有序映射，按照键的自然顺序进行排序。<br>(02) 带有一个 Comparator 类型参数的构造方法，它创建一个空的有序映射，根据指定的比较器进行排序。<br>(03) 带有一个 Map 类型参数的构造方法，它创建一个新的有序映射，其键-值映射关系与参数相同，按照键的自然顺序进行排序。<br>(04) 带有一个 SortedMap 类型参数的构造方法，它创建一个新的有序映射，其键-值映射关系和排序方法与输入的有序映射相同。无法保证强制实施此建议，因为接口不能包含构造方法。</p>
+<p><strong>SortedMap的API</strong></p>
+<pre><code>// 继承于Map的API
+abstract void                 clear()
+abstract boolean              containsKey(Object key)
+abstract boolean              containsValue(Object value)
+abstract Set&lt;Entry&lt;K, V&gt;&gt;     entrySet()
+abstract boolean              equals(Object object)
+abstract V                    get(Object key)
+abstract int                  hashCode()
+abstract boolean              isEmpty()
+abstract Set&lt;K&gt;               keySet()
+abstract V                    put(K key, V value)
+abstract void                 putAll(Map&lt;? extends K, ? extends V&gt; map)
+abstract V                    remove(Object key)
+abstract int                  size()
+abstract Collection&lt;V&gt;        values()
+// SortedMap新增的API 
+abstract Comparator&lt;? super K&gt;     comparator()
+abstract K                         firstKey()
+abstract SortedMap&lt;K, V&gt;           headMap(K endKey)
+abstract K                         lastKey()
+abstract SortedMap&lt;K, V&gt;           subMap(K startKey, K endKey)
+abstract SortedMap&lt;K, V&gt;           tailMap(K startKey)</code></pre><p><a name="anchor5"></a></p>
+<h1 id="5-NavigableMap"><a href="#5-NavigableMap" class="headerlink" title="5 NavigableMap"></a>5 NavigableMap</h1><p>NavigableMap的定义如下：</p>
+<pre><code>public interface NavigableMap&lt;K,V&gt; extends SortedMap&lt;K,V&gt; { }</code></pre><p>NavigableMap是继承于SortedMap的接口。它是一个可导航的键-值对集合，具有了为给定搜索目标报告最接近匹配项的导航方法。<br>NavigableMap分别提供了获取“键”、“键-值对”、“键集”、“键-值对集”的相关方法。</p>
+<p><strong>NavigableMap的API</strong></p>
+<pre><code>abstract Entry&lt;K, V&gt;             ceilingEntry(K key)
+abstract Entry&lt;K, V&gt;             firstEntry()
+abstract Entry&lt;K, V&gt;             floorEntry(K key)
+abstract Entry&lt;K, V&gt;             higherEntry(K key)
+abstract Entry&lt;K, V&gt;             lastEntry()
+abstract Entry&lt;K, V&gt;             lowerEntry(K key)
+abstract Entry&lt;K, V&gt;             pollFirstEntry()
+abstract Entry&lt;K, V&gt;             pollLastEntry()
+abstract K                       ceilingKey(K key)
+abstract K                       floorKey(K key)
+abstract K                       higherKey(K key)
+abstract K                       lowerKey(K key)
+abstract NavigableSet&lt;K&gt;         descendingKeySet()
+abstract NavigableSet&lt;K&gt;         navigableKeySet()
+abstract NavigableMap&lt;K, V&gt;      descendingMap()
+abstract NavigableMap&lt;K, V&gt;      headMap(K toKey, boolean inclusive)
+abstract SortedMap&lt;K, V&gt;         headMap(K toKey)
+abstract SortedMap&lt;K, V&gt;         subMap(K fromKey, K toKey)
+abstract NavigableMap&lt;K, V&gt;      subMap(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive)
+abstract SortedMap&lt;K, V&gt;         tailMap(K fromKey)
+abstract NavigableMap&lt;K, V&gt;      tailMap(K fromKey, boolean inclusive)</code></pre><p>说明：<br>NavigableMap除了继承SortedMap的特性外，它的提供的功能可以分为4类：<br>第1类，提供操作键-值对的方法。<br>&nbsp;&nbsp;lowerEntry、floorEntry、ceilingEntry 和 higherEntry 方法，它们分别返回与小于、小于等于、大于等于、大于给定键的键关联的 Map.Entry 对象。<br>&nbsp;&nbsp;firstEntry、pollFirstEntry、lastEntry 和 pollLastEntry 方法，它们返回和/或移除最小和最大的映射关系（如果存在），否则返回 null。<br>第2类，提供操作键的方法。这个和第1类比较类似<br>&nbsp;&nbsp;lowerKey、floorKey、ceilingKey 和 higherKey 方法，它们分别返回与小于、小于等于、大于等于、大于给定键的键。<br>第3类，获取键集。<br>&nbsp;&nbsp;navigableKeySet、descendingKeySet分别获取正序/反序的键集。<br>第4类，获取键-值对的子集。</p>
+<p><a name="anchor6"></a></p>
+<h1 id="6-Dictionary"><a href="#6-Dictionary" class="headerlink" title="6. Dictionary"></a>6. Dictionary</h1><p>Dictionary的定义如下：</p>
+<pre><code>public abstract class Dictionary&lt;K,V&gt; {}</code></pre><p>NavigableMap是JDK 1.0定义的键值对的接口，它也包括了操作键值对的基本函数。</p>
+<p><strong>Dictionary的API</strong></p>
+<pre><code>abstract Enumeration&lt;V&gt;     elements()
+abstract V                  get(Object key)
+abstract boolean            isEmpty()
+abstract Enumeration&lt;K&gt;     keys()
+abstract V                  put(K key, V value)
+abstract V                  remove(Object key)
+abstract int                size()</code></pre><h1 id="更多内容"><a href="#更多内容" class="headerlink" title="更多内容"></a>更多内容</h1><p><a href="/2012/02/01/collection-00-index">00. Java 集合系列目录(Category)</a><br><a href="/2012/02/01/collection-01-summary">01. Java 集合系列01之 总体框架</a><br><a href="/2012/02/02/collection-02-framework">02. Java 集合系列02之 Collection架构</a><br><a href="/2012/02/03/collection-03-arraylist">03. Java 集合系列03之 ArrayList详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/04/collection-04-fail-fast">04. Java 集合系列04之 fail-fast总结(通过ArrayList来说明fail-fast的原理、解决办法)</a><br><a href="/2012/02/05/collection-05-linkedlist">05. Java 集合系列05之 LinkedList详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/06/collection-06-vector">06. Java 集合系列06之 Vector详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/07/collection-07-stack">07. Java 集合系列07之 Stack详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/08/collection-08-List">08. Java 集合系列08之 List总结(LinkedList, ArrayList等使用场景和性能分析)</a><br><a href="/2012/02/09/collection-09-map">09. Java 集合系列09之 Map架构</a><br><a href="/2012/02/10/collection-10-hashmap">10. Java 集合系列10之 HashMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/11/collection-11-hashtable">11. Java 集合系列11之 Hashtable详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/12/collection-12-treemap">12. Java 集合系列12之 TreeMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/13/collection-13-weakhashmap">13. Java 集合系列13之 WeakHashMap详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/14/collection-14-mapsummary">14. Java 集合系列14之 Map总结(HashMap, Hashtable, TreeMap, WeakHashMap等使用场景)</a><br><a href="/2012/02/15/collection-15-set">15. Java 集合系列15之 Set架构</a><br><a href="/2012/02/16/collection-16-hashset">16. Java 集合系列16之 HashSet详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/17/collection-17-treeset">17. Java 集合系列17之 TreeSet详细介绍(源码解析)和使用示例</a><br><a href="/2012/02/18/collection-18-iterator_enumeration">18. Java 集合系列18之 Iterator和Enumeration比较</a></p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/java/">#java</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2012/02/10/java/collection/2012-02-10-collection-10-hashmap/">Java 集合系列10之 HashMap详细介绍(源码解析)和使用示例</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2012/02/08/java/collection/2012-02-08-collection-08-List/">Java 集合系列08之 List总结(LinkedList, ArrayList等使用场景和性能分析)</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>

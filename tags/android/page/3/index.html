@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+<title>Tag: android - PillBlog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css">
+
+
+
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="PillBlog">
+<meta property="og:url" content="https://apppills.com/tags/android/page/3/index.html">
+<meta property="og:site_name" content="PillBlog">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PillBlog">
+
+
+
+
+
+<link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script defer src="//use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+</head>
+<body>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                <img src="/images/logo.png" alt height="28">
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item " href="/archives">归档</a>
+            
+            <a class="navbar-item " href="/about">关于</a>
+            
+            <a class="navbar-item " href="https://everything.apppills.com">Everything</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            <a class="navbar-item search" title="Search" href="javascript:;">
+                <i class="fas fa-search"></i>
+            </a>
+            
+            
+            
+            <a class="navbar-item" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+               
+            
+        </div>
+    </div>
+</nav>
+
+    <section class="section section-heading">
+    <div class="container">
+        <div class="content">
+            <h5>#android</h5>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/23/android/api_guide/app_component/fragment/2014-06-23-PreferenceFragment/" itemprop="url">Android组件--Fragment(二)之 PreferenceFragment</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-23T01:35:00.000Z" itemprop="datePublished">6月 23 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            5 分钟 read (About 705 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本文介绍PreferenceFragment。PreferenceFragment是Android提供的设置碎片。</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="PreferenceFragment使用说明"><a href="#PreferenceFragment使用说明" class="headerlink" title="PreferenceFragment使用说明"></a>PreferenceFragment使用说明</h1><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/api_guide/app_components/fragment/preference_fragment/01_basic" target="_blank" rel="noopener">PreferenceFragment的完整代码</a></p>
+<h2 id="1-创建配置文件"><a href="#1-创建配置文件" class="headerlink" title="1. 创建配置文件"></a>1. 创建配置文件</h2><p>新建res/xml/preferences.xml，内容如下：</p>
+<pre><code>&lt;PreferenceScreen xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;
+
+    &lt;PreferenceCategory
+        android:title=&quot;PreferenceCategory A&quot;&gt;
+
+        &lt;!-- 
+          (01) android:key是Preferece的id
+          (02) android:title是Preferece的大标题
+          (03) android:summary是Preferece的小标题
+          --&gt;
+        &lt;CheckBoxPreference
+            android:key=&quot;checkbox_preference&quot;
+            android:title=&quot;title_checkbox_preference&quot;
+            android:summary=&quot;summary_checkbox_preference&quot; /&gt;
+
+    &lt;/PreferenceCategory&gt;
+
+    &lt;PreferenceCategory
+        android:title=&quot;PreferenceCategory B&quot;&gt;
+
+        &lt;!-- 
+          android:dialogTitle是对话框的标题
+          android:defaultValue是默认值
+          --&gt;
+        &lt;EditTextPreference
+            android:key=&quot;edittext_preference&quot;
+            android:title=&quot;title_edittext_preference&quot;
+            android:summary=&quot;null&quot;  
+            android:dialogTitle=&quot;dialog_title_edittext_preference&quot;
+            android:defaultValue=&quot;null&quot; /&gt;
+
+        &lt;!-- 
+          android:entries是列表中各项的说明
+          android:entryValues是列表中各项的值
+          --&gt;
+        &lt;ListPreference  
+            android:key=&quot;list_preference&quot;  
+            android:dialogTitle=&quot;Choose font&quot;  
+            android:entries=&quot;@array/pref_font_types&quot;  
+            android:entryValues=&quot;@array/pref_font_types_values&quot;  
+            android:summary=&quot;sans&quot;  
+            android:title=&quot;Font&quot; 
+            android:defaultValue=&quot;sans&quot;/&gt; 
+    &lt;/PreferenceCategory&gt;
+
+
+    &lt;PreferenceCategory
+        android:title=&quot;PreferenceCategory C&quot;&gt;
+
+        &lt;SwitchPreference
+            android:key=&quot;switch_preferece&quot;
+            android:title=&quot;title_switch_preferece&quot;
+            android:defaultValue=&quot;true&quot; /&gt;
+
+        &lt;SeekBarPreference
+            android:key=&quot;seekbar_preference&quot;
+            android:title=&quot;title_seekbar_preference&quot;
+            android:max=&quot;100&quot;
+            android:defaultValue=&quot;30&quot; /&gt;
+
+    &lt;/PreferenceCategory&gt;
+
+&lt;/PreferenceScreen&gt;</code></pre><p>说明：PreferenceFragment的组件很多，包括CheckBoxPreference, EditTextPreference, ListPreference, SwitchPreference, SeekBarPreference, VolumePreference等。这些组建的属性定义如下。<br>(01) android:key是Preferece的id，它是Preferece的唯一标识。<br>(02) android:title是Preferece的大标题。<br>(03) android:summary是Preferece的小标题。<br>(04) android:dialogTitle是对话框的标题。<br>(05) android:defaultValue是默认值。<br>(06) android:entries是列表中各项的说明。<br>(07) android:entryValues是列表中各项的值。  </p>
+<p>注意：SwitchPreference是API 14(Android4.0)才支持的。所以，要想使用SwitchPreference的话，必须在manifest中定义apk支持的最小版本。</p>
+<pre><code>&lt;uses-sdk android:minSdkVersion=&quot;14&quot; /&gt;</code></pre><h2 id="2-自定义PreferenceFragment"><a href="#2-自定义PreferenceFragment" class="headerlink" title="2. 自定义PreferenceFragment"></a>2. 自定义PreferenceFragment</h2><pre><code>public class PrefsFragment extends PreferenceFragment 
+    implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener {
+    private static final String TAG = &quot;##PrefsFragment##&quot;;
+
+    private static final String CHECK_PREFERENCE    = &quot;checkbox_preference&quot;;
+    private static final String EDITTEXT_PREFERENCE = &quot;edittext_preference&quot;;
+    private static final String LIST_PREFERENCE     = &quot;list_preference&quot;;
+    private static final String SWITCH_PREFERENCE   = &quot;switch_preferece&quot;;
+    private static final String SEEKBAR_PREFERENCE  = &quot;seekbar_preference&quot;;
+
+    private Preference mEditText;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Load the preferences from an XML resource
+        addPreferencesFromResource(R.xml.preferences);
+
+        mEditText = (Preference) findPreference(EDITTEXT_PREFERENCE);
+        mEditText.setOnPreferenceClickListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        // Set summary to be the user-description for the selected value
+        Preference connectionPref = findPreference(key);
+        if (key.equals(CHECK_PREFERENCE)) {
+            boolean checked = sharedPreferences.getBoolean(key, false);
+            Log.d(TAG, &quot;CheckBox: checked=&quot;+checked);
+        } else if (key.equals(EDITTEXT_PREFERENCE)) {
+            String value = sharedPreferences.getString(key, &quot;&quot;);
+            connectionPref.setSummary(value);
+            Log.d(TAG, &quot;EditText: value=&quot;+value);
+        } else if (key.equals(LIST_PREFERENCE)) {
+            String value = sharedPreferences.getString(key, &quot;&quot;);
+            connectionPref.setSummary(value);
+            Log.d(TAG, &quot;List: value=&quot;+value);
+        } else if (key.equals(SWITCH_PREFERENCE)) {
+            boolean checked = sharedPreferences.getBoolean(key, false);
+            Log.d(TAG, &quot;Switch: checked=&quot;+checked);
+        } else if (key.equals(SEEKBAR_PREFERENCE)) {
+            int value = sharedPreferences.getInt(key, 0);
+            Log.d(TAG, &quot;Seekbar: value=&quot;+value);
+        } 
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+        SharedPreferences sharedPreferences = preference.getSharedPreferences();
+        String value = sharedPreferences.getString(preference.getKey(), &quot;&quot;);
+        Log.d(TAG, &quot;onPreferenceClick: value=&quot;+value);
+
+        return true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+    }
+
+    @Override
+    public void onPause() {
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
+}</code></pre><p>说明：PreferenceFragment中的每一项都是一个SharedPreferences对象，它们会像SharedPreferences存储在该APK的私有数据区。监听PreferenceFragment中的成员有多种方式，常用的两种就是：<br>(01) 监听数据的变化：通过实现SharedPreferences.OnSharedPreferenceChangeListener接口，来监听PreferenceFragment中每一项的数据变化。<br>(02) 监听点击事件：通过实现Preference.OnPreferenceClickListener接口，来监听PreferenceFragment中每一项的点击动作。 </p>
+<h2 id="3-使用PreferenceFragment"><a href="#3-使用PreferenceFragment" class="headerlink" title="3. 使用PreferenceFragment"></a>3. 使用PreferenceFragment</h2><p>前面已经定义好了一个PreferenceFragment。接下来，就可以实例化它的对象，并将其在Activity中进行显示。</p>
+<pre><code>public class FragmentTest extends Activity {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //setContentView(R.layout.main);
+
+        getFragmentManager().beginTransaction().replace(android.R.id.content,  
+                new PrefsFragment()).commit();  
+    }
+}</code></pre>
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/06/23/android/api_guide/app_component/fragment/2014-06-23-Fragment/" itemprop="url">Android组件--Fragment(一)之 基础知识</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-06-23T01:25:00.000Z" itemprop="datePublished">6月 23 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            6 分钟 read (About 848 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>Fragment的内容很多。本章介绍Fragment的基础知识，包括：生命周期，以及如何使用Fragment。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><strong>1</strong>. <a href="#anchor1">Fragment生命周期图</a><br><strong>2</strong>. <a href="#anchor2">Fragment创建方式</a><br><strong>3</strong>. <a href="#anchor3">Google示例说明</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="Fragment生命周期图"><a href="#Fragment生命周期图" class="headerlink" title="Fragment生命周期图"></a>Fragment生命周期图</h1><p>Fragment的生命周期图如下：</p>
+<p><a href="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/training/01_getting_started/05_fragments/lifecycle/pic/fragment_lifecycle.png" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/wangkuiwu/android_applets/master/training/01_getting_started/05_fragments/lifecycle/pic/fragment_lifecycle.png" alt></a></p>
+<p>说明：总的来说，Fragment和Activity的生命周期类似。需要注意的是，它相比于Activity，多了onAttach(), onDetch(), onCreateView()和onDestroyView()这几个回调函数；但是，却少了onRestart()。<br>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/training/01_getting_started/05_fragments/lifecycle" target="_blank" rel="noopener">Fragment生命周期测试源码</a>“</p>
+<p><a name="anchor2"></a></p>
+<h1 id="Fragment创建方式"><a href="#Fragment创建方式" class="headerlink" title="Fragment创建方式"></a>Fragment创建方式</h1><p>Fragment有两种使用方式：静态方式 和 动态方式。</p>
+<h2 id="1-静态方式"><a href="#1-静态方式" class="headerlink" title="1. 静态方式"></a>1. 静态方式</h2><p><strong>第一步</strong>：先定义一个Fragment子类。</p>
+<pre><code>public class ExampleFragment extends Fragment {
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+            Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.example_fragment, container, false);
+    }   
+}</code></pre><p>说明：ExampleFragment是Fragment的子类，它的布局定义是example_fragment.xml文件。</p>
+<p><strong>第二步</strong>：定义Fragment子类对应的布局文件。</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:tools=&quot;http://schemas.android.com/tools&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;horizontal&quot; &gt;
+
+    &lt;EditText android:id=&quot;@+id/edit_message&quot;
+        android:layout_width=&quot;0dp&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:layout_weight=&quot;1&quot;
+        android:hint=&quot;@string/edit_message&quot; /&gt;
+
+    &lt;Button
+        android:layout_width=&quot;wrap_content&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;@string/button_send&quot;
+        android:onClick=&quot;sendMessage&quot; /&gt;
+
+&lt;/LinearLayout&gt;</code></pre><p>说明：上面是example_fragment.xml的内容。</p>
+<p><strong>第三步</strong>：在需要用到该Fragment的Activity对应的布局中使用该Fragment。</p>
+<p>下面是引用Fragment的Activity的代码：</p>
+<pre><code>public class FragmentLayoutTest extends Activity
+{
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);  
+    } 
+}</code></pre><p>下面是main.xml的内容：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:orientation=&quot;vertical&quot;
+    android:layout_width=&quot;fill_parent&quot;
+    android:layout_height=&quot;fill_parent&quot;
+    &gt;
+    &lt;TextView
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;@string/fragment_intro&quot;
+        /&gt;
+
+   &lt;fragment android:name=&quot;com.skw.fragmentlayouttest.ExampleFragment&quot;
+        android:id=&quot;@+id/frag_example&quot;
+        android:layout_weight=&quot;1&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot;/&gt;
+
+&lt;/LinearLayout&gt;</code></pre><p>说明：在该布局文件中通过<fragment>调用了先前自定义的ExampleFragment。</fragment></p>
+<p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/training/01_getting_started/05_fragments/implemention_01" target="_blank" rel="noopener">静态方式的完整源码</a></p>
+<h2 id="2-动态方式"><a href="#2-动态方式" class="headerlink" title="2. 动态方式"></a>2. 动态方式</h2><p>重复”上面的第一步和第二步”，实现一个Fragment子类。</p>
+<p><strong>第三步</strong>：在需要用到该Fragment的Activity对应的布局中使用定义一个FrameLayout。</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:orientation=&quot;vertical&quot;
+    android:layout_width=&quot;fill_parent&quot;
+    android:layout_height=&quot;fill_parent&quot;
+    &gt;
+
+    &lt;TextView
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;@string/fragment_intro&quot;
+        /&gt;
+
+    &lt;FrameLayout
+        android:id=&quot;@+id/frag_example&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot;/&gt;
+
+&lt;/LinearLayout&gt;</code></pre><p><strong>第四步</strong>：在Activity中将Fragment填充到FrameLayout中。</p>
+<pre><code>public class FragmentLayoutTest extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        // 获取FragmentManager
+        FragmentManager fragmentManager = getFragmentManager();
+        // 获取FragmentTransaction        
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // 获取ExampleFragment
+        ExampleFragment fragment = new ExampleFragment();
+        // 将fragment添加到容器frag_example中
+        fragmentTransaction.add(R.id.frag_example, fragment);
+        fragmentTransaction.commit();
+    }
+}</code></pre><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/training/01_getting_started/05_fragments/implemention_02" target="_blank" rel="noopener">动态方式的完整源码</a></p>
+<p><a name="anchor3"></a></p>
+<h1 id="Google示例说明"><a href="#Google示例说明" class="headerlink" title="Google示例说明"></a>Google示例说明</h1><p>点击查看：<a href="https://github.com/wangkuiwu/android_applets/tree/master/training/01_getting_started/05_fragments/google" target="_blank" rel="noopener">Google给出的Fragment的源码</a></p>
+<p>Google的官网上以此APK来对Fragment进行了简单介绍，点击查看：<a href="http://developer.android.com/intl/zh-cn/training/basics/fragments/index.html" target="_blank" rel="noopener">Google官网Fragment简介</a></p>
+<blockquote>
+<p>实际上，Google官网关于Fragment的讲解内容包括三部分：创建Fragment，用Fragment创建灵活的UI，Fragments之间的通信。</p>
+</blockquote>
+<blockquote>
+<ol>
+<li>如何创建Fragment，我在上面已经详细介绍过了。  </li>
+<li>灵活的创建UI，主要是指采用动态方式创建Fragment，并根据屏幕大小，来选择适当的Fragment对UI进行布局。  </li>
+<li>Fragment之间的通信。Fragments之间是无法直接通信的，那怎么办呢？Google官网给出的解答是，采用类似于回调函数的机制。Fragment都是通过Acitivty来显示的，不同的Fragment可以通过Activity这个中介来进行通信。具体的做法是在Fragment给出接口定义，然后再在Activity中实现给接口，从而实现不同Fragment之间的通信。</li>
+</ol>
+</blockquote>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2014/04/01/android/api_guide/app_component/activity/2014-04-01-Activity01/" itemprop="url">Android 四大组件之Activity篇01之 概述</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2014-04-01T01:01:00.000Z" itemprop="datePublished">4月 1 2014</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/android/">android</a>
+        </span>
+        
+        
+        <span class="column is-narrow">
+            
+            
+            2 分钟 read (About 358 words)
+        </span>
+        
+    </div>
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <blockquote>
+<p>本章介绍会对Android的四大组建(Activity、Service、BroadcastReceiver、ContentProvider)中的Activity作概括性的介绍。</p>
+</blockquote>
+<p>首先，了解一下”什么是Activity”，Android中Activity的介绍如下：</p>
+<blockquote>
+<p>An activity is a single, focused thing that the user can do.  Almost all activities interact with the user, so the Activity class takes care of creating a window for you in which you can place your UI with setContentView().  While activities are often presented to the user as full-screen windows, they can also be used in other ways: as floating windows (via a theme with windowIsFloating) or embedded inside of another activity (using ActivityGroup).</p>
+</blockquote>
+<p>从中，可以看出：<br>    Activity 是用户接口程序，原则上它会提供给用户一个交互式的接口功能。它是 android 应用程序的基本功能单元。Activity 本身是没有界面的。所以activity类创建了一个窗口，开发人员可以通过setContentView(View)接口把UI放到activity创建的窗口上，当activity指向全屏窗口时，也可以用其他方式实现：作为漂浮窗口（通过windowIsFloating的主题集合），或者嵌入到其他的activity（使用ActivityGroup）。activity是单独的，用于处理用户操作。几乎所有的activity都要和用户打交道</p>
+<p>接下来，我们将围绕Activity，依次介绍：<br>(1) Activity的生命周期<br>(2) Activity的启动方式和获取结果<br>(3) Activity的启动模式<br>(4) Activity和Application、进程之间的关系</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous">
+        <a href="/tags/android/page/2/">Prev</a>
+    </div>
+    <div class="pagination-next is-invisible is-hidden-mobile">
+        <a href="/tags/android/page/4/">Next</a>
+    </div>
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link" href="/tags/android/">1</a></li>
+        
+        <li><a class="pagination-link" href="/tags/android/page/2/">2</a></li>
+        
+        <li><a class="pagination-link is-current" href="/tags/android/page/3/">3</a></li>
+        
+    </ul>
+</nav>
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2019 炸鸡叔&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow has-text-black" title="GitHub" href="https://github.com/ppoffice/hexo-theme-minos">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+
+<!-- test if the browser is outdated -->
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // plugin function, place inside DOM ready function
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        })
+    });
+</script>
+
+<script>
+    window.FontAwesomeConfig = {
+        searchPseudoElements: true
+    }
+    moment.locale("zh-CN");
+</script>
+
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+</script>
+
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof($.fn.justifiedGallery) === 'function') {
+                $('.justified-gallery').justifiedGallery();
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+<script src="/js/script.js"></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-mask"></div>
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+</body>
+</html>
